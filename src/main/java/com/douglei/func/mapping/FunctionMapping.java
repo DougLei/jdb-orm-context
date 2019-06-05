@@ -10,6 +10,7 @@ import com.douglei.sessionfactory.DynamicMapping;
  * @author DougLei
  */
 public abstract class FunctionMapping {
+	protected List<DynamicMapping> mappings;
 	private List<String> mappingCodes;
 	
 	/**
@@ -19,10 +20,20 @@ public abstract class FunctionMapping {
 	public abstract String getDescription();
 	
 	/**
+	 * 注册需要的映射
+	 */
+	protected abstract void registerMappings();
+	
+	/**
 	 * 获取功能映射集合
 	 * @return
 	 */
-	public abstract List<DynamicMapping> getMappings();
+	public List<DynamicMapping> getMappings(){
+		if(mappings == null) {
+			registerMappings();
+		}
+		return mappings;
+	}
 
 	/**
 	 * 获取功能映射的code集合

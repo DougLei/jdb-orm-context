@@ -9,7 +9,5 @@ public class RegisterTest {
 		SessionFactoryRegister register = SessionFactoryRegister.singleInstance();
 		register.registerDefaultSessionFactory();
 		
-		
-		
 	}
 }

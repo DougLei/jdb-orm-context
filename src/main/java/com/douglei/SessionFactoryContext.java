@@ -3,10 +3,11 @@ package com.douglei;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.douglei.def.mapping.DefaultMapping;
-import com.douglei.exception.DefaultSessionFactoryExistsException;
 import com.douglei.exception.NotExistsSessionFactoryException;
 import com.douglei.exception.RepeatedSessionFactoryException;
+import com.douglei.func.mapping.FunctionMapping;
+import com.douglei.func.mapping.FunctionMappingContext;
+import com.douglei.link.SessionFactoryAndFunctionMappingLinkContext;
 import com.douglei.sessionfactory.SessionFactory;
 import com.douglei.utils.StringUtil;
 
@@ -15,10 +16,8 @@ import com.douglei.utils.StringUtil;
  * @author DougLei
  */
 class SessionFactoryContext {
-	private static final short dynamicSessionFactoryCount = 8;// 动态的SessionFactory数量
 	private static SessionFactory DEFAULT_JDB_ORM_SESSION_FACTORY;// 默认的jdb-orm SessionFactory对象
 	private static Map<String, SessionFactory> JDB_ORM_SESSION_FACTORY_MAPPING;// jdb-orm SessionFactory映射
-	private static Map<String, DefaultMapping> DEFAULT_MAPPINGS = new HashMap<String, DefaultMapping>(dynamicSessionFactoryCount+1);// 默认的映射集合
 	
 	// --------------------------------------------------------------------------------------------
 	// 注册SessionFactory
@@ -26,9 +25,8 @@ class SessionFactoryContext {
 	/**
 	 * 注册默认的SessionFactory对象
 	 * @param sessionFactory
-	 * @throws DefaultSessionFactoryExistsException
 	 */
-	static void registerDefaultSessionFactory(SessionFactory sessionFactory) throws DefaultSessionFactoryExistsException{
+	static void registerDefaultSessionFactory(SessionFactory sessionFactory) {
 		DEFAULT_JDB_ORM_SESSION_FACTORY = sessionFactory;
 	}
 	
@@ -38,11 +36,9 @@ class SessionFactoryContext {
 	 */
 	static void registerSessionFactory(SessionFactory sessionFactory) {
 		if(JDB_ORM_SESSION_FACTORY_MAPPING == null) {
-			JDB_ORM_SESSION_FACTORY_MAPPING = new HashMap<String, SessionFactory>(dynamicSessionFactoryCount);
-		}else {
-			if(JDB_ORM_SESSION_FACTORY_MAPPING.containsKey(sessionFactory.getId())) {
-				throw new RepeatedSessionFactoryException(sessionFactory.getId());
-			}
+			JDB_ORM_SESSION_FACTORY_MAPPING = new HashMap<String, SessionFactory>(8);
+		}else if(JDB_ORM_SESSION_FACTORY_MAPPING.containsKey(sessionFactory.getId())) {
+			throw new RepeatedSessionFactoryException(sessionFactory.getId());
 		}
 		JDB_ORM_SESSION_FACTORY_MAPPING.put(sessionFactory.getId(), sessionFactory);
 	}
@@ -92,22 +88,42 @@ class SessionFactoryContext {
 			throw new NotExistsSessionFactoryException(sessionFactoryId);
 		}
 		sessionFactory.destroy();
-		sessionFactory = null;
 	}
 	
 	// --------------------------------------------------------------------------------------------
-	// 添加默认映射
+	// 添加FunctionMapping
 	// --------------------------------------------------------------------------------------------
 	/**
-	 * <pre>
-	 * 	给指定的SessionFactory 添加默认映射
-	 * 	举例理解: 添加当前项目必须要的表对应的映射
-	 * </pre>
-	 * @param defaultMapping
+	 * 给SessionFactory添加FunctionMapping
+	 * @param functionMapping
 	 */
-	static void addDefaultMapping(DefaultMapping defaultMapping) {
+	static void addFunctionMapping(FunctionMapping functionMapping) {
+		FunctionMappingContext.registerFunctionMapping(functionMapping);
 		SessionFactory sessionFactory = getSessionFactory();
-		
-		
+		if(SessionFactoryAndFunctionMappingLinkContext.addLink(sessionFactory.getId(), functionMapping)) {
+			sessionFactory.dynamicBatchAddMapping(functionMapping.getMappings());
+		}
+	}
+	
+	/**
+	 * 给SessionFactory添加FunctionMapping
+	 * @param functionMappingClassName
+	 */
+	static void addFunctionMapping(String functionMappingClassName) {
+		SessionFactory sessionFactory = getSessionFactory();
+		if(SessionFactoryAndFunctionMappingLinkContext.addLink(sessionFactory.getId(), functionMappingClassName)) {
+			sessionFactory.dynamicBatchAddMapping(FunctionMappingContext.getFunctionMapping(functionMappingClassName).getMappings());
+		}
+	}
+	
+	/**
+	 * 从SessionFactory移除FunctionMapping
+	 * @param functionMappingClassName
+	 */
+	static void removeFunctionMapping(String functionMappingClassName) {
+		SessionFactory sessionFactory = getSessionFactory();
+		if(SessionFactoryAndFunctionMappingLinkContext.removeLink(sessionFactory.getId(), functionMappingClassName)) {
+			sessionFactory.dynamicBatchRemoveMapping(FunctionMappingContext.getFunctionMapping(functionMappingClassName).getMappingCodes());
+		}
 	}
 }

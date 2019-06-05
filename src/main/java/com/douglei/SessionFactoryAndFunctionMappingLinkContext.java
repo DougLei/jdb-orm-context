@@ -11,7 +11,7 @@ import com.douglei.func.mapping.FunctionMapping;
  * 
  * @author DougLei
  */
-public class SessionFactoryAndFunctionMappingLinkContext {
+class SessionFactoryAndFunctionMappingLinkContext {
 	private static Map<String, List<String>> SESSION_FACTORY_AND_FUNCTION_MAPPING_LINK;// SessionFactory和FunctionMapping的关系, 即哪些SessionFactory关联了哪些FunctionMapping
 	
 	/**

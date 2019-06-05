@@ -16,7 +16,7 @@ public class SessionFactoryId4CurrentThread {
 	}
 	
 	/**
-	 * 获取
+	 * 获取当前线程要使用的SessionFactory的Id
 	 * @return
 	 */
 	public static String getSessionFactoryId4CurrentThread() {

@@ -12,7 +12,7 @@ import com.douglei.utils.reflect.ConstructorUtil;
  * 
  * @author DougLei
  */
-public class FunctionMappingContext {
+class FunctionMappingContext {
 	private static Map<String, FunctionMapping> FUNCTION_MAPPINGS;// 功能映射集合
 	
 	// --------------------------------------------------------------------------------------------

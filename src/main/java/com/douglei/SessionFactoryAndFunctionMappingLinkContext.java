@@ -1,4 +1,4 @@
-package com.douglei.link;
+package com.douglei;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,7 +36,7 @@ public class SessionFactoryAndFunctionMappingLinkContext {
 	 * @param functionMapping
 	 * @return 是否add成功
 	 */
-	public static boolean addLink(String sessionFactoryId, FunctionMapping functionMapping) {
+	static boolean addLink(String sessionFactoryId, FunctionMapping functionMapping) {
 		return addLink(sessionFactoryId, functionMapping.getClass().getName());
 	}
 	
@@ -46,7 +46,7 @@ public class SessionFactoryAndFunctionMappingLinkContext {
 	 * @param functionMappingClassName
 	 * @return 是否add成功
 	 */
-	public static boolean addLink(String sessionFactoryId, String functionMappingClassName) {
+	static boolean addLink(String sessionFactoryId, String functionMappingClassName) {
 		if(existsLink(sessionFactoryId, functionMappingClassName)) {
 			return false;
 		}
@@ -70,7 +70,7 @@ public class SessionFactoryAndFunctionMappingLinkContext {
 	 * @param functionMappingClassName
 	 * @return 是否remove成功
 	 */
-	public static boolean removeLink(String sessionFactoryId, String functionMappingClassName) {
+	static boolean removeLink(String sessionFactoryId, String functionMappingClassName) {
 		if(existsLink(sessionFactoryId, functionMappingClassName)) {
 			SESSION_FACTORY_AND_FUNCTION_MAPPING_LINK.get(sessionFactoryId).remove(functionMappingClassName);
 			return true;

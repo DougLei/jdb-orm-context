@@ -1,10 +1,11 @@
-package com.douglei.func.mapping;
+package com.douglei;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import com.douglei.exception.NotExistsFunctionMappingClassException;
 import com.douglei.exception.UnsupportFunctionMappingClassException;
+import com.douglei.func.mapping.FunctionMapping;
 import com.douglei.utils.reflect.ConstructorUtil;
 
 /**
@@ -21,7 +22,7 @@ public class FunctionMappingContext {
 	 * 注册FunctionMapping
 	 * @param functionMapping
 	 */
-	public static void registerFunctionMapping(FunctionMapping functionMapping) {
+	static void registerFunctionMapping(FunctionMapping functionMapping) {
 		String functionMappingClassName = functionMapping.getClass().getName();
 		if(FUNCTION_MAPPINGS == null) {
 			FUNCTION_MAPPINGS = new HashMap<String, FunctionMapping>(10);
@@ -39,7 +40,7 @@ public class FunctionMappingContext {
 	 * @param functionMappingClassName
 	 * @return
 	 */
-	public static FunctionMapping getFunctionMapping(String functionMappingClassName) {
+	static FunctionMapping getFunctionMapping(String functionMappingClassName) {
 		if(FUNCTION_MAPPINGS == null) {
 			FUNCTION_MAPPINGS = new HashMap<String, FunctionMapping>(10);
 		}else if(FUNCTION_MAPPINGS.containsKey(functionMappingClassName)) {
@@ -67,7 +68,7 @@ public class FunctionMappingContext {
 	 * 移除FunctionMapping
 	 * @param functionMappingClassName
 	 */
-	public static void removeFunctionMapping(String functionMappingClassName) {
+	static void removeFunctionMapping(String functionMappingClassName) {
 		if(FUNCTION_MAPPINGS != null) {
 			FUNCTION_MAPPINGS.remove(functionMappingClassName);
 		}

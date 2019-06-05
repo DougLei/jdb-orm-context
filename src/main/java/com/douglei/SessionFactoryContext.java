@@ -6,8 +6,6 @@ import java.util.Map;
 import com.douglei.exception.NotExistsSessionFactoryException;
 import com.douglei.exception.RepeatedSessionFactoryException;
 import com.douglei.func.mapping.FunctionMapping;
-import com.douglei.func.mapping.FunctionMappingContext;
-import com.douglei.link.SessionFactoryAndFunctionMappingLinkContext;
 import com.douglei.sessionfactory.SessionFactory;
 import com.douglei.utils.StringUtil;
 

@@ -7,22 +7,26 @@ import java.io.UnsupportedEncodingException;
 import com.douglei.configuration.impl.xml.XmlConfiguration;
 import com.douglei.exception.DefaultSessionFactoryExistsException;
 import com.douglei.exception.SessionFactoryRegistrationException;
+import com.douglei.exception.TooManyInstanceException;
 import com.douglei.exception.UnRegisterDefaultSessionFactoryException;
 import com.douglei.func.mapping.FunctionMapping;
 import com.douglei.sessionfactory.SessionFactory;
 
 /**
  * jdb-orm 的SessionFactory注册器
+ * <p><b>注意: 该类只支持创建一个实例</b></p>
  * @author DougLei
  */
 public class SessionFactoryRegister {
 	private static final String DEFAULT_JDB_ORM_CONF_FILE_PATH = "jdb-orm.conf.xml";
 	private boolean registerDefaultSessionFactory;// 是否注册过默认SessionFactory
+	private static short instanceCount = 0;// 实例化次数
 	
-	private SessionFactoryRegister() {}
-	private static final SessionFactoryRegister instance = new SessionFactoryRegister();
-	public static final SessionFactoryRegister singleInstance() {
-		return instance;
+	public SessionFactoryRegister() {
+		if(instanceCount > 0) {
+			throw new TooManyInstanceException(SessionFactoryRegister.class.getName() + ", 只能创建一个实例");
+		}
+		instanceCount=1;
 	}
 	
 	// --------------------------------------------------------------------------------------------

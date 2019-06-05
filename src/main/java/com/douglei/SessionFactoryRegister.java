@@ -8,6 +8,7 @@ import com.douglei.configuration.impl.xml.XmlConfiguration;
 import com.douglei.exception.DefaultSessionFactoryExistsException;
 import com.douglei.exception.SessionFactoryRegistrationException;
 import com.douglei.exception.UnRegisterDefaultSessionFactoryException;
+import com.douglei.func.mapping.FunctionMapping;
 import com.douglei.sessionfactory.SessionFactory;
 
 /**
@@ -112,5 +113,32 @@ public class SessionFactoryRegister {
 	 */
 	public void destroySessionFactory(String sessionFactoryId) {
 		SessionFactoryContext.destroySessionFactory(sessionFactoryId);
+	}
+	
+	// --------------------------------------------------------------------------------------------
+	// 操作FunctionMapping
+	// --------------------------------------------------------------------------------------------
+	/**
+	 * 给SessionFactory添加FunctionMapping
+	 * @param functionMapping
+	 */
+	public void addFunctionMapping(FunctionMapping functionMapping) {
+		SessionFactoryContext.addFunctionMapping(functionMapping);
+	}
+	
+	/**
+	 * 给SessionFactory添加FunctionMapping
+	 * @param functionMappingClassName
+	 */
+	public void addFunctionMapping(String functionMappingClassName) {
+		SessionFactoryContext.addFunctionMapping(functionMappingClassName);
+	}
+	
+	/**
+	 * 从SessionFactory移除FunctionMapping
+	 * @param functionMappingClassName
+	 */
+	public void removeFunctionMapping(String functionMappingClassName) {
+		SessionFactoryContext.removeFunctionMapping(functionMappingClassName);
 	}
 }

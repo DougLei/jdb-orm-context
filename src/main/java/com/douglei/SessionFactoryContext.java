@@ -49,6 +49,9 @@ class SessionFactoryContext {
 	 * @return
 	 */
 	static SessionFactory getDefaultSessionFactory() {
+		if(DEFAULT_JDB_ORM_SESSION_FACTORY == null) {
+			throw new NullPointerException("DefaultSessionFactory不能为空, 请务必registerDefaultSessionFactory()");
+		}
 		return DEFAULT_JDB_ORM_SESSION_FACTORY;
 	}
 	
@@ -58,7 +61,7 @@ class SessionFactoryContext {
 	 */
 	static SessionFactory getSessionFactory() {
 		if(JDB_ORM_SESSION_FACTORY_MAPPING == null) {// 没有动态添加SessionFactory时, 返回默认的SessionFactory
-			return DEFAULT_JDB_ORM_SESSION_FACTORY;
+			return getDefaultSessionFactory();
 		}
 		String sessionFactoryId4CurrentThread = SessionFactoryId4CurrentThread.getSessionFactoryId4CurrentThread();
 		if(StringUtil.isEmpty(sessionFactoryId4CurrentThread)) {

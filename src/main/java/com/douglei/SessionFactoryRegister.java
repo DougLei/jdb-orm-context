@@ -24,7 +24,7 @@ public class SessionFactoryRegister {
 	
 	public SessionFactoryRegister() {
 		if(instanceCount > 0) {
-			throw new TooManyInstanceException(SessionFactoryRegister.class.getName() + ", 只能创建一个实例");
+			throw new TooManyInstanceException(SessionFactoryRegister.class.getName() + ", 只能创建一个实例, 请妥善处理之前创建出的实例, 保证其在项目中处于全局范围");
 		}
 		instanceCount=1;
 	}

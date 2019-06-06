@@ -13,8 +13,13 @@ public class Test implements ITest {
 	public static void main(String[] args) {
 		InvocationHandler proxy = new ITestProxy(t);
 		
-		ITest test = (ITest) Proxy.newProxyInstance(t.getClass().getClassLoader(), t.getClass().getInterfaces(), proxy);
-		test.add();
+		Class<?>[] ints = ITest2.class.getInterfaces();
+		System.out.println(ints.length);
+		for (Class<?> class1 : ints) {
+			System.out.println(class1.getName());
+		}
+		
+		ITest test = (ITest) Proxy.newProxyInstance(ITest.class.getClassLoader(), ITest2.class.getInterfaces(), proxy);
 		test.add();
 	}
 	private static Test t = new Test();

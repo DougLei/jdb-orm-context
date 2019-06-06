@@ -9,7 +9,7 @@ import com.douglei.sessionfactory.DynamicMapping;
  * 功能映射
  * @author DougLei
  */
-public abstract class FunctionMapping {
+public abstract class FunctionalMapping {
 	protected List<DynamicMapping> mappings;
 	private List<String> mappingCodes;
 	

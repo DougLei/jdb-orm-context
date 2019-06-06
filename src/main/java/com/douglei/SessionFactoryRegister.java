@@ -9,7 +9,7 @@ import com.douglei.exception.DefaultSessionFactoryExistsException;
 import com.douglei.exception.SessionFactoryRegistrationException;
 import com.douglei.exception.TooManyInstanceException;
 import com.douglei.exception.UnRegisterDefaultSessionFactoryException;
-import com.douglei.func.mapping.FunctionMapping;
+import com.douglei.func.mapping.FunctionalMapping;
 import com.douglei.sessionfactory.SessionFactory;
 
 /**
@@ -120,29 +120,29 @@ public class SessionFactoryRegister {
 	}
 	
 	// --------------------------------------------------------------------------------------------
-	// 操作FunctionMapping
+	// 操作functionalMapping
 	// --------------------------------------------------------------------------------------------
 	/**
-	 * 给SessionFactory添加FunctionMapping
-	 * @param functionMapping
+	 * 给SessionFactory添加functionalMapping
+	 * @param functionalMapping
 	 */
-	public void addFunctionMapping(FunctionMapping functionMapping) {
-		SessionFactoryContext.addFunctionMapping(functionMapping);
+	public void addfunctionalMapping(FunctionalMapping functionalMapping) {
+		SessionFactoryContext.addfunctionalMapping(functionalMapping);
 	}
 	
 	/**
-	 * 给SessionFactory添加FunctionMapping
-	 * @param functionMappingClassName
+	 * 给SessionFactory添加functionalMapping
+	 * @param functionalMappingClassName
 	 */
-	public void addFunctionMapping(String functionMappingClassName) {
-		SessionFactoryContext.addFunctionMapping(functionMappingClassName);
+	public void addfunctionalMapping(String functionalMappingClassName) {
+		SessionFactoryContext.addfunctionalMapping(functionalMappingClassName);
 	}
 	
 	/**
-	 * 从SessionFactory移除FunctionMapping
-	 * @param functionMappingClassName
+	 * 从SessionFactory移除functionalMapping
+	 * @param functionalMappingClassName
 	 */
-	public void removeFunctionMapping(String functionMappingClassName) {
-		SessionFactoryContext.removeFunctionMapping(functionMappingClassName);
+	public void removefunctionalMapping(String functionalMappingClassName) {
+		SessionFactoryContext.removefunctionalMapping(functionalMappingClassName);
 	}
 }

@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.douglei.exception.NotExistsSessionFactoryException;
 import com.douglei.exception.RepeatedSessionFactoryException;
-import com.douglei.func.mapping.FunctionMapping;
+import com.douglei.func.mapping.FunctionalMapping;
 import com.douglei.sessionfactory.SessionFactory;
 import com.douglei.utils.StringUtil;
 
@@ -92,39 +92,39 @@ class SessionFactoryContext {
 	}
 	
 	// --------------------------------------------------------------------------------------------
-	// 操作FunctionMapping
+	// 操作functionalMapping
 	// --------------------------------------------------------------------------------------------
 	/**
-	 * 给SessionFactory添加FunctionMapping
-	 * @param functionMapping
+	 * 给SessionFactory添加functionalMapping
+	 * @param functionalMapping
 	 */
-	static void addFunctionMapping(FunctionMapping functionMapping) {
-		FunctionMappingContext.registerFunctionMapping(functionMapping);
+	static void addfunctionalMapping(FunctionalMapping functionalMapping) {
+		FunctionalMappingContext.registerfunctionalMapping(functionalMapping);
 		SessionFactory sessionFactory = getSessionFactory();
-		if(SessionFactoryAndFunctionMappingLinkContext.addLink(sessionFactory.getId(), functionMapping)) {
-			sessionFactory.dynamicBatchAddMapping(functionMapping.getMappings());
+		if(SessionFactoryAndfunctionalMappingLinkContext.addLink(sessionFactory.getId(), functionalMapping)) {
+			sessionFactory.dynamicBatchAddMapping(functionalMapping.getMappings());
 		}
 	}
 	
 	/**
-	 * 给SessionFactory添加FunctionMapping
-	 * @param functionMappingClassName
+	 * 给SessionFactory添加functionalMapping
+	 * @param functionalMappingClassName
 	 */
-	static void addFunctionMapping(String functionMappingClassName) {
+	static void addfunctionalMapping(String functionalMappingClassName) {
 		SessionFactory sessionFactory = getSessionFactory();
-		if(SessionFactoryAndFunctionMappingLinkContext.addLink(sessionFactory.getId(), functionMappingClassName)) {
-			sessionFactory.dynamicBatchAddMapping(FunctionMappingContext.getFunctionMapping(functionMappingClassName).getMappings());
+		if(SessionFactoryAndfunctionalMappingLinkContext.addLink(sessionFactory.getId(), functionalMappingClassName)) {
+			sessionFactory.dynamicBatchAddMapping(FunctionalMappingContext.getfunctionalMapping(functionalMappingClassName).getMappings());
 		}
 	}
 	
 	/**
-	 * 从SessionFactory移除FunctionMapping
-	 * @param functionMappingClassName
+	 * 从SessionFactory移除functionalMapping
+	 * @param functionalMappingClassName
 	 */
-	static void removeFunctionMapping(String functionMappingClassName) {
+	static void removefunctionalMapping(String functionalMappingClassName) {
 		SessionFactory sessionFactory = getSessionFactory();
-		if(SessionFactoryAndFunctionMappingLinkContext.removeLink(sessionFactory.getId(), functionMappingClassName)) {
-			sessionFactory.dynamicBatchRemoveMapping(FunctionMappingContext.getFunctionMapping(functionMappingClassName).getMappingCodes());
+		if(SessionFactoryAndfunctionalMappingLinkContext.removeLink(sessionFactory.getId(), functionalMappingClassName)) {
+			sessionFactory.dynamicBatchRemoveMapping(FunctionalMappingContext.getfunctionalMapping(functionalMappingClassName).getMappingCodes());
 		}
 	}
 }

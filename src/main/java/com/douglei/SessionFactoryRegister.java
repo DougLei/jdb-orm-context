@@ -56,10 +56,10 @@ public class SessionFactoryRegister {
 	}
 	
 	// --------------------------------------------------------------------------------------------
-	// 注册SessionFactory
+	// 【多数据源】注册SessionFactory
 	// --------------------------------------------------------------------------------------------
 	/**
-	 * 使用指定的配置文件path注册jdb-orm SessionFactory实例
+	 * 【多数据源】使用指定的配置文件path注册jdb-orm SessionFactory实例
 	 * @param configurationFilePath
 	 * @return
 	 */
@@ -71,7 +71,7 @@ public class SessionFactoryRegister {
 	}
 	
 	/**
-	 * 使用指定的配置文件content注册jdb-orm SessionFactory实例
+	 * 【多数据源】使用指定的配置文件content注册jdb-orm SessionFactory实例
 	 * @param configurationContent
 	 * @return
 	 */
@@ -87,14 +87,17 @@ public class SessionFactoryRegister {
 	}
 	
 	/**
-	 * 使用指定的配置文件input流注册jdb-orm SessionFactory实例
+	 * 【多数据源】使用指定的配置文件input流注册jdb-orm SessionFactory实例
 	 * @param in
 	 * @return
 	 */
 	public SessionFactory registerSessionFactoryByConfigurationInputStream(InputStream in) {
-		SessionFactory sessionFactory = new XmlConfiguration(in).buildSessionFactory();
-		SessionFactoryContext.registerSessionFactory(sessionFactory);
-		return sessionFactory;
+		if(registerDefaultSessionFactory) {
+			SessionFactory sessionFactory = new XmlConfiguration(in).buildSessionFactory();
+			SessionFactoryContext.registerSessionFactory(sessionFactory);
+			return sessionFactory;
+		}
+		throw new UnRegisterDefaultSessionFactoryException();
 	}
 	
 	// --------------------------------------------------------------------------------------------

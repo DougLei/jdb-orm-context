@@ -50,7 +50,7 @@ class SessionFactoryContext {
 	 */
 	static SessionFactory getDefaultSessionFactory() {
 		if(DEFAULT_JDB_ORM_SESSION_FACTORY == null) {
-			throw new NullPointerException("DefaultSessionFactory不能为空, 请务必registerDefaultSessionFactory()");
+			throw new NullPointerException("DefaultSessionFactory不能为空, 请务必registerDefaultSessionFactory(...)");
 		}
 		return DEFAULT_JDB_ORM_SESSION_FACTORY;
 	}
@@ -65,13 +65,13 @@ class SessionFactoryContext {
 		}
 		String sessionFactoryId4CurrentThread = SessionFactoryId4CurrentThread.getSessionFactoryId4CurrentThread();
 		if(StringUtil.isEmpty(sessionFactoryId4CurrentThread)) {
-			throw new NullPointerException("注册了多个SessionFactory时, 在获取SessionFactory时, 必须使用"+SessionFactoryId4CurrentThread.class.getName()+", 设置当前线程要使用的SessionFactory的Id");
+			throw new NullPointerException("注册了多个SessionFactory(即多数据源)时, 在获取SessionFactory时, 必须使用"+SessionFactoryId4CurrentThread.class.getName()+", 设置当前线程要使用的SessionFactory的Id");
 		}
 		
 		if(JDB_ORM_SESSION_FACTORY_MAPPING.containsKey(sessionFactoryId4CurrentThread)) {
 			return JDB_ORM_SESSION_FACTORY_MAPPING.get(sessionFactoryId4CurrentThread);
-		}else if(DEFAULT_JDB_ORM_SESSION_FACTORY.getId().equals(sessionFactoryId4CurrentThread)) {
-			return DEFAULT_JDB_ORM_SESSION_FACTORY;
+		}else if(getDefaultSessionFactory().getId().equals(sessionFactoryId4CurrentThread)) {
+			return getDefaultSessionFactory();
 		}
 		throw new NotExistsSessionFactoryException(sessionFactoryId4CurrentThread);
 	}

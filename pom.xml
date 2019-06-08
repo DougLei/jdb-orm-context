@@ -21,6 +21,12 @@
 		</dependency>
 		
 		<dependency>
+			<groupId>com.douglei</groupId>
+			<artifactId>jaop</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		
+		<dependency>
 		    <groupId>com.alibaba</groupId>
 		    <artifactId>druid</artifactId>
 		    <version>1.1.16</version>

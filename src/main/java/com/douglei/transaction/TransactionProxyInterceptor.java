@@ -12,9 +12,6 @@ import com.douglei.aop.ProxyInterceptor;
 public class TransactionProxyInterceptor extends ProxyInterceptor{
 	// TODO 事务处理的核心
 
-	public TransactionProxyInterceptor(Method method) {
-		super(method);
-	}
 	public TransactionProxyInterceptor(List<Method> methods) {
 		super(methods);
 	}

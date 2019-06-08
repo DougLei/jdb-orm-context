@@ -3,14 +3,22 @@ package com.douglei;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.douglei.aop.ProxyBeanContext;
 import com.douglei.configuration.impl.xml.XmlConfiguration;
 import com.douglei.exception.DefaultSessionFactoryExistsException;
 import com.douglei.exception.SessionFactoryRegistrationException;
 import com.douglei.exception.TooManyInstanceException;
 import com.douglei.exception.UnRegisterDefaultSessionFactoryException;
 import com.douglei.func.mapping.FunctionalMapping;
+import com.douglei.instances.scanner.ClassScanner;
 import com.douglei.sessionfactory.SessionFactory;
+import com.douglei.transaction.Transaction;
+import com.douglei.transaction.TransactionProxyInterceptor;
+import com.douglei.utils.reflect.ClassLoadUtil;
 
 /**
  * jdb-orm 的SessionFactory注册器
@@ -24,35 +32,74 @@ public class SessionFactoryRegister {
 	
 	public SessionFactoryRegister() {
 		if(instanceCount > 0) {
-			throw new TooManyInstanceException(SessionFactoryRegister.class.getName() + ", 只能创建一个实例, 请妥善处理之前创建出的实例, 保证其在项目中处于全局范围");
+			throw new TooManyInstanceException(SessionFactoryRegister.class.getName() + ", 只能创建一个实例, 请妥善处理创建出的实例, 保证其在项目中处于全局范围");
 		}
 		instanceCount=1;
 	}
 	
 	// --------------------------------------------------------------------------------------------
-	// 注册默认的SessionFactory
+	// 【必须的数据源】注册默认的SessionFactory
 	// --------------------------------------------------------------------------------------------
 	/**
-	 * 使用默认的配置文件path注册默认的jdb-orm SessionFactory实例
+	 * 【必须的数据源】使用默认的配置文件path注册默认的jdb-orm SessionFactory实例
+	 * @param scanTransactionPackages 要扫描事务的包路径
 	 * @return
 	 */
-	public SessionFactory registerDefaultSessionFactory() {
-		return registerDefaultSessionFactory(DEFAULT_JDB_ORM_CONF_FILE_PATH);
+	public SessionFactory registerDefaultSessionFactory(String... scanTransactionPackages) {
+		return registerDefaultSessionFactory(DEFAULT_JDB_ORM_CONF_FILE_PATH, scanTransactionPackages);
 	}
 	
 	/**
-	 * 使用指定的配置文件path注册默认的jdb-orm Configuration实例
+	 * 【必须的数据源】使用指定的配置文件path注册默认的jdb-orm Configuration实例
 	 * @param configurationFilePath
+	 * @param scanTransactionPackages 要扫描事务的包路径
 	 * @return
 	 */
-	public SessionFactory registerDefaultSessionFactory(String configurationFilePath) {
+	public SessionFactory registerDefaultSessionFactory(String configurationFilePath, String... scanTransactionPackages) {
 		if(registerDefaultSessionFactory) {
 			throw new DefaultSessionFactoryExistsException(SessionFactoryContext.getDefaultSessionFactory().getId());
 		}
 		registerDefaultSessionFactory = true;
 		SessionFactory sessionFactory = new XmlConfiguration(configurationFilePath).buildSessionFactory();
 		SessionFactoryContext.registerDefaultSessionFactory(sessionFactory);
+		
+		scanTransactionAnnotation(scanTransactionPackages);
 		return sessionFactory;
+	}
+	
+	/**
+	 * 根据包路径扫描事务
+	 * @param scanTransactionPackages 要扫描事务的包路径
+	 */
+	private void scanTransactionAnnotation(String... scanTransactionPackages) {
+		if(scanTransactionPackages != null && scanTransactionPackages.length > 0) {
+			ClassScanner cs = new ClassScanner();
+			List<String> classes = cs.multiScan(scanTransactionPackages);
+			if(classes.size() > 0) {
+				Class<?> loadClass = null;
+				Method[] declareMethods = null;
+				List<Method> transactionAnnotationMethods = new ArrayList<Method>();
+				
+				for (String clz : classes) {
+					loadClass = ClassLoadUtil.loadClass(clz);
+					declareMethods = loadClass.getDeclaredMethods();
+					if(declareMethods.length > 0) {
+						for (Method dm : declareMethods) {
+							if(dm.getAnnotation(Transaction.class) != null) {
+								transactionAnnotationMethods.add(dm);
+							}
+						}
+						
+						if(transactionAnnotationMethods.size() > 0) {
+							ProxyBeanContext.createProxyBean(loadClass, new TransactionProxyInterceptor(transactionAnnotationMethods));
+							transactionAnnotationMethods.clear();
+						}
+					}
+				}
+				transactionAnnotationMethods = null;
+			}
+			cs.destroy();
+		}
 	}
 	
 	// --------------------------------------------------------------------------------------------

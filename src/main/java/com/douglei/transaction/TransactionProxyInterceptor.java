@@ -18,25 +18,24 @@ public class TransactionProxyInterceptor extends ProxyInterceptor{
 
 	@Override
 	protected boolean before(Object obj, Method method, Object[] args) {
-		Session session = null;
 		Transaction transaction = method.getAnnotation(Transaction.class);
 		switch(transaction.propagationBehavior()) {
 			case REQUIRED:
-				session = SessionContext.existsSession();
-				if(session == null) {
-					session = SessionContext.openSession(true, transaction.transactionIsolationLevel());
-				}else if(!session.isBeginTransaction()) {
-					session.beginTransaction();
-					session.setTransactionIsolationLevel(transaction.transactionIsolationLevel());
+				Session session_REQUIRED = SessionContext.existsSession();
+				if(session_REQUIRED == null) {
+					session_REQUIRED = SessionContext.openSession(true, transaction.transactionIsolationLevel());
+				}else if(!session_REQUIRED.isBeginTransaction()) {
+					session_REQUIRED.beginTransaction();
+					session_REQUIRED.setTransactionIsolationLevel(transaction.transactionIsolationLevel());
 				}
 				break;
 			case REQUIRED_NEW:
 				SessionContext.openSession(true, transaction.transactionIsolationLevel());
 				break;
 			case SUPPORTS:
-				session = SessionContext.existsSession();
-				if(session == null) {
-					session = SessionContext.openSession(false, transaction.transactionIsolationLevel());
+				Session session_SUPPORTS = SessionContext.existsSession();
+				if(session_SUPPORTS == null) {
+					session_SUPPORTS = SessionContext.openSession(false, transaction.transactionIsolationLevel());
 				}
 				break;
 		}

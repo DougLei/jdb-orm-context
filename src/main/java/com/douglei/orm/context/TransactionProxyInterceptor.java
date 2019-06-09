@@ -52,9 +52,9 @@ public class TransactionProxyInterceptor extends ProxyInterceptor{
 	}
 
 	@Override
-	protected Object after(Object obj, Method method, Object[] args, Object result) {
+	protected Object after(Object obj, Method method, Object[] args, Object result) throws Throwable {
 		SessionWrapper sessionWrapper = SessionContext.getSessionWrapper();
-		if(sessionWrapper.ready()) {
+		if(sessionWrapper.readyCommit()) {
 			logger.debug("{} session do commit", sessionWrapper);
 			sessionWrapper.getSession().commit();
 		}
@@ -65,9 +65,11 @@ public class TransactionProxyInterceptor extends ProxyInterceptor{
 	protected void exception(Object obj, Method method, Object[] args, Throwable t) {
 		SessionWrapper sessionWrapper = SessionContext.getSessionWrapper();
 		sessionWrapper.setThrowable(t);
-		logger.debug("{} session do rollback", sessionWrapper);
-		sessionWrapper.getSession().rollback();
-		t.printStackTrace();
+		if(sessionWrapper.ready()) {
+			logger.debug("{} session do rollback", sessionWrapper);
+			sessionWrapper.getSession().rollback();
+			sessionWrapper.printStackTraces();
+		}
 	}
 
 	@Override

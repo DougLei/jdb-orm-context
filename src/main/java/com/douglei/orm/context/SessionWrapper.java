@@ -1,5 +1,8 @@
 package com.douglei.orm.context;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.douglei.orm.sessions.Session;
 
 /**
@@ -9,7 +12,7 @@ import com.douglei.orm.sessions.Session;
 class SessionWrapper {
 	private Session session;
 	private short count;
-	private Throwable throwable;
+	private List<Throwable> throwables;
 	
 	SessionWrapper(Session session) {
 		this.session = session;
@@ -28,10 +31,27 @@ class SessionWrapper {
 		return this;
 	}
 	public void setThrowable(Throwable throwable) {
-		this.throwable = throwable;
+		if(this.throwables == null) {
+			this.throwables = new ArrayList<Throwable>();
+		}else if(this.throwables.contains(throwable)) {
+			return;
+		}
+		this.throwables.add(throwable);
 	}
 
 	public boolean ready() {
-		return count == 1 || throwable != null;
+		return count == 1;
+	}
+	public boolean readyCommit() throws Throwable{
+		if(throwables != null) {
+			throw throwables.get(throwables.size()-1);
+		}
+		return count == 1;
+	}
+
+	public void printStackTraces() {
+		for (Throwable t : throwables) {
+			t.printStackTrace();
+		}
 	}
 }

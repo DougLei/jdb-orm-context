@@ -7,7 +7,7 @@ import com.douglei.sessions.Session;
  * 
  * @author DougLei
  */
-public class SessionContext {
+public class TransactionSessionContext {
 	private static final ThreadLocal<Session> SESSION = new ThreadLocal<Session>();
 	
 	/**

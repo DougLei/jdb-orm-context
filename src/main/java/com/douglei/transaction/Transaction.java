@@ -22,8 +22,14 @@ public @interface Transaction {
 	PropagationBehavior propagationBehavior() default PropagationBehavior.REQUIRED;
 	
 	/**
+	 * 是否开启事物
+	 * @return
+	 */
+	boolean beginTransaction() default true;
+	
+	/**
 	 * 事物隔离级别
 	 * @return
 	 */
-	TransactionIsolationLevel transactionIsolationLevel() default TransactionIsolationLevel.READ_COMMITTED;
+	TransactionIsolationLevel transactionIsolationLevel() default TransactionIsolationLevel.DEFAULT;
 }

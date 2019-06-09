@@ -7,7 +7,7 @@ package com.douglei.transaction;
 public enum PropagationBehavior {
 
 	/**
-	 * 需要事物, 如果当前存在一个事物, 则使用该事物, 否则创建一个新事物
+	 * 需要事物, 如果当前存在一个事物, 则使用该事物, 否则开启一个事物
 	 */
 	REQUIRED,
 	
@@ -17,7 +17,7 @@ public enum PropagationBehavior {
 	REQUIRED_NEW,
 	
 	/**
-	 * 不需要事物, 但是如果当前存在一个事物, 则使用该事物
+	 * 不需要事物, 但是如果当前存在一个事物, 则使用该事物, 如果不存在, 则开启一个不带事物的连接
 	 */
 	SUPPORTS;
 }

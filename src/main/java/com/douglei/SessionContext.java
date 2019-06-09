@@ -2,6 +2,9 @@ package com.douglei;
 
 import java.util.Stack;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.douglei.core.dialect.TransactionIsolationLevel;
 import com.douglei.sessions.Session;
 
@@ -10,6 +13,7 @@ import com.douglei.sessions.Session;
  * @author DougLei
  */
 public class SessionContext {
+	private static final Logger logger = LoggerFactory.getLogger(SessionContext.class);
 	private static final ThreadLocal<Stack<Session>> SESSIONS = new ThreadLocal<Stack<Session>>();
 	
 	public static Session getSession() {
@@ -17,7 +21,9 @@ public class SessionContext {
 		if(sessions == null || sessions.size() == 0) {
 			throw new NullPointerException("不存在可用的seesion实例");
 		}
-		return sessions.peek();
+		Session session = sessions.peek();
+		logger.debug("get session is {}", session);
+		return session;
 	}
 	
 	static Session existsSession() {
@@ -25,7 +31,9 @@ public class SessionContext {
 		if(sessions == null || sessions.size() == 0) {
 			return null;
 		}
-		return sessions.peek();
+		Session session = sessions.peek();
+		logger.debug("exists session is {}", session);
+		return session;
 	}
 	
 	static Session openSession(boolean beginTransaction, TransactionIsolationLevel transactionIsolationLevel) {
@@ -36,6 +44,7 @@ public class SessionContext {
 		}
 		Session session = SessionFactoryContext.getSessionFactory().openSession(beginTransaction, transactionIsolationLevel);
 		sessions.push(session);
+		logger.debug("open session is {}", session);
 		return session;
 	}
 	
@@ -45,6 +54,8 @@ public class SessionContext {
 		if(sessions == null || sessions.size() == 0) {
 			throw new NullPointerException("不存在可用的seesion实例");
 		}
-		return sessions.pop();
+		Session session = sessions.pop();
+		logger.debug("pop session is {}", session);
+		return session;
 	}
 }

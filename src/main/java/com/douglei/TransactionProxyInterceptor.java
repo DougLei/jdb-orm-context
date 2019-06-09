@@ -1,4 +1,4 @@
-package com.douglei.transaction;
+package com.douglei;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -48,18 +48,21 @@ public class TransactionProxyInterceptor extends ProxyInterceptor{
 
 	@Override
 	protected Object after(Object obj, Method method, Object[] args, Object result) {
-		SessionContext.popSession().commit();
+		Session session = SessionContext.getSession();
+		session.commit();
 		return result;
 	}
 
 	@Override
 	protected void exception(Object obj, Method method, Object[] args, Throwable t) {
-		SessionContext.popSession().rollback();
+		Session session = SessionContext.getSession();
+		session.rollback();
 		t.printStackTrace();
 	}
 
 	@Override
 	protected void finally_(Object obj, Method method, Object[] args) {
-		SessionContext.popSession().close();
+		Session session = SessionContext.popSession();
+		session.close();
 	}
 }

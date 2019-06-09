@@ -1,4 +1,4 @@
-package com.douglei.transaction;
+package com.douglei;
 
 /**
  * 传播行为

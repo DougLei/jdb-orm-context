@@ -1,7 +1,5 @@
 package com.douglei;
 
-import com.douglei.transaction.Transaction;
-
 public class GetMethod {
 	
 	public void public_method() {

@@ -1,8 +1,7 @@
-package com.douglei.transaction;
+package com.douglei;
 
 import java.util.Stack;
 
-import com.douglei.SimpleSessionContext;
 import com.douglei.core.dialect.TransactionIsolationLevel;
 import com.douglei.sessions.Session;
 
@@ -35,7 +34,7 @@ public class SessionContext {
 			sessions = new Stack<Session>();
 			SESSIONS.set(sessions);
 		}
-		Session session = SimpleSessionContext.getSession(beginTransaction, transactionIsolationLevel);
+		Session session = SessionFactoryContext.getSessionFactory().openSession(beginTransaction, transactionIsolationLevel);
 		sessions.push(session);
 		return session;
 	}

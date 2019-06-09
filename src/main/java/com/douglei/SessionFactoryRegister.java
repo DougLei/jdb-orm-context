@@ -16,8 +16,6 @@ import com.douglei.exception.UnRegisterDefaultSessionFactoryException;
 import com.douglei.func.mapping.FunctionalMapping;
 import com.douglei.instances.scanner.ClassScanner;
 import com.douglei.sessionfactory.SessionFactory;
-import com.douglei.transaction.Transaction;
-import com.douglei.transaction.TransactionProxyInterceptor;
 import com.douglei.utils.reflect.ClassLoadUtil;
 
 /**
@@ -46,7 +44,7 @@ public class SessionFactoryRegister {
 	 * @return
 	 */
 	public SessionFactory registerDefaultSessionFactory(String... scanTransactionPackages) {
-		return registerDefaultSessionFactory(DEFAULT_JDB_ORM_CONF_FILE_PATH, scanTransactionPackages);
+		return registerDefaultSessionFactoryByConfigurationFilePath(DEFAULT_JDB_ORM_CONF_FILE_PATH, scanTransactionPackages);
 	}
 	
 	/**
@@ -55,7 +53,7 @@ public class SessionFactoryRegister {
 	 * @param scanTransactionPackages 要扫描事务的包路径
 	 * @return
 	 */
-	public SessionFactory registerDefaultSessionFactory(String configurationFilePath, String... scanTransactionPackages) {
+	public SessionFactory registerDefaultSessionFactoryByConfigurationFilePath(String configurationFilePath, String... scanTransactionPackages) {
 		if(registerDefaultSessionFactory) {
 			throw new DefaultSessionFactoryExistsException(SessionFactoryContext.getDefaultSessionFactory().getId());
 		}
@@ -78,7 +76,7 @@ public class SessionFactoryRegister {
 			if(classes.size() > 0) {
 				Class<?> loadClass = null;
 				Method[] declareMethods = null;
-				List<Method> transactionAnnotationMethods = new ArrayList<Method>();
+				List<Method> transactionAnnotationMethods = null;
 				
 				for (String clz : classes) {
 					loadClass = ClassLoadUtil.loadClass(clz);
@@ -86,17 +84,19 @@ public class SessionFactoryRegister {
 					if(declareMethods.length > 0) {
 						for (Method dm : declareMethods) {
 							if(dm.getAnnotation(Transaction.class) != null) {
+								if(transactionAnnotationMethods == null) {
+									transactionAnnotationMethods = new ArrayList<Method>(declareMethods.length);
+								}
 								transactionAnnotationMethods.add(dm);
 							}
 						}
 						
-						if(transactionAnnotationMethods.size() > 0) {
+						if(transactionAnnotationMethods != null) {
 							ProxyBeanContext.createProxyBean(loadClass, new TransactionProxyInterceptor(transactionAnnotationMethods));
-							transactionAnnotationMethods.clear();
+							transactionAnnotationMethods = null;
 						}
 					}
 				}
-				transactionAnnotationMethods = null;
 			}
 			cs.destroy();
 		}

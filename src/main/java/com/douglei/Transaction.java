@@ -1,4 +1,4 @@
-package com.douglei.transaction;
+package com.douglei;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

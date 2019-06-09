@@ -24,8 +24,10 @@ public class TransactionProxyInterceptor extends ProxyInterceptor{
 				Session session_REQUIRED = SessionContext.existsSession();
 				if(session_REQUIRED == null) {
 					session_REQUIRED = SessionContext.openSession(true, transaction.transactionIsolationLevel());
-				}else if(!session_REQUIRED.isBeginTransaction()) {
-					session_REQUIRED.beginTransaction();
+				}else {
+					if(!session_REQUIRED.isBeginTransaction()) {
+						session_REQUIRED.beginTransaction();
+					}
 					session_REQUIRED.setTransactionIsolationLevel(transaction.transactionIsolationLevel());
 				}
 				break;
@@ -36,6 +38,8 @@ public class TransactionProxyInterceptor extends ProxyInterceptor{
 				Session session_SUPPORTS = SessionContext.existsSession();
 				if(session_SUPPORTS == null) {
 					session_SUPPORTS = SessionContext.openSession(false, transaction.transactionIsolationLevel());
+				}else {
+					session_SUPPORTS.setTransactionIsolationLevel(transaction.transactionIsolationLevel());
 				}
 				break;
 		}

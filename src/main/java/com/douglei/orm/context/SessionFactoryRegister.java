@@ -21,6 +21,7 @@ import com.douglei.tools.utils.reflect.ClassLoadUtil;
 public class SessionFactoryRegister {
 	private static final String DEFAULT_JDB_ORM_CONF_FILE_PATH = "jdb-orm.conf.xml";
 	private boolean registerDefaultSessionFactory;// 是否注册过默认SessionFactory
+	private boolean scanTransactionAnnotation;// 是否扫描过事物注解
 	private static short instanceCount = 0;// 实例化次数
 	
 	public SessionFactoryRegister() {
@@ -64,7 +65,11 @@ public class SessionFactoryRegister {
 	 * 根据包路径扫描事务
 	 * @param scanTransactionPackages 要扫描事务的包路径
 	 */
-	private void scanTransactionAnnotation(String... scanTransactionPackages) {
+	public void scanTransactionAnnotation(String... scanTransactionPackages) {
+		if(scanTransactionAnnotation) {
+			throw new RepeatedScanTransactionAnnotationException();
+		}
+		scanTransactionAnnotation = true;
 		if(scanTransactionPackages != null && scanTransactionPackages.length > 0) {
 			ClassScanner cs = new ClassScanner();
 			List<String> classes = cs.multiScan(scanTransactionPackages);

@@ -55,6 +55,7 @@ public class TransactionProxyInterceptor extends ProxyInterceptor{
 	@Override
 	protected void exception(Object obj, Method method, Object[] args, Throwable t) {
 		SessionContext.popSession().rollback();
+		t.printStackTrace();
 	}
 
 	@Override

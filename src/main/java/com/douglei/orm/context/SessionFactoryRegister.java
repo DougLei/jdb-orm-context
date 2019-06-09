@@ -64,7 +64,7 @@ public class SessionFactoryRegister {
 	 * 根据包路径扫描事务
 	 * @param scanTransactionPackages 要扫描事务的包路径
 	 */
-	void scanTransactionAnnotation(String... scanTransactionPackages) {
+	public void scanTransactionAnnotation(String... scanTransactionPackages) {
 		if(scanTransactionPackages != null && scanTransactionPackages.length > 0) {
 			ClassScanner cs = new ClassScanner();
 			List<String> classes = cs.multiScan(scanTransactionPackages);

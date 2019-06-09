@@ -54,4 +54,9 @@ class SessionWrapper {
 			t.printStackTrace();
 		}
 	}
+
+	@Override
+	public String toString() {
+		return session.toString();
+	}
 }

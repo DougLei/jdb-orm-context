@@ -25,10 +25,11 @@ public class TransactionProxyInterceptor extends ProxyInterceptor{
 		Transaction transaction = method.getAnnotation(Transaction.class);
 		switch(transaction.propagationBehavior()) {
 			case REQUIRED:
-				Session session_REQUIRED = SessionContext.existsSession();
-				if(session_REQUIRED == null) {
-					session_REQUIRED = SessionContext.openSession(true, transaction.transactionIsolationLevel());
+				SessionWrapper sessionWrapper_REQUIRED = SessionContext.existsSessionWrapper();
+				if(sessionWrapper_REQUIRED == null) {
+					SessionContext.openSession(true, transaction.transactionIsolationLevel());
 				}else {
+					Session session_REQUIRED = sessionWrapper_REQUIRED.increment().getSession();
 					if(!session_REQUIRED.isBeginTransaction()) {
 						session_REQUIRED.beginTransaction();
 					}
@@ -39,11 +40,11 @@ public class TransactionProxyInterceptor extends ProxyInterceptor{
 				SessionContext.openSession(true, transaction.transactionIsolationLevel());
 				break;
 			case SUPPORTS:
-				Session session_SUPPORTS = SessionContext.existsSession();
-				if(session_SUPPORTS == null) {
-					session_SUPPORTS = SessionContext.openSession(false, transaction.transactionIsolationLevel());
+				SessionWrapper sessionWrapper_SUPPORTS = SessionContext.existsSessionWrapper();
+				if(sessionWrapper_SUPPORTS == null) {
+					SessionContext.openSession(false, transaction.transactionIsolationLevel());
 				}else {
-					session_SUPPORTS.setTransactionIsolationLevel(transaction.transactionIsolationLevel());
+					sessionWrapper_SUPPORTS.increment().getSession().setTransactionIsolationLevel(transaction.transactionIsolationLevel());
 				}
 				break;
 		}
@@ -52,24 +53,33 @@ public class TransactionProxyInterceptor extends ProxyInterceptor{
 
 	@Override
 	protected Object after(Object obj, Method method, Object[] args, Object result) {
-		Session session = SessionContext.getSession();
-		logger.debug("{} session do commit", session);
-		session.commit();
+		SessionWrapper sessionWrapper = SessionContext.getSessionWrapper();
+		if(sessionWrapper.ready()) {
+			logger.debug("{} session do commit", sessionWrapper);
+			sessionWrapper.getSession().commit();
+		}
 		return result;
 	}
 
 	@Override
 	protected void exception(Object obj, Method method, Object[] args, Throwable t) {
-		Session session = SessionContext.getSession();
-		logger.debug("{} session do rollback", session);
-		session.rollback();
+		SessionWrapper sessionWrapper = SessionContext.getSessionWrapper();
+		sessionWrapper.setThrowable(t);
+		logger.debug("{} session do rollback", sessionWrapper);
+		sessionWrapper.getSession().rollback();
 		t.printStackTrace();
 	}
 
 	@Override
 	protected void finally_(Object obj, Method method, Object[] args) {
-		Session session = SessionContext.popSession();
-		logger.debug("{} session do close", session);
-		session.close();
+		SessionWrapper sessionWrapper = SessionContext.getSessionWrapper();
+		if(sessionWrapper.ready()) {
+			Session session = SessionContext.popSession();
+			logger.debug("{} session do close", sessionWrapper);
+			session.close();
+		}else {
+			logger.debug("{} session not ready to close", sessionWrapper);
+			sessionWrapper.decrement();
+		}
 	}
 }

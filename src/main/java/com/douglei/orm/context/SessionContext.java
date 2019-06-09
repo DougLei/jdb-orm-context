@@ -14,47 +14,49 @@ import com.douglei.orm.sessions.Session;
  */
 public class SessionContext {
 	private static final Logger logger = LoggerFactory.getLogger(SessionContext.class);
-	private static final ThreadLocal<Stack<Session>> SESSIONS = new ThreadLocal<Stack<Session>>();
+	private static final ThreadLocal<Stack<SessionWrapper>> SESSION_WRAPPERS = new ThreadLocal<Stack<SessionWrapper>>();
 	
 	public static Session getSession() {
-		Stack<Session> sessions = SESSIONS.get();
-		if(sessions == null || sessions.size() == 0) {
-			throw new NullPointerException("不存在可用的seesion实例");
-		}
-		Session session = sessions.peek();
-		logger.debug("get session is {}", session);
+		SessionWrapper sessionWrapper = getSessionWrapper();
+		Session session = sessionWrapper.getSession();
+		logger.debug("get session is {}", sessionWrapper);
 		return session;
 	}
 	
-	static Session existsSession() {
-		Stack<Session> sessions = SESSIONS.get();
-		if(sessions == null || sessions.size() == 0) {
+	static SessionWrapper getSessionWrapper() {
+		Stack<SessionWrapper> sessionWrappers = SESSION_WRAPPERS.get();
+		if(sessionWrappers == null || sessionWrappers.size() == 0) {
+			throw new NullPointerException("不存在可用的seesion实例");
+		}
+		return sessionWrappers.peek();
+	}
+	
+	static SessionWrapper existsSessionWrapper() {
+		Stack<SessionWrapper> sessionWrappers = SESSION_WRAPPERS.get();
+		if(sessionWrappers == null || sessionWrappers.size() == 0) {
 			return null;
 		}
-		Session session = sessions.peek();
-		logger.debug("exists session is {}", session);
-		return session;
+		SessionWrapper sessionWrapper = sessionWrappers.peek();
+		logger.debug("exists session is {}", sessionWrapper);
+		return sessionWrapper;
 	}
 	
-	static Session openSession(boolean beginTransaction, TransactionIsolationLevel transactionIsolationLevel) {
-		Stack<Session> sessions = SESSIONS.get();
-		if(sessions == null || sessions.size() == 0) {
-			sessions = new Stack<Session>();
-			SESSIONS.set(sessions);
+	static void openSession(boolean beginTransaction, TransactionIsolationLevel transactionIsolationLevel) {
+		Stack<SessionWrapper> sessionWrappers = SESSION_WRAPPERS.get();
+		if(sessionWrappers == null || sessionWrappers.size() == 0) {
+			sessionWrappers = new Stack<SessionWrapper>();
+			SESSION_WRAPPERS.set(sessionWrappers);
 		}
 		Session session = SessionFactoryContext.getSessionFactory().openSession(beginTransaction, transactionIsolationLevel);
-		sessions.push(session);
-		logger.debug("open session is {}", session);
-		return session;
+		SessionWrapper sessionWrapper = new SessionWrapper(session);
+		sessionWrappers.push(sessionWrapper);
+		logger.debug("open session is {}", sessionWrapper);
 	}
 	
-	// 获取并移除栈顶的session
+	// 获取并移除栈顶的session, 调用该方法前, 请务必先调用getSessionWrapper()方法, 判断是否满足了出栈的条件
 	static Session popSession() {
-		Stack<Session> sessions = SESSIONS.get();
-		if(sessions == null || sessions.size() == 0) {
-			throw new NullPointerException("不存在可用的seesion实例");
-		}
-		Session session = sessions.pop();
+		Stack<SessionWrapper> sessionWrappers = SESSION_WRAPPERS.get();
+		Session session = sessionWrappers.pop().getSession();
 		logger.debug("pop session is {}", session);
 		return session;
 	}

@@ -1,12 +1,12 @@
-package com.douglei;
+package com.douglei.orm.context;
 
 import java.util.Stack;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.douglei.core.dialect.TransactionIsolationLevel;
-import com.douglei.sessions.Session;
+import com.douglei.orm.core.dialect.TransactionIsolationLevel;
+import com.douglei.orm.sessions.Session;
 
 /**
  * 通过@Transaction注解, 由系统自行控制session的的commit/rollback/close

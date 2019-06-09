@@ -1,4 +1,4 @@
-package com.douglei;
+package com.douglei.orm.context;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -8,15 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.douglei.aop.ProxyBeanContext;
-import com.douglei.configuration.impl.xml.XmlConfiguration;
-import com.douglei.exception.DefaultSessionFactoryExistsException;
-import com.douglei.exception.SessionFactoryRegistrationException;
-import com.douglei.exception.TooManyInstanceException;
-import com.douglei.exception.UnRegisterDefaultSessionFactoryException;
-import com.douglei.func.mapping.FunctionalMapping;
-import com.douglei.instances.scanner.ClassScanner;
-import com.douglei.sessionfactory.SessionFactory;
-import com.douglei.utils.reflect.ClassLoadUtil;
+import com.douglei.orm.configuration.impl.xml.XmlConfiguration;
+import com.douglei.orm.sessionfactory.SessionFactory;
+import com.douglei.tools.instances.scanner.ClassScanner;
+import com.douglei.tools.utils.reflect.ClassLoadUtil;
 
 /**
  * jdb-orm 的SessionFactory注册器

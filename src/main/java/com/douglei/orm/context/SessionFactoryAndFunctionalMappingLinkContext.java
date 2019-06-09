@@ -1,11 +1,9 @@
-package com.douglei;
+package com.douglei.orm.context;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.douglei.func.mapping.FunctionalMapping;
 
 /**
  * 

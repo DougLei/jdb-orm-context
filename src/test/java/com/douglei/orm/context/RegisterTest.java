@@ -1,7 +1,8 @@
-package com.douglei;
+package com.douglei.orm.context;
 
 import com.douglei.aop.ProxyBeanContext;
-import com.douglei.service.Service;
+import com.douglei.orm.context.SessionFactoryRegister;
+import com.douglei.orm.context.service.Service;
 
 /**
  * 

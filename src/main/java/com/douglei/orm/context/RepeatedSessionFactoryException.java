@@ -1,11 +1,11 @@
-package com.douglei.exception;
+package com.douglei.orm.context;
 
 /**
  * 重复的SessionFactory异常
  * @author DougLei
  */
-public class RepeatedSessionFactoryException extends RuntimeException{
-	private static final long serialVersionUID = -3390034632023663009L;
+class RepeatedSessionFactoryException extends RuntimeException{
+	private static final long serialVersionUID = -7123447056720798945L;
 
 	public RepeatedSessionFactoryException(String sessionFactoryId) {
 		super("已存在id=["+sessionFactoryId+"]的SessionFactory实例");

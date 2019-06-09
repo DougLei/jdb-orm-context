@@ -1,7 +1,7 @@
-package com.douglei;
+package com.douglei.orm.context;
 
-import com.douglei.core.dialect.TransactionIsolationLevel;
-import com.douglei.sessions.Session;
+import com.douglei.orm.core.dialect.TransactionIsolationLevel;
+import com.douglei.orm.sessions.Session;
 
 /**
  * 对session的commit/rollback/close, 都由调用者自行控制

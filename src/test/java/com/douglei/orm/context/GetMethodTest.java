@@ -1,6 +1,8 @@
-package com.douglei;
+package com.douglei.orm.context;
 
 import java.lang.reflect.Method;
+
+import com.douglei.orm.context.Transaction;
 
 public class GetMethodTest {
 	public static void main(String[] args) throws Exception {

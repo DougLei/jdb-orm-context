@@ -1,9 +1,9 @@
-package com.douglei.service;
+package com.douglei.orm.context.service;
 
-import com.douglei.PropagationBehavior;
-import com.douglei.SessionContext;
-import com.douglei.Transaction;
 import com.douglei.aop.ProxyBeanContext;
+import com.douglei.orm.context.PropagationBehavior;
+import com.douglei.orm.context.SessionContext;
+import com.douglei.orm.context.Transaction;
 
 public class Service {
 

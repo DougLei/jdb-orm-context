@@ -1,4 +1,4 @@
-package com.douglei;
+package com.douglei.orm.context;
 
 /**
  * 当前线程要使用的SessionFactoryId

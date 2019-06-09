@@ -1,4 +1,6 @@
-package com.douglei;
+package com.douglei.orm.context;
+
+import com.douglei.orm.context.Transaction;
 
 public class GetMethod {
 	

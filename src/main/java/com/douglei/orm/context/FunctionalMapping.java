@@ -1,9 +1,9 @@
-package com.douglei.func.mapping;
+package com.douglei.orm.context;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.douglei.sessionfactory.DynamicMapping;
+import com.douglei.orm.sessionfactory.DynamicMapping;
 
 /**
  * 功能映射

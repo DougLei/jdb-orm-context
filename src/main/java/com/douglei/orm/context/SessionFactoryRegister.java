@@ -9,6 +9,10 @@ import java.util.List;
 
 import com.douglei.aop.ProxyBeanContext;
 import com.douglei.orm.configuration.impl.xml.XmlConfiguration;
+import com.douglei.orm.context.exception.DefaultSessionFactoryExistsException;
+import com.douglei.orm.context.exception.SessionFactoryRegistrationException;
+import com.douglei.orm.context.exception.TooManyInstanceException;
+import com.douglei.orm.context.exception.UnRegisterDefaultSessionFactoryException;
 import com.douglei.orm.sessionfactory.SessionFactory;
 import com.douglei.tools.instances.scanner.ClassScanner;
 import com.douglei.tools.utils.reflect.ClassLoadUtil;

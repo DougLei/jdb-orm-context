@@ -3,6 +3,8 @@ package com.douglei.orm.context;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.douglei.orm.context.exception.NotExistsFunctionalMappingClassException;
+import com.douglei.orm.context.exception.UnsupportFunctionalMappingClassException;
 import com.douglei.tools.utils.reflect.ConstructorUtil;
 
 /**

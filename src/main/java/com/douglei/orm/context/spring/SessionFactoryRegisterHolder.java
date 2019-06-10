@@ -4,7 +4,7 @@ import com.douglei.orm.context.SessionFactoryRegister;
 
 
 /**
- * 
+ * SessionFactoryRegister实例的持有对象
  * @author DougLei
  */
 public class SessionFactoryRegisterHolder {

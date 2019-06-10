@@ -5,6 +5,7 @@ import java.util.Stack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.douglei.orm.context.exception.UnsupportUseSessionContextException;
 import com.douglei.orm.core.dialect.TransactionIsolationLevel;
 import com.douglei.orm.sessions.Session;
 
@@ -15,8 +16,12 @@ import com.douglei.orm.sessions.Session;
 public class SessionContext {
 	private static final Logger logger = LoggerFactory.getLogger(SessionContext.class);
 	private static final ThreadLocal<Stack<SessionWrapper>> SESSION_WRAPPERS = new ThreadLocal<Stack<SessionWrapper>>();
+	private static boolean unUseTransactionAnnoation;// TODO 是否没有使用Transaction注解, 如果没有使用, 则不能使用该类获取session
 	
 	public static Session getSession() {
+		if(unUseTransactionAnnoation) {
+			throw new UnsupportUseSessionContextException();
+		}
 		SessionWrapper sessionWrapper = getSessionWrapper();
 		Session session = sessionWrapper.getSession();
 		logger.debug("get session is {}", sessionWrapper);

@@ -11,6 +11,7 @@ import com.douglei.orm.context.exception.DefaultSessionFactoryExistsException;
 import com.douglei.orm.context.exception.SessionFactoryRegistrationException;
 import com.douglei.orm.context.exception.TooManyInstanceException;
 import com.douglei.orm.context.exception.UnRegisterDefaultSessionFactoryException;
+import com.douglei.orm.context.nmc.NecessaryMappingConfiguration;
 import com.douglei.orm.sessionfactory.SessionFactory;
 
 /**
@@ -117,7 +118,7 @@ public class SessionFactoryRegister {
 	}
 	
 	// --------------------------------------------------------------------------------------------
-	// 获取SessionFactory
+	// 操作SessionFactory
 	// --------------------------------------------------------------------------------------------
 	/**
 	 * 获取SessionFactory
@@ -127,9 +128,6 @@ public class SessionFactoryRegister {
 		return SessionFactoryContext.getSessionFactory();
 	}
 	
-	// --------------------------------------------------------------------------------------------
-	// 销毁SessionFactory
-	// --------------------------------------------------------------------------------------------
 	/**
 	 * 销毁SessionFactory
 	 * @param sessionFactoryId
@@ -138,30 +136,38 @@ public class SessionFactoryRegister {
 		SessionFactoryContext.destroySessionFactory(sessionFactoryId);
 	}
 	
+	/**
+	 * 设置要操作的sessionFactoryId
+	 * @param sessionFactoryId
+	 */
+	public void setSessionFactoryId(String sessionFactoryId) {
+		SessionFactoryId4CurrentThread.setSessionFactoryId4CurrentThread(sessionFactoryId);
+	}
+	
 	// --------------------------------------------------------------------------------------------
-	// 操作functionalMapping
+	// 操作necessaryMappingConfiguration
 	// --------------------------------------------------------------------------------------------
 	/**
-	 * 给SessionFactory添加functionalMapping
-	 * @param functionalMapping
+	 * 给SessionFactory添加necessaryMappingConfiguration
+	 * @param necessaryMappingConfiguration
 	 */
-	public void addfunctionalMapping(FunctionalMapping functionalMapping) {
-		SessionFactoryContext.addfunctionalMapping(functionalMapping);
+	public void addNecessaryMappingConfiguration(NecessaryMappingConfiguration necessaryMappingConfiguration) {
+		SessionFactoryContext.addNecessaryMappingConfiguration(necessaryMappingConfiguration);
 	}
 	
 	/**
-	 * 给SessionFactory添加functionalMapping
-	 * @param functionalMappingClassName
+	 * 给SessionFactory添加necessaryMappingConfiguration
+	 * @param necessaryMappingConfigurationClassName
 	 */
-	public void addfunctionalMapping(String functionalMappingClassName) {
-		SessionFactoryContext.addfunctionalMapping(functionalMappingClassName);
+	public void addNecessaryMappingConfiguration(String necessaryMappingConfigurationClassName) {
+		SessionFactoryContext.addNecessaryMappingConfiguration(necessaryMappingConfigurationClassName);
 	}
 	
 	/**
-	 * 从SessionFactory移除functionalMapping
-	 * @param functionalMappingClassName
+	 * 从SessionFactory移除necessaryMappingConfiguration
+	 * @param necessaryMappingConfigurationClassName
 	 */
-	public void removefunctionalMapping(String functionalMappingClassName) {
-		SessionFactoryContext.removefunctionalMapping(functionalMappingClassName);
+	public void removeNecessaryMappingConfiguration(String necessaryMappingConfigurationClassName) {
+		SessionFactoryContext.removeNecessaryMappingConfiguration(necessaryMappingConfigurationClassName);
 	}
 }

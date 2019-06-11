@@ -1,4 +1,4 @@
-package com.douglei.orm.context;
+package com.douglei.orm.context.nmc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,10 +6,10 @@ import java.util.List;
 import com.douglei.orm.sessionfactory.DynamicMapping;
 
 /**
- * 功能映射
+ * 必须的映射配置
  * @author DougLei
  */
-public abstract class FunctionalMapping {
+public abstract class NecessaryMappingConfiguration {
 	protected List<DynamicMapping> mappings;
 	private List<String> mappingCodes;
 	
@@ -17,31 +17,32 @@ public abstract class FunctionalMapping {
 	 * 获取功能描述, 例如: 自动编码
 	 * @return
 	 */
-	public abstract String getDescription();
+	public abstract String getFunctionDescription();
 	
 	/**
-	 * 注册需要的映射
+	 * 注册必须的映射
+	 * 注册到super.mappings集合属性中
 	 */
-	protected abstract void registerMappings();
+	protected abstract void registerNecessaryMappings();
 	
 	/**
-	 * 获取功能映射集合
+	 * 获取必须的映射集合
 	 * @return
 	 */
-	public List<DynamicMapping> getMappings(){
+	public List<DynamicMapping> getNecessaryMappings(){
 		if(mappings == null) {
-			registerMappings();
+			registerNecessaryMappings();
 		}
 		return mappings;
 	}
 
 	/**
-	 * 获取功能映射的code集合
+	 * 获取必须映射的code集合
 	 * @return
 	 */
 	public List<String> getMappingCodes() {
 		if(mappingCodes == null) {
-			List<DynamicMapping> dms = getMappings();
+			List<DynamicMapping> dms = getNecessaryMappings();
 			mappingCodes = new ArrayList<String>(dms.size());
 			for (DynamicMapping dm : dms) {
 				mappingCodes.add(dm.getMappingCode());

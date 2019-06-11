@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.douglei.orm.context.exception.NotExistsSessionFactoryException;
 import com.douglei.orm.context.exception.RepeatedSessionFactoryException;
+import com.douglei.orm.context.nmc.NecessaryMappingConfiguration;
 import com.douglei.orm.sessionfactory.SessionFactory;
 import com.douglei.tools.utils.StringUtil;
 
@@ -64,7 +65,7 @@ class SessionFactoryContext {
 		}
 		String sessionFactoryId4CurrentThread = SessionFactoryId4CurrentThread.getSessionFactoryId4CurrentThread();
 		if(StringUtil.isEmpty(sessionFactoryId4CurrentThread)) {
-			throw new NullPointerException("注册了多个SessionFactory(即多数据源)时, 在获取SessionFactory时, 必须使用"+SessionFactoryId4CurrentThread.class.getName()+", 设置当前线程要使用的SessionFactory的Id");
+			throw new NullPointerException("注册了多个SessionFactory(即多数据源)时, 在获取SessionFactory时, 必须使用"+SessionFactoryId4CurrentThread.class.getName()+", 设置当前线程要使用的SessionFactory的Id, 或使用["+SessionFactoryRegister.class.getName()+"]中的setSessionFactoryId()方法");
 		}
 		
 		if(JDB_ORM_SESSION_FACTORY_MAPPING.containsKey(sessionFactoryId4CurrentThread)) {
@@ -91,39 +92,39 @@ class SessionFactoryContext {
 	}
 	
 	// --------------------------------------------------------------------------------------------
-	// 操作functionalMapping
+	// 操作necessaryMappingConfiguration
 	// --------------------------------------------------------------------------------------------
 	/**
-	 * 给SessionFactory添加functionalMapping
-	 * @param functionalMapping
+	 * 给SessionFactory添加NecessaryMappingConfiguration
+	 * @param necessaryMappingConfiguration
 	 */
-	static void addfunctionalMapping(FunctionalMapping functionalMapping) {
-		FunctionalMappingContext.registerfunctionalMapping(functionalMapping);
+	static void addNecessaryMappingConfiguration(NecessaryMappingConfiguration necessaryMappingConfiguration) {
+		NecessaryMappingConfigurationContext.registerNecessaryMappingConfiguration(necessaryMappingConfiguration);
 		SessionFactory sessionFactory = getSessionFactory();
-		if(SessionFactoryAndfunctionalMappingLinkContext.addLink(sessionFactory.getId(), functionalMapping)) {
-			sessionFactory.dynamicBatchAddMapping(functionalMapping.getMappings());
+		if(SessionFactoryAndnecessaryMappingConfigurationLinkContext.addLink(sessionFactory.getId(), necessaryMappingConfiguration)) {
+			sessionFactory.dynamicBatchAddMapping(necessaryMappingConfiguration.getNecessaryMappings());
 		}
 	}
 	
 	/**
-	 * 给SessionFactory添加functionalMapping
-	 * @param functionalMappingClassName
+	 * 给SessionFactory添加necessaryMappingConfiguration
+	 * @param necessaryMappingConfigurationClassName
 	 */
-	static void addfunctionalMapping(String functionalMappingClassName) {
+	static void addNecessaryMappingConfiguration(String necessaryMappingConfigurationClassName) {
 		SessionFactory sessionFactory = getSessionFactory();
-		if(SessionFactoryAndfunctionalMappingLinkContext.addLink(sessionFactory.getId(), functionalMappingClassName)) {
-			sessionFactory.dynamicBatchAddMapping(FunctionalMappingContext.getfunctionalMapping(functionalMappingClassName).getMappings());
+		if(SessionFactoryAndnecessaryMappingConfigurationLinkContext.addLink(sessionFactory.getId(), necessaryMappingConfigurationClassName)) {
+			sessionFactory.dynamicBatchAddMapping(NecessaryMappingConfigurationContext.getNecessaryMappingConfiguration(necessaryMappingConfigurationClassName).getNecessaryMappings());
 		}
 	}
 	
 	/**
-	 * 从SessionFactory移除functionalMapping
-	 * @param functionalMappingClassName
+	 * 从SessionFactory移除necessaryMappingConfiguration
+	 * @param necessaryMappingConfigurationClassName
 	 */
-	static void removefunctionalMapping(String functionalMappingClassName) {
+	static void removeNecessaryMappingConfiguration(String necessaryMappingConfigurationClassName) {
 		SessionFactory sessionFactory = getSessionFactory();
-		if(SessionFactoryAndfunctionalMappingLinkContext.removeLink(sessionFactory.getId(), functionalMappingClassName)) {
-			sessionFactory.dynamicBatchRemoveMapping(FunctionalMappingContext.getfunctionalMapping(functionalMappingClassName).getMappingCodes());
+		if(SessionFactoryAndnecessaryMappingConfigurationLinkContext.removeLink(sessionFactory.getId(), necessaryMappingConfigurationClassName)) {
+			sessionFactory.dynamicBatchRemoveMapping(NecessaryMappingConfigurationContext.getNecessaryMappingConfiguration(necessaryMappingConfigurationClassName).getMappingCodes());
 		}
 	}
 }

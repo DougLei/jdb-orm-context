@@ -6,7 +6,7 @@ import com.douglei.orm.context.Transaction;
 
 public class GetMethodTest {
 	public static void main(String[] args) throws Exception {
-		Class<?> clz = Class.forName("com.douglei.GetMethod");
+		Class<?> clz = Class.forName("com.douglei.orm.context.GetMethod");
 		
 		System.out.println("***********************************************************************");
 		System.out.println("declared method");

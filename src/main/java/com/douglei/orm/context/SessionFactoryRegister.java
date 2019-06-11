@@ -3,20 +3,15 @@ package com.douglei.orm.context;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.douglei.aop.ProxyBeanContext;
 import com.douglei.orm.configuration.impl.xml.XmlConfiguration;
 import com.douglei.orm.context.exception.DefaultSessionFactoryExistsException;
-import com.douglei.orm.context.exception.NotFoundTransactionAnnotationConfigurationException;
 import com.douglei.orm.context.exception.SessionFactoryRegistrationException;
 import com.douglei.orm.context.exception.TooManyInstanceException;
 import com.douglei.orm.context.exception.UnRegisterDefaultSessionFactoryException;
 import com.douglei.orm.sessionfactory.SessionFactory;
-import com.douglei.tools.instances.scanner.ClassScanner;
-import com.douglei.tools.utils.reflect.ClassLoadUtil;
 
 /**
  * jdb-orm 的SessionFactory注册器
@@ -70,44 +65,10 @@ public class SessionFactoryRegister {
 	 * @param scanTransactionPackages 要扫描事务的包路径
 	 */
 	private void scanTransactionAnnotation(String... scanTransactionPackages) {
-		if(scanTransactionPackages.length > 0) {
-			ClassScanner cs = new ClassScanner();
-			List<String> classes = cs.multiScan(scanTransactionPackages);
-			if(classes.size() > 0) {
-				Class<?> loadClass = null;
-				Method[] declareMethods = null;
-				List<Method> transactionAnnotationMethods = null;
-				
-				for (String clz : classes) {
-					loadClass = ClassLoadUtil.loadClass(clz);
-					if(loadClass.getAnnotation(Transaction.class) != null) {
-						declareMethods = loadClass.getDeclaredMethods();
-						if(declareMethods.length > 0) {
-							for (Method dm : declareMethods) {
-								if(dm.getAnnotation(Transaction.class) != null) {
-									if(transactionAnnotationMethods == null) {
-										transactionAnnotationMethods = new ArrayList<Method>(declareMethods.length);
-									}
-									transactionAnnotationMethods.add(dm);
-								}
-							}
-							
-							if(transactionAnnotationMethods != null) {
-								ProxyBeanContext.createProxyBean(loadClass, new TransactionProxyInterceptor(loadClass, transactionAnnotationMethods));
-								transactionAnnotationMethods = null;
-							}
-						}
-					}
-				}
-			}
-			cs.destroy();
-			if(!ProxyBeanContext.existsProxyBeans()) {
-				throw new NotFoundTransactionAnnotationConfigurationException(scanTransactionPackages);
-			}
-			TransactionAnnotationMemoryUsage.setMemoryUsage(true);// 记录Transaction注解的使用情况
-			return;
+		List<TransactionClass> transactionClasses = TransactionAnnotationMemoryUsage.scanTransactionAnnotation(scanTransactionPackages);
+		for (TransactionClass transactionClass : transactionClasses) {
+			ProxyBeanContext.createAndAddProxy(transactionClass.getTransactionClass(), new TransactionProxyInterceptor(transactionClass.getTransactionClass(), transactionClass.getTransactionAnnotationMethods()));
 		}
-		TransactionAnnotationMemoryUsage.setMemoryUsage(false);// 记录Transaction注解的使用情况
 	}
 
 	// --------------------------------------------------------------------------------------------

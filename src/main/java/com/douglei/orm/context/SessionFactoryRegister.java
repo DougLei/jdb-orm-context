@@ -10,6 +10,7 @@ import java.util.List;
 import com.douglei.aop.ProxyBeanContext;
 import com.douglei.orm.configuration.impl.xml.XmlConfiguration;
 import com.douglei.orm.context.exception.DefaultSessionFactoryExistsException;
+import com.douglei.orm.context.exception.NotFoundTransactionAnnotationConfigurationException;
 import com.douglei.orm.context.exception.SessionFactoryRegistrationException;
 import com.douglei.orm.context.exception.TooManyInstanceException;
 import com.douglei.orm.context.exception.UnRegisterDefaultSessionFactoryException;
@@ -69,7 +70,7 @@ public class SessionFactoryRegister {
 	 * @param scanTransactionPackages 要扫描事务的包路径
 	 */
 	private void scanTransactionAnnotation(String... scanTransactionPackages) {
-		if(scanTransactionPackages != null && scanTransactionPackages.length > 0) {
+		if(scanTransactionPackages.length > 0) {
 			ClassScanner cs = new ClassScanner();
 			List<String> classes = cs.multiScan(scanTransactionPackages);
 			if(classes.size() > 0) {
@@ -79,28 +80,36 @@ public class SessionFactoryRegister {
 				
 				for (String clz : classes) {
 					loadClass = ClassLoadUtil.loadClass(clz);
-					declareMethods = loadClass.getDeclaredMethods();
-					if(declareMethods.length > 0) {
-						for (Method dm : declareMethods) {
-							if(dm.getAnnotation(Transaction.class) != null) {
-								if(transactionAnnotationMethods == null) {
-									transactionAnnotationMethods = new ArrayList<Method>(declareMethods.length);
+					if(loadClass.getAnnotation(Transaction.class) != null) {
+						declareMethods = loadClass.getDeclaredMethods();
+						if(declareMethods.length > 0) {
+							for (Method dm : declareMethods) {
+								if(dm.getAnnotation(Transaction.class) != null) {
+									if(transactionAnnotationMethods == null) {
+										transactionAnnotationMethods = new ArrayList<Method>(declareMethods.length);
+									}
+									transactionAnnotationMethods.add(dm);
 								}
-								transactionAnnotationMethods.add(dm);
 							}
-						}
-						
-						if(transactionAnnotationMethods != null) {
-							ProxyBeanContext.createProxyBean(loadClass, new TransactionProxyInterceptor(transactionAnnotationMethods));
-							transactionAnnotationMethods = null;
+							
+							if(transactionAnnotationMethods != null) {
+								ProxyBeanContext.createProxyBean(loadClass, new TransactionProxyInterceptor(loadClass, transactionAnnotationMethods));
+								transactionAnnotationMethods = null;
+							}
 						}
 					}
 				}
 			}
 			cs.destroy();
+			if(!ProxyBeanContext.existsProxyBeans()) {
+				throw new NotFoundTransactionAnnotationConfigurationException(scanTransactionPackages);
+			}
+			TransactionAnnotationMemoryUsage.setMemoryUsage(true);// 记录Transaction注解的使用情况
+			return;
 		}
+		TransactionAnnotationMemoryUsage.setMemoryUsage(false);// 记录Transaction注解的使用情况
 	}
-	
+
 	// --------------------------------------------------------------------------------------------
 	// 【多数据源】注册SessionFactory
 	// --------------------------------------------------------------------------------------------

@@ -16,8 +16,8 @@ import com.douglei.orm.sessions.Session;
 public class TransactionProxyInterceptor extends ProxyInterceptor{
 	private static final Logger logger = LoggerFactory.getLogger(TransactionProxyInterceptor.class);
 
-	public TransactionProxyInterceptor(List<Method> methods) {
-		super(methods);
+	public TransactionProxyInterceptor(Class<?> clz, List<Method> methods) {
+		super(clz, methods);
 	}
 
 	@Override

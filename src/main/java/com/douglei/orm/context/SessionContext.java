@@ -13,13 +13,12 @@ import com.douglei.orm.sessions.Session;
  * 通过@Transaction注解, 由系统自行控制session的的commit/rollback/close
  * @author DougLei
  */
-public class SessionContext {
+public final class SessionContext {
 	private static final Logger logger = LoggerFactory.getLogger(SessionContext.class);
 	private static final ThreadLocal<Stack<SessionWrapper>> SESSION_WRAPPERS = new ThreadLocal<Stack<SessionWrapper>>();
-	private static boolean unUseTransactionAnnoation;// TODO 是否没有使用Transaction注解, 如果没有使用, 则不能使用该类获取session
 	
 	public static Session getSession() {
-		if(unUseTransactionAnnoation) {
+		if(TransactionAnnotationMemoryUsage.unUse()) {
 			throw new UnsupportUseSessionContextException();
 		}
 		SessionWrapper sessionWrapper = getSessionWrapper();

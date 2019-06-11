@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.douglei.orm.context.exception.NotExistsNecessaryMappingConfigurationClassException;
 import com.douglei.orm.context.exception.UnsupportNecessaryMappingConfigurationClassException;
-import com.douglei.orm.context.nmc.NecessaryMappingConfiguration;
+import com.douglei.orm.context.necessary.mapping.configuration.NecessaryMappingConfiguration;
 import com.douglei.tools.utils.reflect.ConstructorUtil;
 
 /**

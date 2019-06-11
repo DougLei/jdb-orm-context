@@ -11,7 +11,7 @@ import com.douglei.orm.context.exception.DefaultSessionFactoryExistsException;
 import com.douglei.orm.context.exception.SessionFactoryRegistrationException;
 import com.douglei.orm.context.exception.TooManyInstanceException;
 import com.douglei.orm.context.exception.UnRegisterDefaultSessionFactoryException;
-import com.douglei.orm.context.nmc.NecessaryMappingConfiguration;
+import com.douglei.orm.context.necessary.mapping.configuration.NecessaryMappingConfiguration;
 import com.douglei.orm.sessionfactory.SessionFactory;
 
 /**

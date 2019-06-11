@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.douglei.orm.context.nmc.NecessaryMappingConfiguration;
+import com.douglei.orm.context.necessary.mapping.configuration.NecessaryMappingConfiguration;
 
 /**
  * 

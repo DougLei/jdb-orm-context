@@ -1,4 +1,4 @@
-package com.douglei.orm.context.nmc;
+package com.douglei.orm.context.necessary.mapping.configuration;
 
 import java.util.ArrayList;
 import java.util.List;

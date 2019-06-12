@@ -38,12 +38,12 @@ public class TransactionAnnotationMemoryUsage {
 	 * @param scanTransactionPackages
 	 * @return 返回扫描到的TransactionClass集合
 	 */
-	public static List<TransactionClass> scanTransactionAnnotation(String... scanTransactionPackages) {
+	public static List<TransactionProxyEntity> scanTransactionAnnotation(String... scanTransactionPackages) {
 		if(scanTransactionPackages.length > 0) {
 			ClassScanner cs = new ClassScanner();
 			List<String> classes = cs.multiScan(scanTransactionPackages);
 			if(classes.size() > 0) {
-				List<TransactionClass> transactionClasses = null;
+				List<TransactionProxyEntity> transactionProxyEntities = null;
 				
 				Class<?> loadClass = null;
 				Method[] declareMethods = null;
@@ -53,30 +53,30 @@ public class TransactionAnnotationMemoryUsage {
 					declareMethods = loadClass.getDeclaredMethods();
 					
 					if(declareMethods.length > 0) {
-						TransactionClass transactionClass = null;
+						TransactionProxyEntity transactionProxyEntity = null;
 						for (Method dm : declareMethods) {
 							if(dm.getAnnotation(Transaction.class) != null) {
-								if(transactionClass == null) {
-									transactionClass = new TransactionClass(loadClass, declareMethods.length);
+								if(transactionProxyEntity == null) {
+									transactionProxyEntity = new TransactionProxyEntity(loadClass, declareMethods.length);
 								}
-								transactionClass.addMethod(dm);
+								transactionProxyEntity.addMethod(dm);
 							}
 						}
 						
-						if(transactionClass != null) {
-							if(transactionClasses == null) {
-								transactionClasses = new LinkedList<TransactionClass>();
+						if(transactionProxyEntity != null) {
+							if(transactionProxyEntities == null) {
+								transactionProxyEntities = new LinkedList<TransactionProxyEntity>();
 							}
-							transactionClasses.add(transactionClass);
+							transactionProxyEntities.add(transactionProxyEntity);
 						}
 					}
 				}
 				
 				cs.destroy();
 				
-				if(transactionClasses != null) {
+				if(transactionProxyEntities != null) {
 					setIsUse();
-					return transactionClasses;
+					return transactionProxyEntities;
 				}
 			}
 		}

@@ -4,7 +4,7 @@ package com.douglei.orm.context;
  * 当前线程要使用的SessionFactoryId
  * @author DougLei
  */
-public class SessionFactoryId4CurrentThread {
+class SessionFactoryId4CurrentThread {
 	private static final ThreadLocal<String> SESSION_FACTORY_ID_4_CURRENT_THREAD = new ThreadLocal<String>();// 当前线程要使用的SessionFactory的Id
 	
 	/**

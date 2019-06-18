@@ -4,7 +4,7 @@ import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.douglei.orm.context.exception.NotFoundTransactionAnnotationConfigurationException;
+import com.douglei.orm.context.exception.NotFoundTransactionComponentConfigurationException;
 import com.douglei.tools.instances.scanner.ClassScanner;
 import com.douglei.tools.utils.reflect.ClassLoadUtil;
 
@@ -34,14 +34,14 @@ public class TransactionAnnotationMemoryUsage {
 	}
 	
 	/**
-	 * 根据指定的包路径, 扫描事务注解
-	 * @param scanTransactionPackages
+	 * 根据指定的包路径, 扫描事务组件
+	 * @param transactionComponentPackages
 	 * @return 返回扫描到的TransactionClass集合
 	 */
-	public static List<TransactionProxyEntity> scanTransactionAnnotation(String... scanTransactionPackages) {
-		if(scanTransactionPackages.length > 0) {
+	public static List<TransactionProxyEntity> scanTransactionComponent(String... transactionComponentPackages) {
+		if(transactionComponentPackages.length > 0) {
 			ClassScanner cs = new ClassScanner();
-			List<String> classes = cs.multiScan(scanTransactionPackages);
+			List<String> classes = cs.multiScan(transactionComponentPackages);
 			if(classes.size() > 0) {
 				List<TransactionProxyEntity> transactionProxyEntities = null;
 				
@@ -50,24 +50,26 @@ public class TransactionAnnotationMemoryUsage {
 				
 				for (String clz : classes) {
 					loadClass = ClassLoadUtil.loadClass(clz);
-					declareMethods = loadClass.getDeclaredMethods();
-					
-					if(declareMethods.length > 0) {
-						TransactionProxyEntity transactionProxyEntity = null;
-						for (Method dm : declareMethods) {
-							if(dm.getAnnotation(Transaction.class) != null) {
-								if(transactionProxyEntity == null) {
-									transactionProxyEntity = new TransactionProxyEntity(loadClass, declareMethods.length);
-								}
-								transactionProxyEntity.addMethod(dm);
-							}
-						}
+					if(loadClass.getAnnotation(TransactionComponent.class) != null) {
+						declareMethods = loadClass.getDeclaredMethods();
 						
-						if(transactionProxyEntity != null) {
-							if(transactionProxyEntities == null) {
-								transactionProxyEntities = new LinkedList<TransactionProxyEntity>();
+						if(declareMethods.length > 0) {
+							TransactionProxyEntity transactionProxyEntity = null;
+							for (Method dm : declareMethods) {
+								if(dm.getAnnotation(Transaction.class) != null) {
+									if(transactionProxyEntity == null) {
+										transactionProxyEntity = new TransactionProxyEntity(loadClass, declareMethods.length);
+									}
+									transactionProxyEntity.addMethod(dm);
+								}
 							}
-							transactionProxyEntities.add(transactionProxyEntity);
+							
+							if(transactionProxyEntity != null) {
+								if(transactionProxyEntities == null) {
+									transactionProxyEntities = new LinkedList<TransactionProxyEntity>();
+								}
+								transactionProxyEntities.add(transactionProxyEntity);
+							}
 						}
 					}
 				}
@@ -80,6 +82,6 @@ public class TransactionAnnotationMemoryUsage {
 				}
 			}
 		}
-		throw new NotFoundTransactionAnnotationConfigurationException(scanTransactionPackages);
+		throw new NotFoundTransactionComponentConfigurationException(transactionComponentPackages);
 	}
 }

@@ -36,20 +36,20 @@ public final class SessionFactoryRegister {
 	// --------------------------------------------------------------------------------------------
 	/**
 	 * 【必须的数据源】使用默认的配置文件path注册默认的jdb-orm SessionFactory实例
-	 * @param scanTransactionPackages 要扫描事务的包路径
+	 * @param scanTransactionComponentPackages 要扫描事务组件包路径
 	 * @return
 	 */
-	public SessionFactory registerDefaultSessionFactory(String... scanTransactionPackages) {
-		return registerDefaultSessionFactoryByConfigurationFile(Configuration.DEFAULT_CONF_FILE, scanTransactionPackages);
+	public SessionFactory registerDefaultSessionFactory(String... scanTransactionComponentPackages) {
+		return registerDefaultSessionFactoryByConfigurationFile(Configuration.DEFAULT_CONF_FILE, scanTransactionComponentPackages);
 	}
 	
 	/**
 	 * 【必须的数据源】使用指定的配置文件path注册默认的jdb-orm Configuration实例
 	 * @param configurationFile
-	 * @param scanTransactionPackages 要扫描事务的包路径
+	 * @param transactionComponentPackages 要扫描事务组件包路径
 	 * @return
 	 */
-	public SessionFactory registerDefaultSessionFactoryByConfigurationFile(String configurationFile, String... scanTransactionPackages) {
+	public SessionFactory registerDefaultSessionFactoryByConfigurationFile(String configurationFile, String... transactionComponentPackages) {
 		if(registerDefaultSessionFactory) {
 			throw new DefaultSessionFactoryExistsException(SessionFactoryContext.getDefaultSessionFactory().getId());
 		}
@@ -57,17 +57,17 @@ public final class SessionFactoryRegister {
 		SessionFactory sessionFactory = new XmlConfiguration(configurationFile).buildSessionFactory();
 		SessionFactoryContext.registerDefaultSessionFactory(sessionFactory);
 		
-		scanTransactionAnnotation(scanTransactionPackages);
+		scanTransactionComponent(transactionComponentPackages);
 		return sessionFactory;
 	}
 	
 	/**
-	 * 根据包路径扫描事务
-	 * @param scanTransactionPackages 要扫描事务的包路径
+	 * 根据包路径扫描事务组件
+	 * @param transactionComponentPackages 要扫描事务组件包路径
 	 */
-	private void scanTransactionAnnotation(String... scanTransactionPackages) {
-		if(scanTransactionPackages.length > 0) {
-			List<TransactionProxyEntity> transactionProxyEntities = TransactionAnnotationMemoryUsage.scanTransactionAnnotation(scanTransactionPackages);
+	private void scanTransactionComponent(String... transactionComponentPackages) {
+		if(transactionComponentPackages.length > 0) {
+			List<TransactionProxyEntity> transactionProxyEntities = TransactionAnnotationMemoryUsage.scanTransactionComponent(transactionComponentPackages);
 			for (TransactionProxyEntity transactionProxyEntity : transactionProxyEntities) {
 				ProxyBeanContext.createAndAddProxy(transactionProxyEntity.getTransactionClass(), new TransactionProxyInterceptor(transactionProxyEntity.getTransactionClass(), transactionProxyEntity.getTransactionAnnotationMethods()));
 			}

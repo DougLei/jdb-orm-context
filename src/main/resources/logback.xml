@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <configuration scan="false">
-	<property name="log_name" value="jdb-dynamic-model"/>
+	<property name="log_name" value="jdb-orm-context"/>
 	<property name="log_home" value="logs"/>
 	<property name="custom_log_pattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %level %logger.%M -%msg%n"/>
 	<property name="custom_log_filename_pattern" value="%d{yyyy-MM-dd}.%i.log" />

@@ -66,9 +66,11 @@ public class SessionFactoryRegister {
 	 * @param scanTransactionPackages 要扫描事务的包路径
 	 */
 	private void scanTransactionAnnotation(String... scanTransactionPackages) {
-		List<TransactionProxyEntity> transactionProxyEntities = TransactionAnnotationMemoryUsage.scanTransactionAnnotation(scanTransactionPackages);
-		for (TransactionProxyEntity transactionProxyEntity : transactionProxyEntities) {
-			ProxyBeanContext.createAndAddProxy(transactionProxyEntity.getTransactionClass(), new TransactionProxyInterceptor(transactionProxyEntity.getTransactionClass(), transactionProxyEntity.getTransactionAnnotationMethods()));
+		if(scanTransactionPackages.length > 0) {
+			List<TransactionProxyEntity> transactionProxyEntities = TransactionAnnotationMemoryUsage.scanTransactionAnnotation(scanTransactionPackages);
+			for (TransactionProxyEntity transactionProxyEntity : transactionProxyEntities) {
+				ProxyBeanContext.createAndAddProxy(transactionProxyEntity.getTransactionClass(), new TransactionProxyInterceptor(transactionProxyEntity.getTransactionClass(), transactionProxyEntity.getTransactionAnnotationMethods()));
+			}
 		}
 	}
 

@@ -67,9 +67,9 @@ public final class SessionFactoryRegister {
 	 */
 	private void scanTransactionComponent(String... transactionComponentPackages) {
 		if(transactionComponentPackages.length > 0) {
-			List<TransactionProxyEntity> transactionProxyEntities = TransactionAnnotationMemoryUsage.scanTransactionComponent(transactionComponentPackages);
-			for (TransactionProxyEntity transactionProxyEntity : transactionProxyEntities) {
-				ProxyBeanContext.createAndAddProxy(transactionProxyEntity.getTransactionClass(), new TransactionProxyInterceptor(transactionProxyEntity.getTransactionClass(), transactionProxyEntity.getTransactionAnnotationMethods()));
+			List<TransactionComponentProxyEntity> transactionComponentProxyEntities = TransactionAnnotationMemoryUsage.scanTransactionComponent(transactionComponentPackages);
+			for (TransactionComponentProxyEntity transactionComponentProxyEntity : transactionComponentProxyEntities) {
+				ProxyBeanContext.createAndAddProxy(transactionComponentProxyEntity.getTransactionComponentProxyBeanClass(), new TransactionProxyInterceptor(transactionComponentProxyEntity.getTransactionComponentProxyBeanClass(), transactionComponentProxyEntity.getTransactionMethods()));
 			}
 		}
 	}

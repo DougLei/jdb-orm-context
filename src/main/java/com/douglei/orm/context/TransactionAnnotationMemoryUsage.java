@@ -38,12 +38,12 @@ public class TransactionAnnotationMemoryUsage {
 	 * @param transactionComponentPackages
 	 * @return 返回扫描到的TransactionClass集合
 	 */
-	public static List<TransactionProxyEntity> scanTransactionComponent(String... transactionComponentPackages) {
+	public static List<TransactionComponentProxyEntity> scanTransactionComponent(String... transactionComponentPackages) {
 		if(transactionComponentPackages.length > 0) {
 			ClassScanner cs = new ClassScanner();
 			List<String> classes = cs.multiScan(transactionComponentPackages);
 			if(classes.size() > 0) {
-				List<TransactionProxyEntity> transactionProxyEntities = null;
+				List<TransactionComponentProxyEntity> transactionComponentProxyEntities = null;
 				
 				Class<?> loadClass = null;
 				Method[] declareMethods = null;
@@ -54,21 +54,21 @@ public class TransactionAnnotationMemoryUsage {
 						declareMethods = loadClass.getDeclaredMethods();
 						
 						if(declareMethods.length > 0) {
-							TransactionProxyEntity transactionProxyEntity = null;
+							TransactionComponentProxyEntity transactionProxyEntity = null;
 							for (Method dm : declareMethods) {
 								if(dm.getAnnotation(Transaction.class) != null) {
 									if(transactionProxyEntity == null) {
-										transactionProxyEntity = new TransactionProxyEntity(loadClass, declareMethods.length);
+										transactionProxyEntity = new TransactionComponentProxyEntity(loadClass, declareMethods.length);
 									}
 									transactionProxyEntity.addMethod(dm);
 								}
 							}
 							
 							if(transactionProxyEntity != null) {
-								if(transactionProxyEntities == null) {
-									transactionProxyEntities = new LinkedList<TransactionProxyEntity>();
+								if(transactionComponentProxyEntities == null) {
+									transactionComponentProxyEntities = new LinkedList<TransactionComponentProxyEntity>();
 								}
-								transactionProxyEntities.add(transactionProxyEntity);
+								transactionComponentProxyEntities.add(transactionProxyEntity);
 							}
 						}
 					}
@@ -76,9 +76,9 @@ public class TransactionAnnotationMemoryUsage {
 				
 				cs.destroy();
 				
-				if(transactionProxyEntities != null) {
+				if(transactionComponentProxyEntities != null) {
 					setIsUse();
-					return transactionProxyEntities;
+					return transactionComponentProxyEntities;
 				}
 			}
 		}

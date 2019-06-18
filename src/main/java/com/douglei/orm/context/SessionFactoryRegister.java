@@ -15,18 +15,18 @@ import com.douglei.orm.context.necessary.mapping.configuration.NecessaryMappingC
 import com.douglei.orm.sessionfactory.SessionFactory;
 
 /**
- * jdb-orm 的SessionFactory处理器
+ * jdb-orm 的SessionFactory注册器
  * <p><b>注意: 该类只支持创建一个实例</b></p>
  * @author DougLei
  */
-public class SessionFactoryHandler {
+public class SessionFactoryRegister {
 	private static final String DEFAULT_JDB_ORM_CONF_FILE = "jdb-orm.conf.xml";
 	private boolean registerDefaultSessionFactory;// 是否注册过默认SessionFactory
 	private static short instanceCount = 0;// 实例化次数
 	
-	public SessionFactoryHandler() {
+	public SessionFactoryRegister() {
 		if(instanceCount > 0) {
-			throw new TooManyInstanceException(SessionFactoryHandler.class.getName() + ", 只能创建一个实例, 请妥善处理创建出的实例, 保证其在项目中处于全局范围");
+			throw new TooManyInstanceException(SessionFactoryRegister.class.getName() + ", 只能创建一个实例, 请妥善处理创建出的实例, 保证其在项目中处于全局范围");
 		}
 		instanceCount=1;
 	}
@@ -82,7 +82,7 @@ public class SessionFactoryHandler {
 	 */
 	public SessionFactory registerSessionFactoryByConfigurationFile(String configurationFile) {
 		if(registerDefaultSessionFactory) {
-			return registerSessionFactoryByConfigurationInputStream(SessionFactoryHandler.class.getClassLoader().getResourceAsStream(configurationFile));
+			return registerSessionFactoryByConfigurationInputStream(SessionFactoryRegister.class.getClassLoader().getResourceAsStream(configurationFile));
 		}
 		throw new UnRegisterDefaultSessionFactoryException();
 	}

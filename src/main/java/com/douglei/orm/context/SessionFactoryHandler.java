@@ -15,18 +15,18 @@ import com.douglei.orm.context.necessary.mapping.configuration.NecessaryMappingC
 import com.douglei.orm.sessionfactory.SessionFactory;
 
 /**
- * jdb-orm 的SessionFactory注册器
+ * jdb-orm 的SessionFactory处理器
  * <p><b>注意: 该类只支持创建一个实例</b></p>
  * @author DougLei
  */
-public class SessionFactoryRegister {
-	private static final String DEFAULT_JDB_ORM_CONF_FILE_PATH = "jdb-orm.conf.xml";
+public class SessionFactoryHandler {
+	private static final String DEFAULT_JDB_ORM_CONF_FILE = "jdb-orm.conf.xml";
 	private boolean registerDefaultSessionFactory;// 是否注册过默认SessionFactory
 	private static short instanceCount = 0;// 实例化次数
 	
-	public SessionFactoryRegister() {
+	public SessionFactoryHandler() {
 		if(instanceCount > 0) {
-			throw new TooManyInstanceException(SessionFactoryRegister.class.getName() + ", 只能创建一个实例, 请妥善处理创建出的实例, 保证其在项目中处于全局范围");
+			throw new TooManyInstanceException(SessionFactoryHandler.class.getName() + ", 只能创建一个实例, 请妥善处理创建出的实例, 保证其在项目中处于全局范围");
 		}
 		instanceCount=1;
 	}
@@ -40,21 +40,21 @@ public class SessionFactoryRegister {
 	 * @return
 	 */
 	public SessionFactory registerDefaultSessionFactory(String... scanTransactionPackages) {
-		return registerDefaultSessionFactoryByConfigurationFilePath(DEFAULT_JDB_ORM_CONF_FILE_PATH, scanTransactionPackages);
+		return registerDefaultSessionFactoryByConfigurationFile(DEFAULT_JDB_ORM_CONF_FILE, scanTransactionPackages);
 	}
 	
 	/**
 	 * 【必须的数据源】使用指定的配置文件path注册默认的jdb-orm Configuration实例
-	 * @param configurationFilePath
+	 * @param configurationFile
 	 * @param scanTransactionPackages 要扫描事务的包路径
 	 * @return
 	 */
-	public SessionFactory registerDefaultSessionFactoryByConfigurationFilePath(String configurationFilePath, String... scanTransactionPackages) {
+	public SessionFactory registerDefaultSessionFactoryByConfigurationFile(String configurationFile, String... scanTransactionPackages) {
 		if(registerDefaultSessionFactory) {
 			throw new DefaultSessionFactoryExistsException(SessionFactoryContext.getDefaultSessionFactory().getId());
 		}
 		registerDefaultSessionFactory = true;
-		SessionFactory sessionFactory = new XmlConfiguration(configurationFilePath).buildSessionFactory();
+		SessionFactory sessionFactory = new XmlConfiguration(configurationFile).buildSessionFactory();
 		SessionFactoryContext.registerDefaultSessionFactory(sessionFactory);
 		
 		scanTransactionAnnotation(scanTransactionPackages);
@@ -77,12 +77,12 @@ public class SessionFactoryRegister {
 	// --------------------------------------------------------------------------------------------
 	/**
 	 * 【多数据源】使用指定的配置文件path注册jdb-orm SessionFactory实例
-	 * @param configurationFilePath
+	 * @param configurationFile
 	 * @return
 	 */
-	public SessionFactory registerSessionFactoryByConfigurationFilePath(String configurationFilePath) {
+	public SessionFactory registerSessionFactoryByConfigurationFile(String configurationFile) {
 		if(registerDefaultSessionFactory) {
-			return registerSessionFactoryByConfigurationInputStream(SessionFactoryRegister.class.getClassLoader().getResourceAsStream(configurationFilePath));
+			return registerSessionFactoryByConfigurationInputStream(SessionFactoryHandler.class.getClassLoader().getResourceAsStream(configurationFile));
 		}
 		throw new UnRegisterDefaultSessionFactoryException();
 	}

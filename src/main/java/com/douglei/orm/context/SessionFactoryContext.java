@@ -65,7 +65,7 @@ class SessionFactoryContext {
 		}
 		String sessionFactoryId4CurrentThread = SessionFactoryId4CurrentThread.getSessionFactoryId4CurrentThread();
 		if(StringUtil.isEmpty(sessionFactoryId4CurrentThread)) {
-			throw new NullPointerException("注册了多个SessionFactory(即多数据源)时, 在获取SessionFactory时, 必须使用["+SessionFactoryRegister.class.getName()+"]中的setSessionFactoryId()方法");
+			throw new NullPointerException("注册了多个SessionFactory(即多数据源)时, 在获取SessionFactory时, 必须使用["+SessionFactoryHandler.class.getName()+"]中的setSessionFactoryId()方法");
 		}
 		
 		if(JDB_ORM_SESSION_FACTORY_MAPPING.containsKey(sessionFactoryId4CurrentThread)) {

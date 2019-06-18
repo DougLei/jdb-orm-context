@@ -20,7 +20,7 @@ import com.douglei.orm.sessionfactory.SessionFactory;
  * <p><b>注意: 该类只支持创建一个实例</b></p>
  * @author DougLei
  */
-public class SessionFactoryRegister {
+public final class SessionFactoryRegister {
 	private boolean registerDefaultSessionFactory;// 是否注册过默认SessionFactory
 	private static short instanceCount = 0;// 实例化次数
 	

@@ -50,7 +50,7 @@ class SessionFactoryContext {
 	 */
 	static SessionFactory getDefaultSessionFactory() {
 		if(DEFAULT_JDB_ORM_SESSION_FACTORY == null) {
-			throw new NullPointerException("默认的SessionFactory不能为空, 请务必registerDefaultSessionFactory(...)");
+			throw new NullPointerException("默认的SessionFactory不能为空, 请务必注册默认的SessionFactory");
 		}
 		return DEFAULT_JDB_ORM_SESSION_FACTORY;
 	}

@@ -6,6 +6,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import com.douglei.aop.ProxyBeanContext;
+import com.douglei.orm.configuration.Configuration;
 import com.douglei.orm.configuration.impl.xml.XmlConfiguration;
 import com.douglei.orm.context.exception.DefaultSessionFactoryExistsException;
 import com.douglei.orm.context.exception.SessionFactoryRegistrationException;
@@ -20,7 +21,6 @@ import com.douglei.orm.sessionfactory.SessionFactory;
  * @author DougLei
  */
 public class SessionFactoryRegister {
-	private static final String DEFAULT_JDB_ORM_CONF_FILE = "jdb-orm.conf.xml";
 	private boolean registerDefaultSessionFactory;// 是否注册过默认SessionFactory
 	private static short instanceCount = 0;// 实例化次数
 	
@@ -40,7 +40,7 @@ public class SessionFactoryRegister {
 	 * @return
 	 */
 	public SessionFactory registerDefaultSessionFactory(String... scanTransactionPackages) {
-		return registerDefaultSessionFactoryByConfigurationFile(DEFAULT_JDB_ORM_CONF_FILE, scanTransactionPackages);
+		return registerDefaultSessionFactoryByConfigurationFile(Configuration.DEFAULT_CONF_FILE, scanTransactionPackages);
 	}
 	
 	/**

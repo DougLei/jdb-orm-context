@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.douglei.orm.context.exception.NotExistsSessionFactoryException;
 import com.douglei.orm.context.exception.RepeatedSessionFactoryException;
+import com.douglei.orm.context.exception.UnRegisterDefaultSessionFactoryException;
 import com.douglei.orm.context.necessary.mapping.configuration.NecessaryMappingConfiguration;
 import com.douglei.orm.sessionfactory.SessionFactory;
 import com.douglei.tools.utils.StringUtil;
@@ -50,7 +51,7 @@ class SessionFactoryContext {
 	 */
 	static SessionFactory getDefaultSessionFactory() {
 		if(DEFAULT_JDB_ORM_SESSION_FACTORY == null) {
-			throw new NullPointerException("默认的SessionFactory不能为空, 请务必注册默认的SessionFactory");
+			throw new UnRegisterDefaultSessionFactoryException();
 		}
 		return DEFAULT_JDB_ORM_SESSION_FACTORY;
 	}

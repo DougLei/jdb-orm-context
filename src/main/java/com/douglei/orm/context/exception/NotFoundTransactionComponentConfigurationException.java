@@ -9,7 +9,7 @@ import java.util.Arrays;
 public class NotFoundTransactionComponentConfigurationException extends RuntimeException{
 	private static final long serialVersionUID = 91039541681959693L;
 
-	public NotFoundTransactionComponentConfigurationException(String... scanTransactionComponentPackages) {
-		super("在指定的事务组件包["+Arrays.toString(scanTransactionComponentPackages)+"]中, 没有扫描到事务组件配置, 请检查");
+	public NotFoundTransactionComponentConfigurationException(String... transactionComponentPackages) {
+		super("在指定的事务组件包["+Arrays.toString(transactionComponentPackages)+"]中, 没有扫描到事务组件配置, 请检查");
 	}
 }

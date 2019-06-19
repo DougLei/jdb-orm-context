@@ -36,11 +36,11 @@ public final class SessionFactoryRegister {
 	// --------------------------------------------------------------------------------------------
 	/**
 	 * 【必须的数据源】使用默认的配置文件path注册默认的jdb-orm SessionFactory实例
-	 * @param scanTransactionComponentPackages 要扫描事务组件包路径
+	 * @param transactionComponentPackages 要扫描事务组件包路径
 	 * @return
 	 */
-	public SessionFactory registerDefaultSessionFactory(String... scanTransactionComponentPackages) {
-		return registerDefaultSessionFactoryByConfigurationFile(Configuration.DEFAULT_CONF_FILE, scanTransactionComponentPackages);
+	public SessionFactory registerDefaultSessionFactory(String... transactionComponentPackages) {
+		return registerDefaultSessionFactoryByConfigurationFile(Configuration.DEFAULT_CONF_FILE, transactionComponentPackages);
 	}
 	
 	/**

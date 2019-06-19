@@ -27,4 +27,10 @@ public class TransactionComponentProxyEntity {
 	public List<Method> getTransactionMethods() {
 		return transactionMethods;
 	}
+
+	@Override
+	public String toString() {
+		return "TransactionComponentProxyEntity [transactionComponentProxyBeanClass="
+				+ transactionComponentProxyBeanClass.getName() + ", transactionMethods=" + transactionMethods + "]";
+	}
 }

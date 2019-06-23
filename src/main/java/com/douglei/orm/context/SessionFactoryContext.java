@@ -103,7 +103,7 @@ class SessionFactoryContext {
 		NecessaryMappingConfigurationContext.registerNecessaryMappingConfiguration(necessaryMappingConfiguration);
 		SessionFactory sessionFactory = getSessionFactory();
 		if(SessionFactoryAndnecessaryMappingConfigurationLinkContext.addLink(sessionFactory.getId(), necessaryMappingConfiguration)) {
-			sessionFactory.dynamicBatchAddOrCoverMapping(necessaryMappingConfiguration.getNecessaryMappings());
+			sessionFactory.dynamicBatchAddMapping(necessaryMappingConfiguration.getNecessaryMappings());
 		}
 	}
 	
@@ -114,7 +114,7 @@ class SessionFactoryContext {
 	static void addNecessaryMappingConfiguration(String necessaryMappingConfigurationClassName) {
 		SessionFactory sessionFactory = getSessionFactory();
 		if(SessionFactoryAndnecessaryMappingConfigurationLinkContext.addLink(sessionFactory.getId(), necessaryMappingConfigurationClassName)) {
-			sessionFactory.dynamicBatchAddOrCoverMapping(NecessaryMappingConfigurationContext.getNecessaryMappingConfiguration(necessaryMappingConfigurationClassName).getNecessaryMappings());
+			sessionFactory.dynamicBatchAddMapping(NecessaryMappingConfigurationContext.getNecessaryMappingConfiguration(necessaryMappingConfigurationClassName).getNecessaryMappings());
 		}
 	}
 	

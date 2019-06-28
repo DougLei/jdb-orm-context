@@ -3,7 +3,7 @@
 	
 	<groupId>com.douglei</groupId>
 	<artifactId>jdb-orm-context</artifactId>
-	<version>1.0.0</version>
+	<version>0.0.1-SNAPSHOT</version>
 	
 	<name>jdb-orm-context</name>
 	
@@ -36,7 +36,7 @@
 		<dependency>
 		    <groupId>com.oracle</groupId>
 		    <artifactId>ojdbc6</artifactId>
-		    <version>1.0.0</version>
+		     <version>11.2.0</version>
 		    <scope>test</scope>
 		</dependency>
 		

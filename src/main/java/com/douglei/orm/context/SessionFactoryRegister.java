@@ -12,7 +12,6 @@ import com.douglei.orm.context.exception.DefaultSessionFactoryExistsException;
 import com.douglei.orm.context.exception.SessionFactoryRegistrationException;
 import com.douglei.orm.context.exception.TooManyInstanceException;
 import com.douglei.orm.context.exception.UnRegisterDefaultSessionFactoryException;
-import com.douglei.orm.context.necessary.mapping.configuration.NecessaryMappingConfiguration;
 import com.douglei.orm.sessionfactory.SessionFactory;
 
 /**
@@ -144,32 +143,5 @@ public final class SessionFactoryRegister {
 	 */
 	public void setSessionFactoryId(String sessionFactoryId) {
 		SessionFactoryId4CurrentThread.setSessionFactoryId4CurrentThread(sessionFactoryId);
-	}
-	
-	// --------------------------------------------------------------------------------------------
-	// 操作necessaryMappingConfiguration
-	// --------------------------------------------------------------------------------------------
-	/**
-	 * 给SessionFactory添加necessaryMappingConfiguration
-	 * @param necessaryMappingConfiguration
-	 */
-	public void addNecessaryMappingConfiguration(NecessaryMappingConfiguration necessaryMappingConfiguration) {
-		SessionFactoryContext.addNecessaryMappingConfiguration(necessaryMappingConfiguration);
-	}
-	
-	/**
-	 * 给SessionFactory添加necessaryMappingConfiguration
-	 * @param necessaryMappingConfigurationClassName
-	 */
-	public void addNecessaryMappingConfiguration(String necessaryMappingConfigurationClassName) {
-		SessionFactoryContext.addNecessaryMappingConfiguration(necessaryMappingConfigurationClassName);
-	}
-	
-	/**
-	 * 从SessionFactory移除necessaryMappingConfiguration
-	 * @param necessaryMappingConfigurationClassName
-	 */
-	public void removeNecessaryMappingConfiguration(String necessaryMappingConfigurationClassName) {
-		SessionFactoryContext.removeNecessaryMappingConfiguration(necessaryMappingConfigurationClassName);
 	}
 }

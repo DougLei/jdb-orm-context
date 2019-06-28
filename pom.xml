@@ -17,13 +17,13 @@
 		<dependency>
 			<groupId>com.douglei</groupId>
 			<artifactId>jdb-orm</artifactId>
-			<version>1.0.0</version>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>com.douglei</groupId>
 			<artifactId>jaop</artifactId>
-			<version>1.0.0</version>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>

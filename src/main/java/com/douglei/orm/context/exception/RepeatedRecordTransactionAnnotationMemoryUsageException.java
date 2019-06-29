@@ -1,6 +1,6 @@
 package com.douglei.orm.context.exception;
 
-import com.douglei.orm.context.TransactionAnnotationMemoryUsage;
+import com.douglei.orm.context.transaction.component.TransactionAnnotationMemoryUsage;
 
 /**
  * 重复记录Transaction注解使用情况异常

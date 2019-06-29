@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.douglei.orm.context.exception.UnsupportUseSessionContextException;
+import com.douglei.orm.context.transaction.component.TransactionAnnotationMemoryUsage;
 import com.douglei.orm.core.dialect.TransactionIsolationLevel;
 import com.douglei.orm.sessions.Session;
 

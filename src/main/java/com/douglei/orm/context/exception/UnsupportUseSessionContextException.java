@@ -2,7 +2,7 @@ package com.douglei.orm.context.exception;
 
 import com.douglei.orm.context.SessionContext;
 import com.douglei.orm.context.SimpleSessionContext;
-import com.douglei.orm.context.Transaction;
+import com.douglei.orm.context.transaction.component.Transaction;
 
 /**
  * 不支持的使用SessionContext异常

@@ -5,6 +5,7 @@ import com.douglei.orm.sessions.Session;
 
 /**
  * 对session的commit/rollback/close, 都由调用者自行控制
+ * <b>一个线程中, 只会产生一个session</b>
  * @author DougLei
  */
 public class SimpleSessionContext {

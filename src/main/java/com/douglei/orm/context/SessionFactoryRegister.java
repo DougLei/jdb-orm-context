@@ -12,6 +12,8 @@ import com.douglei.orm.context.exception.DefaultSessionFactoryExistsException;
 import com.douglei.orm.context.exception.SessionFactoryRegistrationException;
 import com.douglei.orm.context.exception.TooManyInstanceException;
 import com.douglei.orm.context.exception.UnRegisterDefaultSessionFactoryException;
+import com.douglei.orm.context.transaction.component.TransactionAnnotationMemoryUsage;
+import com.douglei.orm.context.transaction.component.TransactionComponentProxyEntity;
 import com.douglei.orm.sessionfactory.SessionFactory;
 
 /**

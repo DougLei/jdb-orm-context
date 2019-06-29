@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.douglei.aop.ProxyInterceptor;
+import com.douglei.orm.context.transaction.component.Transaction;
 import com.douglei.orm.sessions.Session;
 
 /**

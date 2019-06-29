@@ -1,10 +1,11 @@
-package com.douglei.orm.context;
+package com.douglei.orm.context.transaction.component;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import com.douglei.orm.context.PropagationBehavior;
 import com.douglei.orm.core.dialect.TransactionIsolationLevel;
 
 /**

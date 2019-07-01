@@ -50,8 +50,8 @@ class SessionWrapper {
 	}
 
 	public void printStackTraces() {
-		for (Throwable t : throwables) {
-			t.printStackTrace();
+		for(int i=throwables.size()-1;i>=0;i--) {
+			throwables.get(i).printStackTrace();
 		}
 	}
 

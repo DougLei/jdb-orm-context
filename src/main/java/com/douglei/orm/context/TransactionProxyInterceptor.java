@@ -65,7 +65,7 @@ public class TransactionProxyInterceptor extends ProxyInterceptor{
 	@Override
 	protected void exception(Object obj, Method method, Object[] args, Throwable t) {
 		SessionWrapper sessionWrapper = SessionContext.getSessionWrapper();
-		sessionWrapper.setThrowable(t);
+		sessionWrapper.pushThrowable(t);
 		if(sessionWrapper.ready()) {
 			logger.debug("{} session do rollback", sessionWrapper);
 			sessionWrapper.getSession().rollback();

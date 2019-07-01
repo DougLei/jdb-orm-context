@@ -30,7 +30,7 @@ class SessionWrapper {
 		count--;
 		return this;
 	}
-	public void setThrowable(Throwable throwable) {
+	public void pushThrowable(Throwable throwable) {
 		if(this.throwables == null) {
 			this.throwables = new ArrayList<Throwable>();
 		}else if(this.throwables.contains(throwable)) {

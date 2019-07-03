@@ -40,7 +40,7 @@ public class TransactionAnnotationMemoryUsage {
 	 */
 	public static List<TransactionComponentProxyEntity> scanTransactionComponent(String... transactionComponentPackages) {
 		if(transactionComponentPackages.length > 0) {
-			ClassScanner cs = new ClassScanner();
+			ClassScanner cs = new ClassScanner(true);
 			List<String> classes = cs.multiScan(transactionComponentPackages);
 			if(classes.size() > 0) {
 				List<TransactionComponentProxyEntity> transactionComponentProxyEntities = null;

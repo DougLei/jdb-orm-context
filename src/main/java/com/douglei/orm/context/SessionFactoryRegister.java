@@ -41,7 +41,7 @@ public final class SessionFactoryRegister {
 	 * @return
 	 */
 	public SessionFactory registerDefaultSessionFactory(String... transactionComponentPackages) {
-		return registerDefaultSessionFactory(false, transactionComponentPackages);
+		return registerDefaultSessionFactoryByConfigurationFile(Configuration.DEFAULT_CONF_FILE, false, transactionComponentPackages);
 	}
 	
 	/**

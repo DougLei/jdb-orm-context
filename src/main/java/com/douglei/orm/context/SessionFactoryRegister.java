@@ -41,7 +41,17 @@ public final class SessionFactoryRegister {
 	 * @return
 	 */
 	public SessionFactory registerDefaultSessionFactory(String... transactionComponentPackages) {
-		return registerDefaultSessionFactoryByConfigurationFile(Configuration.DEFAULT_CONF_FILE, transactionComponentPackages);
+		return registerDefaultSessionFactory(false, transactionComponentPackages);
+	}
+	
+	/**
+	 * 【必须的数据源】使用默认的配置文件path注册默认的jdb-orm SessionFactory实例
+	 * @param searchAllPath
+	 * @param transactionComponentPackages 要扫描事务组件包路径
+	 * @return
+	 */
+	public SessionFactory registerDefaultSessionFactory(boolean searchAllPath, String... transactionComponentPackages) {
+		return registerDefaultSessionFactoryByConfigurationFile(Configuration.DEFAULT_CONF_FILE, searchAllPath, transactionComponentPackages);
 	}
 	
 	/**
@@ -51,6 +61,17 @@ public final class SessionFactoryRegister {
 	 * @return
 	 */
 	public SessionFactory registerDefaultSessionFactoryByConfigurationFile(String configurationFile, String... transactionComponentPackages) {
+		return registerDefaultSessionFactoryByConfigurationFile(configurationFile, false, transactionComponentPackages);
+	}
+	
+	/**
+	 * 【必须的数据源】使用指定的配置文件path注册默认的jdb-orm Configuration实例
+	 * @param configurationFile
+	 * @param searchAllPath
+	 * @param transactionComponentPackages 要扫描事务组件包路径
+	 * @return
+	 */
+	public SessionFactory registerDefaultSessionFactoryByConfigurationFile(String configurationFile, boolean searchAllPath, String... transactionComponentPackages) {
 		if(registerDefaultSessionFactory) {
 			throw new DefaultSessionFactoryExistsException(SessionFactoryContext.getDefaultSessionFactory().getId());
 		}
@@ -58,17 +79,18 @@ public final class SessionFactoryRegister {
 		SessionFactory sessionFactory = new XmlConfiguration(configurationFile).buildSessionFactory();
 		SessionFactoryContext.registerDefaultSessionFactory(sessionFactory);
 		
-		scanTransactionComponent(transactionComponentPackages);
+		scanTransactionComponent(searchAllPath, transactionComponentPackages);
 		return sessionFactory;
 	}
 	
 	/**
 	 * 根据包路径扫描事务组件
+	 * @param searchAllPath
 	 * @param transactionComponentPackages 要扫描事务组件包路径
 	 */
-	private void scanTransactionComponent(String... transactionComponentPackages) {
+	private void scanTransactionComponent(boolean searchAllPath, String... transactionComponentPackages) {
 		if(transactionComponentPackages.length > 0) {
-			List<TransactionComponentProxyEntity> transactionComponentProxyEntities = TransactionAnnotationMemoryUsage.scanTransactionComponent(transactionComponentPackages);
+			List<TransactionComponentProxyEntity> transactionComponentProxyEntities = TransactionAnnotationMemoryUsage.scanTransactionComponent(searchAllPath, transactionComponentPackages);
 			for (TransactionComponentProxyEntity transactionComponentProxyEntity : transactionComponentProxyEntities) {
 				ProxyBeanContext.createAndAddProxy(transactionComponentProxyEntity.getTransactionComponentProxyBeanClass(), new TransactionProxyInterceptor(transactionComponentProxyEntity.getTransactionComponentProxyBeanClass(), transactionComponentProxyEntity.getTransactionMethods()));
 			}

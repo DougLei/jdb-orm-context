@@ -12,6 +12,7 @@ import com.douglei.orm.context.exception.DefaultSessionFactoryExistsException;
 import com.douglei.orm.context.exception.SessionFactoryRegistrationException;
 import com.douglei.orm.context.exception.TooManyInstanceException;
 import com.douglei.orm.context.exception.UnRegisterDefaultSessionFactoryException;
+import com.douglei.orm.context.exception.UnRegisterMultipleSessionFactoryException;
 import com.douglei.orm.context.transaction.component.TransactionAnnotationMemoryUsage;
 import com.douglei.orm.context.transaction.component.TransactionComponentProxyEntity;
 import com.douglei.orm.sessionfactory.SessionFactory;
@@ -22,7 +23,8 @@ import com.douglei.orm.sessionfactory.SessionFactory;
  * @author DougLei
  */
 public final class SessionFactoryRegister {
-	private boolean registerDefaultSessionFactory;// 是否注册过默认SessionFactory
+	private boolean registerDefaultSessionFactory;// 是否注册过默认的SessionFactory
+	private boolean registerMultipleSessionFactory;// 是否注册过多个SessionFactory
 	private static short instanceCount = 0;// 实例化次数
 	
 	public SessionFactoryRegister() {
@@ -105,9 +107,13 @@ public final class SessionFactoryRegister {
 	 * @param configurationFile
 	 * @return
 	 */
-	public SessionFactory registerSessionFactoryByConfigurationFile(String configurationFile) {
+	public void registerSessionFactoryByConfigurationFile(String configurationFile) {
 		if(registerDefaultSessionFactory) {
-			return registerSessionFactoryByConfigurationInputStream(SessionFactoryRegister.class.getClassLoader().getResourceAsStream(configurationFile));
+			InputStream input = SessionFactoryRegister.class.getClassLoader().getResourceAsStream(configurationFile);
+			if(input == null) {
+				throw new SessionFactoryRegistrationException("不存在路径为["+configurationFile+"]的配置文件");
+			}
+			registerSessionFactoryByConfigurationInputStream(input);
 		}
 		throw new UnRegisterDefaultSessionFactoryException();
 	}
@@ -117,12 +123,14 @@ public final class SessionFactoryRegister {
 	 * @param configurationContent
 	 * @return
 	 */
-	public SessionFactory registerSessionFactoryByConfigurationContent(String configurationContent) {
+	public void registerSessionFactoryByConfigurationContent(String configurationContent) {
 		if(registerDefaultSessionFactory) {
 			try {
-				return registerSessionFactoryByConfigurationInputStream(new ByteArrayInputStream(configurationContent.getBytes("utf-8")));
+				registerSessionFactoryByConfigurationInputStream(new ByteArrayInputStream(configurationContent.getBytes("utf-8")));
 			} catch (UnsupportedEncodingException e) {
 				throw new SessionFactoryRegistrationException("将configurationContent=["+configurationContent+"]转换为utf-8编码格式的byte数组时出现异常", e);
+			} catch (Exception e) {
+				throw e;
 			}
 		}
 		throw new UnRegisterDefaultSessionFactoryException();
@@ -133,11 +141,10 @@ public final class SessionFactoryRegister {
 	 * @param in
 	 * @return
 	 */
-	public SessionFactory registerSessionFactoryByConfigurationInputStream(InputStream in) {
+	public void registerSessionFactoryByConfigurationInputStream(InputStream in) {
 		if(registerDefaultSessionFactory) {
-			SessionFactory sessionFactory = new XmlConfiguration(in).buildSessionFactory();
-			SessionFactoryContext.registerSessionFactory(sessionFactory);
-			return sessionFactory;
+			SessionFactoryContext.registerSessionFactory(new XmlConfiguration(in).buildSessionFactory());
+			registerMultipleSessionFactory = true;
 		}
 		throw new UnRegisterDefaultSessionFactoryException();
 	}
@@ -150,7 +157,10 @@ public final class SessionFactoryRegister {
 	 * @return
 	 */
 	public SessionFactory getSessionFactory() {
-		return SessionFactoryContext.getSessionFactory();
+		if(registerDefaultSessionFactory) {
+			return SessionFactoryContext.getSessionFactory();
+		}
+		throw new UnRegisterDefaultSessionFactoryException();
 	}
 	
 	/**
@@ -158,14 +168,20 @@ public final class SessionFactoryRegister {
 	 * @param sessionFactoryId
 	 */
 	public void destroySessionFactory(String sessionFactoryId) {
-		SessionFactoryContext.destroySessionFactory(sessionFactoryId);
+		if(registerMultipleSessionFactory) {
+			registerMultipleSessionFactory = SessionFactoryContext.destroySessionFactory(sessionFactoryId);
+		}
+		throw new UnRegisterMultipleSessionFactoryException("没有注册多个SessionFactory, 无法进行destroySessionFactory操作");
 	}
 	
 	/**
 	 * 设置要操作的sessionFactoryId
 	 * @param sessionFactoryId
 	 */
-	public void setSessionFactoryId(String sessionFactoryId) {
-		SessionFactoryId4CurrentThread.setSessionFactoryId4CurrentThread(sessionFactoryId);
+	public SessionFactoryRegister setSessionFactoryId(String sessionFactoryId) {
+		if(registerMultipleSessionFactory) {
+			SessionFactoryId4CurrentThread.setSessionFactoryId4CurrentThread(sessionFactoryId);
+		}
+		return this;
 	}
 }

@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.douglei.orm.context.exception.NotExistsSessionFactoryException;
+import com.douglei.orm.context.exception.ProhibitDestroyDefaultSessionFactoryException;
 import com.douglei.orm.context.exception.RepeatedSessionFactoryException;
-import com.douglei.orm.context.exception.UnRegisterDefaultSessionFactoryException;
 import com.douglei.orm.sessionfactory.SessionFactory;
 import com.douglei.tools.utils.StringUtil;
 
@@ -32,13 +32,14 @@ class SessionFactoryContext {
 	 * 注册SessionFactory
 	 * @param sessionFactory
 	 */
-	static void registerSessionFactory(SessionFactory sessionFactory) {
+	synchronized static void registerSessionFactory(SessionFactory sessionFactory) {
+		String sessionFactoryId = sessionFactory.getId();
 		if(JDB_ORM_SESSION_FACTORY_MAPPING == null) {
 			JDB_ORM_SESSION_FACTORY_MAPPING = new HashMap<String, SessionFactory>(8);
-		}else if(JDB_ORM_SESSION_FACTORY_MAPPING.containsKey(sessionFactory.getId())) {
-			throw new RepeatedSessionFactoryException(sessionFactory.getId());
+		}else if(JDB_ORM_SESSION_FACTORY_MAPPING.containsKey(sessionFactoryId) || DEFAULT_JDB_ORM_SESSION_FACTORY.getId().equals(sessionFactoryId)) {
+			throw new RepeatedSessionFactoryException(sessionFactoryId);
 		}
-		JDB_ORM_SESSION_FACTORY_MAPPING.put(sessionFactory.getId(), sessionFactory);
+		JDB_ORM_SESSION_FACTORY_MAPPING.put(sessionFactoryId, sessionFactory);
 	}
 	
 	// --------------------------------------------------------------------------------------------
@@ -49,9 +50,6 @@ class SessionFactoryContext {
 	 * @return
 	 */
 	static SessionFactory getDefaultSessionFactory() {
-		if(DEFAULT_JDB_ORM_SESSION_FACTORY == null) {
-			throw new UnRegisterDefaultSessionFactoryException();
-		}
 		return DEFAULT_JDB_ORM_SESSION_FACTORY;
 	}
 	
@@ -61,7 +59,7 @@ class SessionFactoryContext {
 	 */
 	static SessionFactory getSessionFactory() {
 		if(JDB_ORM_SESSION_FACTORY_MAPPING == null) {// 没有动态添加SessionFactory时, 返回默认的SessionFactory
-			return getDefaultSessionFactory();
+			return DEFAULT_JDB_ORM_SESSION_FACTORY;
 		}
 		String sessionFactoryId = SessionFactoryId4CurrentThread.getSessionFactoryId4CurrentThread();
 		if(StringUtil.isEmpty(sessionFactoryId)) {
@@ -70,8 +68,8 @@ class SessionFactoryContext {
 		
 		if(JDB_ORM_SESSION_FACTORY_MAPPING.containsKey(sessionFactoryId)) {
 			return JDB_ORM_SESSION_FACTORY_MAPPING.get(sessionFactoryId);
-		}else if(getDefaultSessionFactory().getId().equals(sessionFactoryId)) {
-			return getDefaultSessionFactory();
+		}else if(DEFAULT_JDB_ORM_SESSION_FACTORY.getId().equals(sessionFactoryId)) {
+			return DEFAULT_JDB_ORM_SESSION_FACTORY;
 		}
 		throw new NotExistsSessionFactoryException(sessionFactoryId);
 	}
@@ -82,12 +80,17 @@ class SessionFactoryContext {
 	/**
 	 * 销毁SessionFactory
 	 * @param sessionFactoryId
+	 * @return 是否还存在其他数据源
 	 */
-	static void destroySessionFactory(String sessionFactoryId) {
-		SessionFactory sessionFactory = JDB_ORM_SESSION_FACTORY_MAPPING.remove(sessionFactoryId);
-		if(sessionFactory == null) {
+	synchronized static boolean destroySessionFactory(String sessionFactoryId) {
+		if(JDB_ORM_SESSION_FACTORY_MAPPING.containsKey(sessionFactoryId)) {
+			JDB_ORM_SESSION_FACTORY_MAPPING.remove(sessionFactoryId).destroy();
+			return JDB_ORM_SESSION_FACTORY_MAPPING.size() > 0;
+		}else {
+			if(DEFAULT_JDB_ORM_SESSION_FACTORY.getId().equals(sessionFactoryId)) {
+				throw new ProhibitDestroyDefaultSessionFactoryException(sessionFactoryId);
+			}
 			throw new NotExistsSessionFactoryException(sessionFactoryId);
 		}
-		sessionFactory.destroy();
 	}
 }

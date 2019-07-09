@@ -24,7 +24,7 @@ class SessionFactoryContext {
 	 * 注册默认的SessionFactory对象
 	 * @param sessionFactory
 	 */
-	static void registerDefaultSessionFactory(SessionFactory sessionFactory) {
+	synchronized static void registerDefaultSessionFactory(SessionFactory sessionFactory) {
 		DEFAULT_JDB_ORM_SESSION_FACTORY = sessionFactory;
 	}
 	

@@ -14,7 +14,7 @@ import com.douglei.orm.context.exception.TooManyInstanceException;
 import com.douglei.orm.context.exception.UnRegisterDefaultSessionFactoryException;
 import com.douglei.orm.context.exception.UnRegisterMultipleSessionFactoryException;
 import com.douglei.orm.context.transaction.component.TransactionAnnotationMemoryUsage;
-import com.douglei.orm.context.transaction.component.TransactionComponentProxyEntity;
+import com.douglei.orm.context.transaction.component.TransactionComponentEntity;
 import com.douglei.orm.sessionfactory.SessionFactory;
 
 /**
@@ -92,9 +92,9 @@ public final class SessionFactoryRegister {
 	 */
 	private void scanTransactionComponent(boolean searchAllPath, String... transactionComponentPackages) {
 		if(transactionComponentPackages.length > 0) {
-			List<TransactionComponentProxyEntity> transactionComponentProxyEntities = TransactionAnnotationMemoryUsage.scanTransactionComponent(searchAllPath, transactionComponentPackages);
-			for (TransactionComponentProxyEntity transactionComponentProxyEntity : transactionComponentProxyEntities) {
-				ProxyBeanContext.createAndAddProxy(transactionComponentProxyEntity.getTransactionComponentProxyBeanClass(), new TransactionProxyInterceptor(transactionComponentProxyEntity.getTransactionComponentProxyBeanClass(), transactionComponentProxyEntity.getTransactionMethods()));
+			List<TransactionComponentEntity> transactionComponentEntities = TransactionAnnotationMemoryUsage.scanTransactionComponent(searchAllPath, transactionComponentPackages);
+			for (TransactionComponentEntity transactionComponentEntity : transactionComponentEntities) {
+				ProxyBeanContext.createAndAddProxy(transactionComponentEntity.getTransactionComponentProxyBeanClass(), new TransactionProxyInterceptor(transactionComponentEntity.getTransactionComponentProxyBeanClass(), transactionComponentEntity.getTransactionMethods()));
 			}
 		}
 	}

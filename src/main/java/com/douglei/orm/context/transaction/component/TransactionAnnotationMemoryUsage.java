@@ -39,12 +39,12 @@ public class TransactionAnnotationMemoryUsage {
 	 * @param transactionComponentPackages
 	 * @return 返回扫描到的TransactionClass集合
 	 */
-	public static List<TransactionComponentProxyEntity> scanTransactionComponent(boolean searchAllPath, String... transactionComponentPackages) {
+	public static List<TransactionComponentEntity> scanTransactionComponent(boolean searchAllPath, String... transactionComponentPackages) {
 		if(transactionComponentPackages.length > 0) {
 			ClassScanner cs = new ClassScanner();
 			List<String> classes = cs.multiScan(searchAllPath, transactionComponentPackages);
 			if(classes.size() > 0) {
-				List<TransactionComponentProxyEntity> transactionComponentProxyEntities = null;
+				List<TransactionComponentEntity> transactionComponentProxyEntities = null;
 				
 				Class<?> loadClass = null;
 				Method[] declareMethods = null;
@@ -55,11 +55,11 @@ public class TransactionAnnotationMemoryUsage {
 						declareMethods = loadClass.getDeclaredMethods();
 						
 						if(declareMethods.length > 0) {
-							TransactionComponentProxyEntity transactionProxyEntity = null;
+							TransactionComponentEntity transactionProxyEntity = null;
 							for (Method dm : declareMethods) {
 								if(dm.getAnnotation(Transaction.class) != null) {
 									if(transactionProxyEntity == null) {
-										transactionProxyEntity = new TransactionComponentProxyEntity(loadClass, declareMethods.length);
+										transactionProxyEntity = new TransactionComponentEntity(loadClass, declareMethods.length);
 									}
 									transactionProxyEntity.addMethod(dm);
 								}
@@ -67,7 +67,7 @@ public class TransactionAnnotationMemoryUsage {
 							
 							if(transactionProxyEntity != null) {
 								if(transactionComponentProxyEntities == null) {
-									transactionComponentProxyEntities = new LinkedList<TransactionComponentProxyEntity>();
+									transactionComponentProxyEntities = new LinkedList<TransactionComponentEntity>();
 								}
 								transactionComponentProxyEntities.add(transactionProxyEntity);
 							}

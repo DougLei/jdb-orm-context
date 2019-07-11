@@ -8,11 +8,11 @@ import java.util.List;
  * 
  * @author DougLei
  */
-public class TransactionComponentProxyEntity {
+public class TransactionComponentEntity {
 	private Class<?> transactionComponentProxyBeanClass;
 	private List<Method> transactionMethods;
 	
-	public TransactionComponentProxyEntity(Class<?> transactionComponentProxyBeanClass, int methodSize) {
+	public TransactionComponentEntity(Class<?> transactionComponentProxyBeanClass, int methodSize) {
 		this.transactionComponentProxyBeanClass = transactionComponentProxyBeanClass;
 		transactionMethods = new ArrayList<Method>(methodSize);
 	}

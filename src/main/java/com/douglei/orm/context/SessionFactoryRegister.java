@@ -94,7 +94,7 @@ public final class SessionFactoryRegister {
 		if(transactionComponentPackages.length > 0) {
 			List<TransactionComponentEntity> transactionComponentEntities = TransactionAnnotationMemoryUsage.scanTransactionComponent(searchAllPath, transactionComponentPackages);
 			for (TransactionComponentEntity transactionComponentEntity : transactionComponentEntities) {
-				ProxyBeanContext.createAndAddProxy(transactionComponentEntity.getTransactionComponentProxyBeanClass(), new TransactionProxyInterceptor(transactionComponentEntity.getTransactionComponentProxyBeanClass(), transactionComponentEntity.getTransactionMethods()));
+				ProxyBeanContext.createAndAddProxy(transactionComponentEntity.getTransactionComponentClass(), new TransactionProxyInterceptor(transactionComponentEntity.getTransactionComponentClass(), transactionComponentEntity.getTransactionMethods()));
 			}
 		}
 	}

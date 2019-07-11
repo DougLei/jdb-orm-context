@@ -9,11 +9,11 @@ import java.util.List;
  * @author DougLei
  */
 public class TransactionComponentEntity {
-	private Class<?> transactionComponentProxyBeanClass;
+	private Class<?> transactionComponentClass;
 	private List<Method> transactionMethods;
 	
-	public TransactionComponentEntity(Class<?> transactionComponentProxyBeanClass, int methodSize) {
-		this.transactionComponentProxyBeanClass = transactionComponentProxyBeanClass;
+	public TransactionComponentEntity(Class<?> transactionComponentClass, int methodSize) {
+		this.transactionComponentClass = transactionComponentClass;
 		transactionMethods = new ArrayList<Method>(methodSize);
 	}
 
@@ -21,8 +21,8 @@ public class TransactionComponentEntity {
 		transactionMethods.add(method);
 	}
 	
-	public Class<?> getTransactionComponentProxyBeanClass() {
-		return transactionComponentProxyBeanClass;
+	public Class<?> getTransactionComponentClass() {
+		return transactionComponentClass;
 	}
 	public List<Method> getTransactionMethods() {
 		return transactionMethods;
@@ -30,7 +30,7 @@ public class TransactionComponentEntity {
 
 	@Override
 	public String toString() {
-		return "TransactionComponentProxyEntity [transactionComponentProxyBeanClass="
-				+ transactionComponentProxyBeanClass.getName() + ", transactionMethods=" + transactionMethods + "]";
+		return "TransactionComponentProxyEntity [transactionComponentClass="
+				+ transactionComponentClass.getName() + ", transactionMethods=" + transactionMethods + "]";
 	}
 }

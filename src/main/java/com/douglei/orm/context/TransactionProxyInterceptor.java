@@ -22,8 +22,11 @@ public class TransactionProxyInterceptor extends ProxyInterceptor{
 	}
 
 	@Override
-	protected boolean before(Object obj, Method method, Object[] args) {
+	protected boolean before_(Object obj, Method method, Object[] args) {
 		Transaction transaction = method.getAnnotation(Transaction.class);
+		if(transaction == null) {
+			return false;
+		}
 		switch(transaction.propagationBehavior()) {
 			case REQUIRED:
 				SessionWrapper sessionWrapper_REQUIRED = SessionContext.existsSessionWrapper();
@@ -53,7 +56,7 @@ public class TransactionProxyInterceptor extends ProxyInterceptor{
 	}
 
 	@Override
-	protected Object after(Object obj, Method method, Object[] args, Object result) throws Throwable {
+	protected Object after_(Object obj, Method method, Object[] args, Object result) throws Throwable {
 		SessionWrapper sessionWrapper = SessionContext.getSessionWrapper();
 		if(sessionWrapper.readyCommit()) {
 			logger.debug("{} session do commit", sessionWrapper);
@@ -63,7 +66,7 @@ public class TransactionProxyInterceptor extends ProxyInterceptor{
 	}
 
 	@Override
-	protected void exception(Object obj, Method method, Object[] args, Throwable t) {
+	protected void exception_(Object obj, Method method, Object[] args, Throwable t) {
 		SessionWrapper sessionWrapper = SessionContext.getSessionWrapper();
 		sessionWrapper.pushThrowable(t);
 		if(sessionWrapper.ready()) {

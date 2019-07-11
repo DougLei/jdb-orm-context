@@ -44,7 +44,7 @@ public class TransactionAnnotationMemoryUsage {
 			ClassScanner cs = new ClassScanner();
 			List<String> classes = cs.multiScan(searchAllPath, transactionComponentPackages);
 			if(classes.size() > 0) {
-				List<TransactionComponentEntity> transactionComponentProxyEntities = null;
+				List<TransactionComponentEntity> transactionComponentEntities = null;
 				
 				Class<?> loadClass = null;
 				Method[] declareMethods = null;
@@ -55,21 +55,21 @@ public class TransactionAnnotationMemoryUsage {
 						declareMethods = loadClass.getDeclaredMethods();
 						
 						if(declareMethods.length > 0) {
-							TransactionComponentEntity transactionProxyEntity = null;
+							TransactionComponentEntity transactionComponentEntity = null;
 							for (Method dm : declareMethods) {
 								if(dm.getAnnotation(Transaction.class) != null) {
-									if(transactionProxyEntity == null) {
-										transactionProxyEntity = new TransactionComponentEntity(loadClass, declareMethods.length);
+									if(transactionComponentEntity == null) {
+										transactionComponentEntity = new TransactionComponentEntity(loadClass, declareMethods.length);
 									}
-									transactionProxyEntity.addMethod(dm);
+									transactionComponentEntity.addMethod(dm);
 								}
 							}
 							
-							if(transactionProxyEntity != null) {
-								if(transactionComponentProxyEntities == null) {
-									transactionComponentProxyEntities = new LinkedList<TransactionComponentEntity>();
+							if(transactionComponentEntity != null) {
+								if(transactionComponentEntities == null) {
+									transactionComponentEntities = new LinkedList<TransactionComponentEntity>();
 								}
-								transactionComponentProxyEntities.add(transactionProxyEntity);
+								transactionComponentEntities.add(transactionComponentEntity);
 							}
 						}
 					}
@@ -77,9 +77,9 @@ public class TransactionAnnotationMemoryUsage {
 				
 				cs.destroy();
 				
-				if(transactionComponentProxyEntities != null) {
+				if(transactionComponentEntities != null) {
 					setIsUse();
-					return transactionComponentProxyEntities;
+					return transactionComponentEntities;
 				}
 			}
 		}

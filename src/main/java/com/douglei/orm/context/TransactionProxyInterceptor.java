@@ -25,17 +25,17 @@ public class TransactionProxyInterceptor extends ProxyInterceptor{
 
 	/**
 	 * 获取Transaction注解
-	 * @param obj
+	 * @param originObject
 	 * @param method
 	 * @return
 	 * @throws SecurityException 
 	 * @throws NoSuchMethodException 
 	 */
-	private Transaction getTransactionAnnotation(Object obj, Method method) {
+	private Transaction getTransactionAnnotation(Object originObject, Method method) {
 		Transaction transaction = method.getAnnotation(Transaction.class);
 		if(transaction == null && method.getDeclaringClass().isInterface()) {
 			try {
-				transaction = obj.getClass().getDeclaredMethod(method.getName(), method.getParameterTypes()).getAnnotation(Transaction.class);
+				transaction = originObject.getClass().getDeclaredMethod(method.getName(), method.getParameterTypes()).getAnnotation(Transaction.class);
 			} catch (Exception e) {
 				logger.error("获取[{}]注解时出现异常: {}", Transaction.class.getName(), ExceptionUtil.getExceptionDetailMessage(e));
 				return null;
@@ -45,8 +45,8 @@ public class TransactionProxyInterceptor extends ProxyInterceptor{
 	}
 	
 	@Override
-	protected boolean before_(Object obj, Method method, Object[] args) {
-		Transaction transaction = getTransactionAnnotation(obj, method);
+	protected boolean before_(Object originObject, Method method, Object[] args) {
+		Transaction transaction = getTransactionAnnotation(originObject, method);
 		if(transaction == null) {
 			return false;
 		}
@@ -79,7 +79,7 @@ public class TransactionProxyInterceptor extends ProxyInterceptor{
 	}
 
 	@Override
-	protected Object after_(Object obj, Method method, Object[] args, Object result) throws Throwable {
+	protected Object after_(Object originObject, Method method, Object[] args, Object result) throws Throwable {
 		SessionWrapper sessionWrapper = SessionContext.getSessionWrapper();
 		if(sessionWrapper.readyCommit()) {
 			logger.debug("{} session do commit", sessionWrapper);
@@ -89,7 +89,7 @@ public class TransactionProxyInterceptor extends ProxyInterceptor{
 	}
 
 	@Override
-	protected void exception_(Object obj, Method method, Object[] args, Throwable t) {
+	protected void exception_(Object originObject, Method method, Object[] args, Throwable t) {
 		SessionWrapper sessionWrapper = SessionContext.getSessionWrapper();
 		sessionWrapper.pushThrowable(t);
 		if(sessionWrapper.ready()) {
@@ -100,7 +100,7 @@ public class TransactionProxyInterceptor extends ProxyInterceptor{
 	}
 
 	@Override
-	protected void finally_(Object obj, Method method, Object[] args) {
+	protected void finally_(Object originObject, Method method, Object[] args) {
 		SessionWrapper sessionWrapper = SessionContext.getSessionWrapper();
 		if(sessionWrapper.ready()) {
 			Session session = SessionContext.popSession();

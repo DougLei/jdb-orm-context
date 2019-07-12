@@ -10,6 +10,7 @@ import com.douglei.aop.ProxyInterceptor;
 import com.douglei.aop.ProxyMethod;
 import com.douglei.orm.context.transaction.component.Transaction;
 import com.douglei.orm.sessions.Session;
+import com.douglei.tools.utils.ExceptionUtil;
 
 /**
  * 
@@ -22,9 +23,30 @@ public class TransactionProxyInterceptor extends ProxyInterceptor{
 		super(clz, methods);
 	}
 
+	/**
+	 * 获取Transaction注解
+	 * @param obj
+	 * @param method
+	 * @return
+	 * @throws SecurityException 
+	 * @throws NoSuchMethodException 
+	 */
+	private Transaction getTransactionAnnotation(Object obj, Method method) {
+		Transaction transaction = method.getAnnotation(Transaction.class);
+		if(transaction == null && method.getDeclaringClass().isInterface()) {
+			try {
+				transaction = obj.getClass().getDeclaredMethod(method.getName(), method.getParameterTypes()).getAnnotation(Transaction.class);
+			} catch (Exception e) {
+				logger.error("获取[{}]注解时出现异常: {}", Transaction.class.getName(), ExceptionUtil.getExceptionDetailMessage(e));
+				return null;
+			}
+		}
+		return transaction;
+	}
+	
 	@Override
 	protected boolean before_(Object obj, Method method, Object[] args) {
-		Transaction transaction = method.getAnnotation(Transaction.class);
+		Transaction transaction = getTransactionAnnotation(obj, method);
 		if(transaction == null) {
 			return false;
 		}

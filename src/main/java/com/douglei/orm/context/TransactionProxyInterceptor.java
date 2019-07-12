@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.douglei.aop.ProxyInterceptor;
+import com.douglei.aop.ProxyMethod;
 import com.douglei.orm.context.transaction.component.Transaction;
 import com.douglei.orm.sessions.Session;
 
@@ -17,7 +18,7 @@ import com.douglei.orm.sessions.Session;
 public class TransactionProxyInterceptor extends ProxyInterceptor{
 	private static final Logger logger = LoggerFactory.getLogger(TransactionProxyInterceptor.class);
 
-	public TransactionProxyInterceptor(Class<?> clz, List<Method> methods) {
+	public TransactionProxyInterceptor(Class<?> clz, List<ProxyMethod> methods) {
 		super(clz, methods);
 	}
 

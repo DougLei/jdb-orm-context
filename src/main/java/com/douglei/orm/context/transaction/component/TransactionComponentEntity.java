@@ -1,8 +1,9 @@
 package com.douglei.orm.context.transaction.component;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.douglei.aop.ProxyMethod;
 
 /**
  * 
@@ -10,21 +11,21 @@ import java.util.List;
  */
 public class TransactionComponentEntity {
 	private Class<?> transactionComponentClass;
-	private List<Method> transactionMethods;
+	private List<ProxyMethod> transactionMethods;
 	
 	public TransactionComponentEntity(Class<?> transactionComponentClass, int methodSize) {
 		this.transactionComponentClass = transactionComponentClass;
-		transactionMethods = new ArrayList<Method>(methodSize);
+		transactionMethods = new ArrayList<ProxyMethod>(methodSize);
 	}
 
-	public void addMethod(Method method) {
+	public void addMethod(ProxyMethod method) {
 		transactionMethods.add(method);
 	}
 	
 	public Class<?> getTransactionComponentClass() {
 		return transactionComponentClass;
 	}
-	public List<Method> getTransactionMethods() {
+	public List<ProxyMethod> getTransactionMethods() {
 		return transactionMethods;
 	}
 

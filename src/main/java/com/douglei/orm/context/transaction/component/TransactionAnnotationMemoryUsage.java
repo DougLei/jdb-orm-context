@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.douglei.aop.ProxyMethod;
 import com.douglei.orm.context.exception.NotFoundTransactionComponentConfigurationException;
 import com.douglei.tools.instances.scanner.ClassScanner;
 import com.douglei.tools.utils.reflect.ClassLoadUtil;
@@ -61,7 +62,7 @@ public class TransactionAnnotationMemoryUsage {
 									if(transactionComponentEntity == null) {
 										transactionComponentEntity = new TransactionComponentEntity(loadClass, declareMethods.length);
 									}
-									transactionComponentEntity.addMethod(dm);
+									transactionComponentEntity.addMethod(new ProxyMethod(dm));
 								}
 							}
 							

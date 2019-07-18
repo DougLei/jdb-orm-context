@@ -36,14 +36,14 @@ public class TransactionAnnotationMemoryUsage {
 	
 	/**
 	 * 根据指定的包路径, 扫描事务组件
-	 * @param searchAllPath
+	 * @param searchAll
 	 * @param transactionComponentPackages
 	 * @return 返回扫描到的TransactionClass集合
 	 */
-	public static List<TransactionComponentEntity> scanTransactionComponent(boolean searchAllPath, String... transactionComponentPackages) {
+	public static List<TransactionComponentEntity> scanTransactionComponent(boolean searchAll, String... transactionComponentPackages) {
 		if(transactionComponentPackages.length > 0) {
 			ClassScanner cs = new ClassScanner();
-			List<String> classes = cs.multiScan(searchAllPath, transactionComponentPackages);
+			List<String> classes = cs.multiScan(searchAll, transactionComponentPackages);
 			if(classes.size() > 0) {
 				List<TransactionComponentEntity> transactionComponentEntities = null;
 				

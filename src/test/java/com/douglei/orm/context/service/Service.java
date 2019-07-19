@@ -10,7 +10,7 @@ public class Service {
 	@Transaction
 	public void add() {
 		System.out.println("Service.add()");
-		System.out.println(SessionContext.getSession());
+		System.out.println(SessionContext.getSqlSession());
 		System.out.println("Service.add()");
 		
 		ProxyBeanContext.getProxy(Service.class).delete();
@@ -22,7 +22,7 @@ public class Service {
 	@Transaction
 	public void delete() {
 		System.out.println("Service.delete()");
-		System.out.println(SessionContext.getSession());
+		System.out.println(SessionContext.getSqlSession());
 		System.out.println("Service.delete()");
 		throw new NullPointerException("Service.delete1()");
 	}
@@ -30,7 +30,7 @@ public class Service {
 	@Transaction
 	public void delete2() {
 		System.out.println("Service.delete2()");
-		System.out.println(SessionContext.getSession());
+		System.out.println(SessionContext.getSqlSession());
 		System.out.println("Service.delete2()");
 		throw new NullPointerException("Service.delete2()");
 	}
@@ -38,7 +38,7 @@ public class Service {
 	@Transaction(propagationBehavior=PropagationBehavior.REQUIRED_NEW)
 	public void delete3() {
 		System.out.println("Service.delete3()");
-		System.out.println(SessionContext.getSession());
+		System.out.println(SessionContext.getSqlSession());
 		System.out.println("Service.delete3()");
 	}
 }

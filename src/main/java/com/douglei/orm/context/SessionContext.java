@@ -9,6 +9,9 @@ import com.douglei.orm.context.exception.UnsupportUseSessionContextException;
 import com.douglei.orm.context.transaction.component.TransactionAnnotationMemoryUsage;
 import com.douglei.orm.core.dialect.TransactionIsolationLevel;
 import com.douglei.orm.sessions.Session;
+import com.douglei.orm.sessions.session.sql.SQLSession;
+import com.douglei.orm.sessions.session.table.TableSession;
+import com.douglei.orm.sessions.sqlsession.SqlSession;
 
 /**
  * 通过@Transaction注解, 由系统自行控制session的的commit/rollback/close
@@ -18,7 +21,17 @@ public final class SessionContext {
 	private static final Logger logger = LoggerFactory.getLogger(SessionContext.class);
 	private static final ThreadLocal<Stack<SessionWrapper>> SESSION_WRAPPERS = new ThreadLocal<Stack<SessionWrapper>>();
 	
-	public static Session getSession() {
+	public static SqlSession getSqlSession() {
+		return getSession().getSqlSession();
+	}
+	public static TableSession getTableSession() {
+		return getSession().getTableSession();
+	}
+	public static SQLSession getSQLSession() {
+		return getSession().getSQLSession();
+	}
+	
+	private static Session getSession() {
 		if(TransactionAnnotationMemoryUsage.unUse()) {
 			throw new UnsupportUseSessionContextException();
 		}

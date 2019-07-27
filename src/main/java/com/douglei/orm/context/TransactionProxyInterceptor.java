@@ -10,7 +10,7 @@ import com.douglei.aop.ProxyInterceptor;
 import com.douglei.aop.ProxyMethod;
 import com.douglei.orm.context.transaction.component.Transaction;
 import com.douglei.orm.sessions.Session;
-import com.douglei.tools.utils.ExceptionUtil;
+import com.douglei.tools.utils.exception.ExceptionUtil;
 
 /**
  * 

@@ -2,7 +2,7 @@ package com.douglei.orm.context;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import com.douglei.aop.ProxyBeanContext;
@@ -125,13 +125,7 @@ public final class SessionFactoryRegister {
 	 */
 	public void registerSessionFactoryByConfigurationContent(String configurationContent) {
 		if(registerDefaultSessionFactory) {
-			try {
-				registerSessionFactoryByConfigurationInputStream(new ByteArrayInputStream(configurationContent.getBytes("utf-8")));
-			} catch (UnsupportedEncodingException e) {
-				throw new SessionFactoryRegistrationException("将configurationContent=["+configurationContent+"]转换为utf-8编码格式的byte数组时出现异常", e);
-			} catch (Exception e) {
-				throw e;
-			}
+			registerSessionFactoryByConfigurationInputStream(new ByteArrayInputStream(configurationContent.getBytes(StandardCharsets.UTF_8)));
 		}
 		throw new UnRegisterDefaultSessionFactoryException();
 	}

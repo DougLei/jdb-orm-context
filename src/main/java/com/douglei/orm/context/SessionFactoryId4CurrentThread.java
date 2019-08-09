@@ -20,6 +20,10 @@ public class SessionFactoryId4CurrentThread {
 	 * @return
 	 */
 	public static String getSessionFactoryId4CurrentThread() {
-		return SESSION_FACTORY_ID_4_CURRENT_THREAD.get();
+		String id=  SESSION_FACTORY_ID_4_CURRENT_THREAD.get();
+		if(id != null) {
+			SESSION_FACTORY_ID_4_CURRENT_THREAD.remove();
+		}
+		return id;
 	}
 }

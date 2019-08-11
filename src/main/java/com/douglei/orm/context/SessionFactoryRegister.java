@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.douglei.aop.ProxyBeanContext;
 import com.douglei.orm.configuration.Configuration;
+import com.douglei.orm.configuration.environment.mapping.cache.store.MappingCacheStore;
 import com.douglei.orm.configuration.impl.xml.XmlConfiguration;
 import com.douglei.orm.context.exception.DefaultSessionFactoryExistsException;
 import com.douglei.orm.context.exception.SessionFactoryRegistrationException;
@@ -79,6 +80,26 @@ public final class SessionFactoryRegister {
 		}
 		registerDefaultSessionFactory = true;
 		SessionFactory sessionFactory = new XmlConfiguration(configurationFile).buildSessionFactory();
+		SessionFactoryContext.registerDefaultSessionFactory(sessionFactory);
+		
+		scanTransactionComponent(searchAll, transactionComponentPackages);
+		return sessionFactory;
+	}
+	
+	/**
+	 * 【必须的数据源】使用指定的配置文件path注册默认的jdb-orm Configuration实例
+	 * @param configurationFile
+	 * @param searchAll
+	 * @param mappingCacheStore
+	 * @param transactionComponentPackages 要扫描事务组件包路径
+	 * @return
+	 */
+	public SessionFactory registerDefaultSessionFactoryByConfigurationFile(String configurationFile, boolean searchAll, MappingCacheStore mappingCacheStore, String... transactionComponentPackages) {
+		if(registerDefaultSessionFactory) {
+			throw new DefaultSessionFactoryExistsException(SessionFactoryContext.getDefaultSessionFactory().getId());
+		}
+		registerDefaultSessionFactory = true;
+		SessionFactory sessionFactory = new XmlConfiguration(configurationFile, mappingCacheStore).buildSessionFactory();
 		SessionFactoryContext.registerDefaultSessionFactory(sessionFactory);
 		
 		scanTransactionComponent(searchAll, transactionComponentPackages);

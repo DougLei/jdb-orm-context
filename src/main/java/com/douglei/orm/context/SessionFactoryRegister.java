@@ -62,7 +62,7 @@ public final class SessionFactoryRegister {
 	 * @param transactionComponentPackages
 	 * @return
 	 */
-	public synchronized SessionFactory registerDefaultSessionFactoryByConfigurationFile(String configurationFile, ExternalDataSource dataSource, MappingCacheStore mappingCacheStore, boolean searchAll, String... transactionComponentPackages) {
+	public synchronized SessionFactory registerDefaultSessionFactory(String configurationFile, ExternalDataSource dataSource, MappingCacheStore mappingCacheStore, boolean searchAll, String... transactionComponentPackages) {
 		if(registerDefaultSessionFactory) {
 			throw new DefaultSessionFactoryExistsException(SessionFactoryContext.getDefaultSessionFactory().getId());
 		}

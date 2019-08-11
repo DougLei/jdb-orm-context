@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.douglei.aop.ProxyBeanContext;
 import com.douglei.orm.configuration.Configuration;
+import com.douglei.orm.configuration.ExternalDataSource;
 import com.douglei.orm.configuration.environment.mapping.cache.store.MappingCacheStore;
 import com.douglei.orm.configuration.impl.xml.XmlConfiguration;
 import com.douglei.orm.context.exception.DefaultSessionFactoryExistsException;
@@ -35,74 +36,41 @@ public final class SessionFactoryRegister {
 		instanceCount=1;
 	}
 	
+	/**
+	 * 
+	 * @param configurationFile
+	 * @param dataSource
+	 * @param mappingCacheStore
+	 * @return
+	 */
+	private SessionFactory buildSessionFactory(InputStream configurationFile, ExternalDataSource dataSource, MappingCacheStore mappingCacheStore) {
+		Configuration configuration = new XmlConfiguration(configurationFile);
+		configuration.setExternalDataSource(dataSource);
+		configuration.setMappingCacheStore(mappingCacheStore);
+		return configuration.buildSessionFactory();
+	}
+	
 	// --------------------------------------------------------------------------------------------
 	// 【必须的数据源】注册默认的SessionFactory
 	// --------------------------------------------------------------------------------------------
 	/**
-	 * 【必须的数据源】使用默认的配置文件path注册默认的jdb-orm SessionFactory实例
-	 * @param transactionComponentPackages 要扫描事务组件包路径
-	 * @return
-	 */
-	public SessionFactory registerDefaultSessionFactory(String... transactionComponentPackages) {
-		return registerDefaultSessionFactoryByConfigurationFile(Configuration.DEFAULT_CONF_FILE, false, transactionComponentPackages);
-	}
-	
-	/**
-	 * 【必须的数据源】使用默认的配置文件path注册默认的jdb-orm SessionFactory实例
-	 * @param searchAll
-	 * @param transactionComponentPackages 要扫描事务组件包路径
-	 * @return
-	 */
-	public SessionFactory registerDefaultSessionFactory(boolean searchAll, String... transactionComponentPackages) {
-		return registerDefaultSessionFactoryByConfigurationFile(Configuration.DEFAULT_CONF_FILE, searchAll, transactionComponentPackages);
-	}
-	
-	/**
-	 * 【必须的数据源】使用指定的配置文件path注册默认的jdb-orm Configuration实例
+	 * 使用指定的配置文件注册默认的jdb-orm Configuration实例
 	 * @param configurationFile
-	 * @param transactionComponentPackages 要扫描事务组件包路径
-	 * @return
-	 */
-	public SessionFactory registerDefaultSessionFactoryByConfigurationFile(String configurationFile, String... transactionComponentPackages) {
-		return registerDefaultSessionFactoryByConfigurationFile(configurationFile, false, transactionComponentPackages);
-	}
-	
-	/**
-	 * 【必须的数据源】使用指定的配置文件path注册默认的jdb-orm Configuration实例
-	 * @param configurationFile
+	 * @param dataSource 可为空
+	 * @param mappingCacheStore 可为空
 	 * @param searchAll
-	 * @param transactionComponentPackages 要扫描事务组件包路径
+	 * @param transactionComponentPackages
 	 * @return
 	 */
-	public SessionFactory registerDefaultSessionFactoryByConfigurationFile(String configurationFile, boolean searchAll, String... transactionComponentPackages) {
+	public synchronized SessionFactory registerDefaultSessionFactoryByConfigurationFile(String configurationFile, ExternalDataSource dataSource, MappingCacheStore mappingCacheStore, boolean searchAll, String... transactionComponentPackages) {
 		if(registerDefaultSessionFactory) {
 			throw new DefaultSessionFactoryExistsException(SessionFactoryContext.getDefaultSessionFactory().getId());
 		}
-		registerDefaultSessionFactory = true;
-		SessionFactory sessionFactory = new XmlConfiguration(configurationFile).buildSessionFactory();
+		SessionFactory sessionFactory = buildSessionFactory(SessionFactoryRegister.class.getClassLoader().getResourceAsStream(configurationFile), dataSource, mappingCacheStore);
 		SessionFactoryContext.registerDefaultSessionFactory(sessionFactory);
 		
 		scanTransactionComponent(searchAll, transactionComponentPackages);
-		return sessionFactory;
-	}
-	
-	/**
-	 * 【必须的数据源】使用指定的配置文件path注册默认的jdb-orm Configuration实例
-	 * @param configurationFile
-	 * @param searchAll
-	 * @param mappingCacheStore
-	 * @param transactionComponentPackages 要扫描事务组件包路径
-	 * @return
-	 */
-	public SessionFactory registerDefaultSessionFactoryByConfigurationFile(String configurationFile, boolean searchAll, MappingCacheStore mappingCacheStore, String... transactionComponentPackages) {
-		if(registerDefaultSessionFactory) {
-			throw new DefaultSessionFactoryExistsException(SessionFactoryContext.getDefaultSessionFactory().getId());
-		}
 		registerDefaultSessionFactory = true;
-		SessionFactory sessionFactory = new XmlConfiguration(configurationFile, mappingCacheStore).buildSessionFactory();
-		SessionFactoryContext.registerDefaultSessionFactory(sessionFactory);
-		
-		scanTransactionComponent(searchAll, transactionComponentPackages);
 		return sessionFactory;
 	}
 	
@@ -126,15 +94,17 @@ public final class SessionFactoryRegister {
 	/**
 	 * 【多数据源】使用指定的配置文件path注册jdb-orm SessionFactory实例
 	 * @param configurationFile
-	 * @return
+	 * @param dataSource
+	 * @param mappingCacheStore
+	 * @return 
 	 */
-	public void registerSessionFactoryByConfigurationFile(String configurationFile) {
+	public SessionFactory registerSessionFactoryByConfigurationFile(String configurationFile, ExternalDataSource dataSource, MappingCacheStore mappingCacheStore) {
 		if(registerDefaultSessionFactory) {
 			InputStream input = SessionFactoryRegister.class.getClassLoader().getResourceAsStream(configurationFile);
 			if(input == null) {
 				throw new SessionFactoryRegistrationException("不存在路径为["+configurationFile+"]的配置文件");
 			}
-			registerSessionFactoryByConfigurationInputStream(input);
+			return registerSessionFactoryByConfigurationInputStream(input, dataSource, mappingCacheStore);
 		}
 		throw new UnRegisterDefaultSessionFactoryException();
 	}
@@ -142,24 +112,30 @@ public final class SessionFactoryRegister {
 	/**
 	 * 【多数据源】使用指定的配置文件content注册jdb-orm SessionFactory实例
 	 * @param configurationContent
-	 * @return
+	 * @param dataSource
+	 * @param mappingCacheStore
+	 * @return 
 	 */
-	public void registerSessionFactoryByConfigurationContent(String configurationContent) {
+	public SessionFactory registerSessionFactoryByConfigurationContent(String configurationContent, ExternalDataSource dataSource, MappingCacheStore mappingCacheStore) {
 		if(registerDefaultSessionFactory) {
-			registerSessionFactoryByConfigurationInputStream(new ByteArrayInputStream(configurationContent.getBytes(StandardCharsets.UTF_8)));
+			return registerSessionFactoryByConfigurationInputStream(new ByteArrayInputStream(configurationContent.getBytes(StandardCharsets.UTF_8)), dataSource, mappingCacheStore);
 		}
 		throw new UnRegisterDefaultSessionFactoryException();
 	}
 	
 	/**
 	 * 【多数据源】使用指定的配置文件input流注册jdb-orm SessionFactory实例
-	 * @param in
-	 * @return
+	 * @param configurationFile
+	 * @param dataSource
+	 * @param mappingCacheStore
+	 * @return 
 	 */
-	public void registerSessionFactoryByConfigurationInputStream(InputStream in) {
+	public synchronized SessionFactory registerSessionFactoryByConfigurationInputStream(InputStream configurationFile, ExternalDataSource dataSource, MappingCacheStore mappingCacheStore) {
 		if(registerDefaultSessionFactory) {
-			SessionFactoryContext.registerSessionFactory(new XmlConfiguration(in).buildSessionFactory());
+			SessionFactory sessionFactory = buildSessionFactory(configurationFile, dataSource, mappingCacheStore);
+			SessionFactoryContext.registerSessionFactory(sessionFactory);
 			registerMultipleSessionFactory = true;
+			return sessionFactory;
 		}
 		throw new UnRegisterDefaultSessionFactoryException();
 	}
@@ -182,7 +158,7 @@ public final class SessionFactoryRegister {
 	 * 销毁SessionFactory
 	 * @param sessionFactoryId
 	 */
-	public void destroySessionFactory(String sessionFactoryId) {
+	public synchronized void destroySessionFactory(String sessionFactoryId) {
 		if(registerMultipleSessionFactory) {
 			registerMultipleSessionFactory = SessionFactoryContext.destroySessionFactory(sessionFactoryId);
 		}

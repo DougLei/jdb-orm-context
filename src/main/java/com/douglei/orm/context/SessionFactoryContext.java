@@ -24,7 +24,7 @@ class SessionFactoryContext {
 	 * 注册默认的SessionFactory对象
 	 * @param sessionFactory
 	 */
-	synchronized static void registerDefaultSessionFactory(SessionFactory sessionFactory) {
+	static void registerDefaultSessionFactory(SessionFactory sessionFactory) {
 		DEFAULT_JDB_ORM_SESSION_FACTORY = sessionFactory;
 	}
 	
@@ -32,7 +32,7 @@ class SessionFactoryContext {
 	 * 注册SessionFactory
 	 * @param sessionFactory
 	 */
-	synchronized static void registerSessionFactory(SessionFactory sessionFactory) {
+	static void registerSessionFactory(SessionFactory sessionFactory) {
 		String sessionFactoryId = sessionFactory.getId();
 		if(JDB_ORM_SESSION_FACTORY_MAPPING == null) {
 			JDB_ORM_SESSION_FACTORY_MAPPING = new HashMap<String, SessionFactory>(8);
@@ -82,7 +82,7 @@ class SessionFactoryContext {
 	 * @param sessionFactoryId
 	 * @return 是否还存在其他数据源
 	 */
-	synchronized static boolean destroySessionFactory(String sessionFactoryId) {
+	static boolean destroySessionFactory(String sessionFactoryId) {
 		if(JDB_ORM_SESSION_FACTORY_MAPPING.containsKey(sessionFactoryId)) {
 			JDB_ORM_SESSION_FACTORY_MAPPING.remove(sessionFactoryId).destroy();
 			return JDB_ORM_SESSION_FACTORY_MAPPING.size() > 0;

@@ -8,7 +8,7 @@ import java.util.List;
 import com.douglei.aop.ProxyBeanContext;
 import com.douglei.orm.configuration.Configuration;
 import com.douglei.orm.configuration.ExternalDataSource;
-import com.douglei.orm.configuration.environment.mapping.cache.store.MappingCacheStore;
+import com.douglei.orm.configuration.environment.mapping.store.MappingStore;
 import com.douglei.orm.configuration.impl.xml.XmlConfiguration;
 import com.douglei.orm.context.exception.DefaultSessionFactoryExistsException;
 import com.douglei.orm.context.exception.SessionFactoryRegistrationException;
@@ -39,14 +39,14 @@ public final class SessionFactoryRegister {
 	/**
 	 * 
 	 * @param configurationFile
-	 * @param dataSource
-	 * @param mappingCacheStore
+	 * @param dataSource 可为空
+	 * @param mappingStore 可为空
 	 * @return
 	 */
-	private SessionFactory buildSessionFactory(InputStream configurationFile, ExternalDataSource dataSource, MappingCacheStore mappingCacheStore) {
+	private SessionFactory buildSessionFactory(InputStream configurationFile, ExternalDataSource dataSource, MappingStore mappingStore) {
 		Configuration configuration = new XmlConfiguration(configurationFile);
 		configuration.setExternalDataSource(dataSource);
-		configuration.setMappingCacheStore(mappingCacheStore);
+		configuration.setMappingStore(mappingStore);
 		return configuration.buildSessionFactory();
 	}
 	
@@ -57,16 +57,16 @@ public final class SessionFactoryRegister {
 	 * 使用指定的配置文件注册默认的jdb-orm Configuration实例
 	 * @param configurationFile
 	 * @param dataSource 可为空
-	 * @param mappingCacheStore 可为空
+	 * @param mappingStore 可为空
 	 * @param searchAll
 	 * @param transactionComponentPackages
 	 * @return
 	 */
-	public synchronized SessionFactory registerDefaultSessionFactory(String configurationFile, ExternalDataSource dataSource, MappingCacheStore mappingCacheStore, boolean searchAll, String... transactionComponentPackages) {
+	public synchronized SessionFactory registerDefaultSessionFactory(String configurationFile, ExternalDataSource dataSource, MappingStore mappingStore, boolean searchAll, String... transactionComponentPackages) {
 		if(registerDefaultSessionFactory) {
 			throw new DefaultSessionFactoryExistsException(SessionFactoryContext.getDefaultSessionFactory().getId());
 		}
-		SessionFactory sessionFactory = buildSessionFactory(SessionFactoryRegister.class.getClassLoader().getResourceAsStream(configurationFile), dataSource, mappingCacheStore);
+		SessionFactory sessionFactory = buildSessionFactory(SessionFactoryRegister.class.getClassLoader().getResourceAsStream(configurationFile), dataSource, mappingStore);
 		SessionFactoryContext.registerDefaultSessionFactory(sessionFactory);
 		
 		scanTransactionComponent(searchAll, transactionComponentPackages);
@@ -98,7 +98,7 @@ public final class SessionFactoryRegister {
 	 * @param mappingCacheStore
 	 * @return 
 	 */
-	public SessionFactory registerSessionFactoryByConfigurationFile(String configurationFile, ExternalDataSource dataSource, MappingCacheStore mappingCacheStore) {
+	public SessionFactory registerSessionFactoryByConfigurationFile(String configurationFile, ExternalDataSource dataSource, MappingStore mappingCacheStore) {
 		if(registerDefaultSessionFactory) {
 			InputStream input = SessionFactoryRegister.class.getClassLoader().getResourceAsStream(configurationFile);
 			if(input == null) {
@@ -116,7 +116,7 @@ public final class SessionFactoryRegister {
 	 * @param mappingCacheStore
 	 * @return 
 	 */
-	public SessionFactory registerSessionFactoryByConfigurationContent(String configurationContent, ExternalDataSource dataSource, MappingCacheStore mappingCacheStore) {
+	public SessionFactory registerSessionFactoryByConfigurationContent(String configurationContent, ExternalDataSource dataSource, MappingStore mappingCacheStore) {
 		if(registerDefaultSessionFactory) {
 			return registerSessionFactoryByConfigurationInputStream(new ByteArrayInputStream(configurationContent.getBytes(StandardCharsets.UTF_8)), dataSource, mappingCacheStore);
 		}
@@ -130,7 +130,7 @@ public final class SessionFactoryRegister {
 	 * @param mappingCacheStore
 	 * @return 
 	 */
-	public synchronized SessionFactory registerSessionFactoryByConfigurationInputStream(InputStream configurationFile, ExternalDataSource dataSource, MappingCacheStore mappingCacheStore) {
+	public synchronized SessionFactory registerSessionFactoryByConfigurationInputStream(InputStream configurationFile, ExternalDataSource dataSource, MappingStore mappingCacheStore) {
 		if(registerDefaultSessionFactory) {
 			SessionFactory sessionFactory = buildSessionFactory(configurationFile, dataSource, mappingCacheStore);
 			SessionFactoryContext.registerSessionFactory(sessionFactory);

@@ -5,10 +5,11 @@ import com.douglei.orm.sessions.Session;
 
 /**
  * 对session的commit/rollback/close, 都由调用者自行控制
- * <b>每次调用都会产生一个新的session</b>
+ * <b>一个线程中, 只会产生一个session</b>
  * @author DougLei
  */
-public class SimpleSessionContext {
+public class SimpleUniqueSessionContext {
+	private static final ThreadLocal<Session> SESSION = new ThreadLocal<Session>();
 	
 	/**
 	 * <pre>
@@ -41,6 +42,11 @@ public class SimpleSessionContext {
 	 * @return
 	 */
 	public static Session getSession(boolean beginTransaction, TransactionIsolationLevel transactionIsolationLevel) {
-		return SessionFactoryContext.getSessionFactory().openSession(beginTransaction, transactionIsolationLevel);
+		Session session = SESSION.get();
+		if(session == null) {
+			session = SessionFactoryContext.getSessionFactory().openSession(beginTransaction, transactionIsolationLevel);
+			SESSION.set(session);
+		}
+		return session;
 	}
 }

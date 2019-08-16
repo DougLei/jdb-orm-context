@@ -71,7 +71,7 @@ public final class SessionContext {
 		logger.debug("open session is {}", sessionWrapper);
 	}
 	
-	// 获取并移除栈顶的session, 调用该方法前, 请务必先调用getSessionWrapper()方法, 判断是否满足了出栈的条件
+	// 获取并移除栈顶的session, 调用该方法前, 请务必先调用getSessionWrapper().ready()方法, 判断是否满足了出栈的条件
 	static Session popSession() {
 		Stack<SessionWrapper> sessionWrappers = SESSION_WRAPPERS.get();
 		Session session = sessionWrappers.pop().getSession();

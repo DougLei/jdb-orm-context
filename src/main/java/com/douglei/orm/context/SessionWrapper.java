@@ -17,7 +17,7 @@ class SessionWrapper {
 	private static final Logger logger = LoggerFactory.getLogger(SessionWrapper.class);
 	
 	private Session session;
-	private short count;
+	private byte count;
 	private List<Throwable> throwables;
 	
 	SessionWrapper(Session session) {
@@ -55,10 +55,19 @@ class SessionWrapper {
 		return count == 1;
 	}
 
-	public void printStackTraces() {
+	public void throwThrowable() throws Throwable {
 		for(int i=throwables.size()-1;i>=0;i--) {
 			logger.error(ExceptionUtil.getExceptionDetailMessage(throwables.get(i)));
 		}
+		throw throwables.get(throwables.size()-1);
+	}
+	
+	public void close() {
+		if(throwables != null) {
+			throwables.clear();
+			throwables = null;
+		}
+		session.close();
 	}
 
 	@Override

@@ -72,10 +72,10 @@ public final class SessionContext {
 	}
 	
 	// 获取并移除栈顶的session, 调用该方法前, 请务必先调用getSessionWrapper().ready()方法, 判断是否满足了出栈的条件
-	static Session popSession() {
+	static SessionWrapper popSessionWrapper() {
 		Stack<SessionWrapper> sessionWrappers = SESSION_WRAPPERS.get();
-		Session session = sessionWrappers.pop().getSession();
-		logger.debug("pop session is {}", session);
-		return session;
+		SessionWrapper sessionWrapper = sessionWrappers.pop();
+		logger.debug("pop session is {}", sessionWrapper);
+		return sessionWrapper;
 	}
 }

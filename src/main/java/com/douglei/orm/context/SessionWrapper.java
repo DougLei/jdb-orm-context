@@ -3,13 +3,19 @@ package com.douglei.orm.context;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.douglei.orm.sessions.Session;
+import com.douglei.tools.utils.ExceptionUtil;
 
 /**
  * 
  * @author DougLei
  */
 class SessionWrapper {
+	private static final Logger logger = LoggerFactory.getLogger(SessionWrapper.class);
+	
 	private Session session;
 	private short count;
 	private List<Throwable> throwables;
@@ -51,7 +57,7 @@ class SessionWrapper {
 
 	public void printStackTraces() {
 		for(int i=throwables.size()-1;i>=0;i--) {
-			throwables.get(i).printStackTrace();
+			logger.error(ExceptionUtil.getExceptionDetailMessage(throwables.get(i)));
 		}
 	}
 

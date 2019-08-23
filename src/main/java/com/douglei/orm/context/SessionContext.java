@@ -61,11 +61,9 @@ public final class SessionContext {
 	
 	static void openSession(boolean beginTransaction, TransactionIsolationLevel transactionIsolationLevel) {
 		Stack<SessionWrapper> sessionWrappers = SESSION_WRAPPERS.get();
-		if(sessionWrappers == null) {
+		if(sessionWrappers == null || sessionWrappers.size() == 0) {
 			sessionWrappers = new Stack<SessionWrapper>();
 			SESSION_WRAPPERS.set(sessionWrappers);
-		}else if(sessionWrappers.size() > 0){
-			sessionWrappers.clear();
 		}
 		Session session = SessionFactoryContext.getSessionFactory().openSession(beginTransaction, transactionIsolationLevel);
 		SessionWrapper sessionWrapper = new SessionWrapper(session);
@@ -78,6 +76,11 @@ public final class SessionContext {
 		Stack<SessionWrapper> sessionWrappers = SESSION_WRAPPERS.get();
 		SessionWrapper sessionWrapper = sessionWrappers.pop();
 		logger.debug("pop session is {}", sessionWrapper);
+		
+		if(sessionWrappers.isEmpty()) {
+			SESSION_WRAPPERS.remove();
+			logger.debug("session stack is empty, remove session stack from ThreadLocal");
+		}
 		return sessionWrapper;
 	}
 }

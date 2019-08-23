@@ -61,9 +61,11 @@ public final class SessionContext {
 	
 	static void openSession(boolean beginTransaction, TransactionIsolationLevel transactionIsolationLevel) {
 		Stack<SessionWrapper> sessionWrappers = SESSION_WRAPPERS.get();
-		if(sessionWrappers == null || sessionWrappers.size() == 0) {
+		if(sessionWrappers == null) {
 			sessionWrappers = new Stack<SessionWrapper>();
 			SESSION_WRAPPERS.set(sessionWrappers);
+		}else if(sessionWrappers.size() > 0){
+			sessionWrappers.clear();
 		}
 		Session session = SessionFactoryContext.getSessionFactory().openSession(beginTransaction, transactionIsolationLevel);
 		SessionWrapper sessionWrapper = new SessionWrapper(session);

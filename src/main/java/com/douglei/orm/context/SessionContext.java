@@ -8,10 +8,10 @@ import org.slf4j.LoggerFactory;
 import com.douglei.orm.context.exception.UnsupportUseSessionContextException;
 import com.douglei.orm.context.transaction.component.TransactionAnnotationMemoryUsage;
 import com.douglei.orm.core.dialect.TransactionIsolationLevel;
-import com.douglei.orm.sessions.Session;
-import com.douglei.orm.sessions.session.sql.SQLSession;
-import com.douglei.orm.sessions.session.table.TableSession;
-import com.douglei.orm.sessions.sqlsession.SqlSession;
+import com.douglei.orm.factory.sessions.Session;
+import com.douglei.orm.factory.sessions.session.sql.SQLSession;
+import com.douglei.orm.factory.sessions.session.table.TableSession;
+import com.douglei.orm.factory.sessions.sqlsession.SqlSession;
 
 /**
  * 通过@Transaction注解, 由系统自行控制session的的commit/rollback/close

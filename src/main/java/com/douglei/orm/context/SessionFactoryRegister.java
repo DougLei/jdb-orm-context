@@ -144,7 +144,20 @@ public final class SessionFactoryRegister {
 	// 操作SessionFactory
 	// --------------------------------------------------------------------------------------------
 	/**
+	 * 获取默认的SessionFactory
+	 * @return
+	 */
+	public SessionFactory getDefaultSessionFactory() {
+		if(registerDefaultSessionFactory) {
+			return SessionFactoryContext.getDefaultSessionFactory();
+		}
+		throw new UnRegisterDefaultSessionFactoryException();
+	}
+	
+	/**
 	 * 获取SessionFactory
+	 * 当只有默认数据源时, 该方法等效于 @see {@link SessionFactoryRegister#getDefaultSessionFactory()}
+	 * 当有多个数据源, 调用该方法前需要先设置数据源id @see {@link MultiSessionFactoryHandler#setSessionFactoryId(String)}, 或使用 @see {@link SessionFactoryRegister#getSessionFactory(String)}方法
 	 * @return
 	 */
 	public SessionFactory getSessionFactory() {
@@ -152,6 +165,16 @@ public final class SessionFactoryRegister {
 			return SessionFactoryContext.getSessionFactory();
 		}
 		throw new UnRegisterDefaultSessionFactoryException();
+	}
+	
+	/**
+	 * 获取SessionFactory
+	 * @param sessionFactoryId
+	 * @return
+	 */
+	public SessionFactory getSessionFactory(String sessionFactoryId) {
+		MultiSessionFactoryHandler.setSessionFactoryId(sessionFactoryId);
+		return getSessionFactory();
 	}
 	
 	/**
@@ -163,16 +186,5 @@ public final class SessionFactoryRegister {
 			registerMultipleSessionFactory = SessionFactoryContext.destroySessionFactory(sessionFactoryId);
 		}
 		throw new UnRegisterMultipleSessionFactoryException("没有注册多个SessionFactory, 无法进行destroySessionFactory操作");
-	}
-	
-	/**
-	 * 设置要操作的sessionFactoryId
-	 * @param sessionFactoryId
-	 */
-	public SessionFactoryRegister setSessionFactoryId(String sessionFactoryId) {
-		if(registerMultipleSessionFactory) {
-			MultiSessionFactoryHandler.setSessionFactoryId(sessionFactoryId);
-		}
-		return this;
 	}
 }

@@ -63,7 +63,7 @@ class SessionFactoryContext {
 		}
 		String sessionFactoryId = MultiSessionFactoryHandler.getSessionFactoryId();
 		if(StringUtil.isEmpty(sessionFactoryId)) {
-			throw new NullPointerException("注册了多个SessionFactory(即多数据源)时, 在获取SessionFactory时, 必须使用["+SessionFactoryRegister.class.getName()+"]中的setSessionFactoryId(...)方法, 或["+MultiSessionFactoryHandler.class.getName()+"]中的setSessionFactoryId(String sessionFactoryId)方法, 指定要获取的数据源id");
+			throw new NullPointerException("注册了多个SessionFactory(即多数据源)时, 在获取SessionFactory时, 必须指定要获取的数据源id");
 		}
 		
 		if(JDB_ORM_SESSION_FACTORY_MAPPING.containsKey(sessionFactoryId)) {

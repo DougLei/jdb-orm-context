@@ -6,7 +6,7 @@ import java.util.Map;
 import com.douglei.orm.context.exception.NotExistsSessionFactoryException;
 import com.douglei.orm.context.exception.ProhibitDestroyDefaultSessionFactoryException;
 import com.douglei.orm.context.exception.RepeatedSessionFactoryException;
-import com.douglei.orm.factory.OrmFactory;
+import com.douglei.orm.factory.SessionFactory;
 import com.douglei.tools.utils.StringUtil;
 
 /**
@@ -14,8 +14,8 @@ import com.douglei.tools.utils.StringUtil;
  * @author DougLei
  */
 class SessionFactoryContext {
-	private static OrmFactory DEFAULT_JDB_ORM_SESSION_FACTORY;// 默认的jdb-orm SessionFactory对象
-	private static Map<String, OrmFactory> JDB_ORM_SESSION_FACTORY_MAPPING;// jdb-orm SessionFactory映射
+	private static SessionFactory DEFAULT_JDB_ORM_SESSION_FACTORY;// 默认的jdb-orm SessionFactory对象
+	private static Map<String, SessionFactory> JDB_ORM_SESSION_FACTORY_MAPPING;// jdb-orm SessionFactory映射
 	
 	// --------------------------------------------------------------------------------------------
 	// 注册SessionFactory
@@ -24,7 +24,7 @@ class SessionFactoryContext {
 	 * 注册默认的SessionFactory对象
 	 * @param sessionFactory
 	 */
-	static void registerDefaultSessionFactory(OrmFactory sessionFactory) {
+	static void registerDefaultSessionFactory(SessionFactory sessionFactory) {
 		DEFAULT_JDB_ORM_SESSION_FACTORY = sessionFactory;
 	}
 	
@@ -32,10 +32,10 @@ class SessionFactoryContext {
 	 * 注册SessionFactory
 	 * @param sessionFactory
 	 */
-	static void registerSessionFactory(OrmFactory sessionFactory) {
+	static void registerSessionFactory(SessionFactory sessionFactory) {
 		String sessionFactoryId = sessionFactory.getId();
 		if(JDB_ORM_SESSION_FACTORY_MAPPING == null) {
-			JDB_ORM_SESSION_FACTORY_MAPPING = new HashMap<String, OrmFactory>(8);
+			JDB_ORM_SESSION_FACTORY_MAPPING = new HashMap<String, SessionFactory>(8);
 		}else if(JDB_ORM_SESSION_FACTORY_MAPPING.containsKey(sessionFactoryId) || DEFAULT_JDB_ORM_SESSION_FACTORY.getId().equals(sessionFactoryId)) {
 			throw new RepeatedSessionFactoryException(sessionFactoryId);
 		}
@@ -49,7 +49,7 @@ class SessionFactoryContext {
 	 * 获取默认的SessionFactory对象
 	 * @return
 	 */
-	static OrmFactory getDefaultSessionFactory() {
+	static SessionFactory getDefaultSessionFactory() {
 		return DEFAULT_JDB_ORM_SESSION_FACTORY;
 	}
 	
@@ -57,7 +57,7 @@ class SessionFactoryContext {
 	 * 获取SessionFactory
 	 * @return
 	 */
-	static OrmFactory getSessionFactory() {
+	static SessionFactory getSessionFactory() {
 		if(JDB_ORM_SESSION_FACTORY_MAPPING == null) {// 没有动态添加SessionFactory时, 返回默认的SessionFactory
 			return DEFAULT_JDB_ORM_SESSION_FACTORY;
 		}

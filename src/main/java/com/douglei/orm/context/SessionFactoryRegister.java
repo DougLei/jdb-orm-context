@@ -17,7 +17,7 @@ import com.douglei.orm.context.exception.UnRegisterDefaultSessionFactoryExceptio
 import com.douglei.orm.context.exception.UnRegisterMultipleSessionFactoryException;
 import com.douglei.orm.context.transaction.component.TransactionAnnotationMemoryUsage;
 import com.douglei.orm.context.transaction.component.TransactionComponentEntity;
-import com.douglei.orm.factory.OrmFactory;
+import com.douglei.orm.factory.SessionFactory;
 
 /**
  * jdb-orm 的SessionFactory注册器
@@ -43,7 +43,7 @@ public final class SessionFactoryRegister {
 	 * @param mappingStore 可为空
 	 * @return
 	 */
-	private OrmFactory buildSessionFactory(InputStream configurationFile, ExternalDataSource dataSource, MappingStore mappingStore) {
+	private SessionFactory buildSessionFactory(InputStream configurationFile, ExternalDataSource dataSource, MappingStore mappingStore) {
 		Configuration configuration = new XmlConfiguration(configurationFile);
 		configuration.setExternalDataSource(dataSource);
 		configuration.setMappingStore(mappingStore);
@@ -62,11 +62,11 @@ public final class SessionFactoryRegister {
 	 * @param transactionComponentPackages
 	 * @return
 	 */
-	public synchronized OrmFactory registerDefaultSessionFactory(String configurationFile, ExternalDataSource dataSource, MappingStore mappingStore, boolean searchAll, String... transactionComponentPackages) {
+	public synchronized SessionFactory registerDefaultSessionFactory(String configurationFile, ExternalDataSource dataSource, MappingStore mappingStore, boolean searchAll, String... transactionComponentPackages) {
 		if(registerDefaultSessionFactory) {
 			throw new DefaultSessionFactoryExistsException(SessionFactoryContext.getDefaultSessionFactory().getId());
 		}
-		OrmFactory sessionFactory = buildSessionFactory(SessionFactoryRegister.class.getClassLoader().getResourceAsStream(configurationFile), dataSource, mappingStore);
+		SessionFactory sessionFactory = buildSessionFactory(SessionFactoryRegister.class.getClassLoader().getResourceAsStream(configurationFile), dataSource, mappingStore);
 		SessionFactoryContext.registerDefaultSessionFactory(sessionFactory);
 		
 		scanTransactionComponent(searchAll, transactionComponentPackages);
@@ -98,7 +98,7 @@ public final class SessionFactoryRegister {
 	 * @param mappingCacheStore
 	 * @return 
 	 */
-	public OrmFactory registerSessionFactoryByConfigurationFile(String configurationFile, ExternalDataSource dataSource, MappingStore mappingCacheStore) {
+	public SessionFactory registerSessionFactoryByConfigurationFile(String configurationFile, ExternalDataSource dataSource, MappingStore mappingCacheStore) {
 		if(registerDefaultSessionFactory) {
 			InputStream input = SessionFactoryRegister.class.getClassLoader().getResourceAsStream(configurationFile);
 			if(input == null) {
@@ -116,7 +116,7 @@ public final class SessionFactoryRegister {
 	 * @param mappingCacheStore
 	 * @return 
 	 */
-	public OrmFactory registerSessionFactoryByConfigurationContent(String configurationContent, ExternalDataSource dataSource, MappingStore mappingCacheStore) {
+	public SessionFactory registerSessionFactoryByConfigurationContent(String configurationContent, ExternalDataSource dataSource, MappingStore mappingCacheStore) {
 		if(registerDefaultSessionFactory) {
 			return registerSessionFactoryByConfigurationInputStream(new ByteArrayInputStream(configurationContent.getBytes(StandardCharsets.UTF_8)), dataSource, mappingCacheStore);
 		}
@@ -130,9 +130,9 @@ public final class SessionFactoryRegister {
 	 * @param mappingCacheStore
 	 * @return 
 	 */
-	public synchronized OrmFactory registerSessionFactoryByConfigurationInputStream(InputStream configurationFile, ExternalDataSource dataSource, MappingStore mappingCacheStore) {
+	public synchronized SessionFactory registerSessionFactoryByConfigurationInputStream(InputStream configurationFile, ExternalDataSource dataSource, MappingStore mappingCacheStore) {
 		if(registerDefaultSessionFactory) {
-			OrmFactory sessionFactory = buildSessionFactory(configurationFile, dataSource, mappingCacheStore);
+			SessionFactory sessionFactory = buildSessionFactory(configurationFile, dataSource, mappingCacheStore);
 			SessionFactoryContext.registerSessionFactory(sessionFactory);
 			registerMultipleSessionFactory = true;
 			return sessionFactory;
@@ -147,7 +147,7 @@ public final class SessionFactoryRegister {
 	 * 获取SessionFactory
 	 * @return
 	 */
-	public OrmFactory getSessionFactory() {
+	public SessionFactory getSessionFactory() {
 		if(registerDefaultSessionFactory) {
 			return SessionFactoryContext.getSessionFactory();
 		}

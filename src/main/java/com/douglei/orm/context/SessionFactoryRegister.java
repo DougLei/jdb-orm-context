@@ -17,7 +17,7 @@ import com.douglei.orm.context.exception.UnRegisterDefaultSessionFactoryExceptio
 import com.douglei.orm.context.exception.UnRegisterMultipleSessionFactoryException;
 import com.douglei.orm.context.transaction.component.TransactionAnnotationMemoryUsage;
 import com.douglei.orm.context.transaction.component.TransactionComponentEntity;
-import com.douglei.orm.factory.SessionFactory;
+import com.douglei.orm.sessionfactory.SessionFactory;
 
 /**
  * jdb-orm 的SessionFactory注册器
@@ -171,7 +171,7 @@ public final class SessionFactoryRegister {
 	 */
 	public SessionFactoryRegister setSessionFactoryId(String sessionFactoryId) {
 		if(registerMultipleSessionFactory) {
-			SessionFactoryId4CurrentThread.setSessionFactoryId4CurrentThread(sessionFactoryId);
+			MultiSessionFactoryHandler.setSessionFactoryId(sessionFactoryId);
 		}
 		return this;
 	}

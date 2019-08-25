@@ -6,7 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.douglei.orm.factory.sessions.Session;
+import com.douglei.orm.sessionfactory.sessions.Session;
 import com.douglei.tools.utils.ExceptionUtil;
 
 /**

@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.douglei.aop.ProxyInterceptor;
 import com.douglei.aop.ProxyMethod;
 import com.douglei.orm.context.transaction.component.Transaction;
-import com.douglei.orm.factory.sessions.Session;
+import com.douglei.orm.sessionfactory.sessions.Session;
 import com.douglei.tools.utils.ExceptionUtil;
 
 /**

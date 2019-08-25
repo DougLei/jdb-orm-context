@@ -6,7 +6,7 @@ import java.util.Map;
 import com.douglei.orm.context.exception.NotExistsSessionFactoryException;
 import com.douglei.orm.context.exception.ProhibitDestroyDefaultSessionFactoryException;
 import com.douglei.orm.context.exception.RepeatedSessionFactoryException;
-import com.douglei.orm.factory.SessionFactory;
+import com.douglei.orm.sessionfactory.SessionFactory;
 import com.douglei.tools.utils.StringUtil;
 
 /**
@@ -61,9 +61,9 @@ class SessionFactoryContext {
 		if(JDB_ORM_SESSION_FACTORY_MAPPING == null) {// 没有动态添加SessionFactory时, 返回默认的SessionFactory
 			return DEFAULT_JDB_ORM_SESSION_FACTORY;
 		}
-		String sessionFactoryId = SessionFactoryId4CurrentThread.getSessionFactoryId4CurrentThread();
+		String sessionFactoryId = MultiSessionFactoryHandler.getSessionFactoryId();
 		if(StringUtil.isEmpty(sessionFactoryId)) {
-			throw new NullPointerException("注册了多个SessionFactory(即多数据源)时, 在获取SessionFactory时, 必须使用["+SessionFactoryRegister.class.getName()+"]中的setSessionFactoryId(...)方法, 或["+SessionFactoryId4CurrentThread.class.getName()+"]中的setSessionFactoryId4CurrentThread(...)方法, 指定要获取的数据源id");
+			throw new NullPointerException("注册了多个SessionFactory(即多数据源)时, 在获取SessionFactory时, 必须使用["+SessionFactoryRegister.class.getName()+"]中的setSessionFactoryId(...)方法, 或["+MultiSessionFactoryHandler.class.getName()+"]中的setSessionFactoryId(String sessionFactoryId)方法, 指定要获取的数据源id");
 		}
 		
 		if(JDB_ORM_SESSION_FACTORY_MAPPING.containsKey(sessionFactoryId)) {

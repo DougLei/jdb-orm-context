@@ -169,12 +169,15 @@ public final class SessionFactoryRegister {
 	
 	/**
 	 * 获取SessionFactory
-	 * @param sessionFactoryId
+	 * @param sessionFactoryId 指定数据源id
 	 * @return
 	 */
 	public SessionFactory getSessionFactory(String sessionFactoryId) {
-		MultiSessionFactoryHandler.setSessionFactoryId(sessionFactoryId);
-		return getSessionFactory();
+		if(registerDefaultSessionFactory) {
+			MultiSessionFactoryHandler.setSessionFactoryId(sessionFactoryId);
+			return SessionFactoryContext.getSessionFactory();
+		}
+		throw new UnRegisterDefaultSessionFactoryException();
 	}
 	
 	/**

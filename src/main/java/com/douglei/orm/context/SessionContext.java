@@ -21,6 +21,15 @@ public final class SessionContext {
 	private static final Logger logger = LoggerFactory.getLogger(SessionContext.class);
 	private static final ThreadLocal<Stack<SessionWrapper>> SESSION_WRAPPERS = new ThreadLocal<Stack<SessionWrapper>>();
 	
+	public static Session getSession() {
+		if(TransactionAnnotationMemoryUsage.unUse()) {
+			throw new UnsupportUseSessionContextException();
+		}
+		SessionWrapper sessionWrapper = getSessionWrapper();
+		Session session = sessionWrapper.getSession();
+		logger.debug("get session is {}", sessionWrapper);
+		return session;
+	}
 	public static SqlSession getSqlSession() {
 		return getSession().getSqlSession();
 	}
@@ -29,16 +38,6 @@ public final class SessionContext {
 	}
 	public static SQLSession getSQLSession() {
 		return getSession().getSQLSession();
-	}
-	
-	private static Session getSession() {
-		if(TransactionAnnotationMemoryUsage.unUse()) {
-			throw new UnsupportUseSessionContextException();
-		}
-		SessionWrapper sessionWrapper = getSessionWrapper();
-		Session session = sessionWrapper.getSession();
-		logger.debug("get session is {}", sessionWrapper);
-		return session;
 	}
 	
 	static SessionWrapper getSessionWrapper() {

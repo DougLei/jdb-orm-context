@@ -12,7 +12,7 @@ import com.douglei.orm.configuration.environment.mapping.store.MappingStore;
 import com.douglei.orm.configuration.impl.xml.XmlConfiguration;
 import com.douglei.orm.context.exception.SessionFactoryRegistrationException;
 import com.douglei.orm.context.exception.TooManyInstanceException;
-import com.douglei.orm.context.exception.UnRegisterMultipleSessionFactoryException;
+import com.douglei.orm.context.exception.NotEnabledMultipleSessionFactoryException;
 import com.douglei.orm.context.transaction.component.TransactionAnnotationMemoryUsage;
 import com.douglei.orm.context.transaction.component.TransactionComponentEntity;
 import com.douglei.orm.sessionfactory.SessionFactory;
@@ -141,6 +141,6 @@ public final class SessionFactoryRegister {
 		if(enableMultipleSessionFactory) {
 			enableMultipleSessionFactory = SessionFactoryContext.destroySessionFactory(sessionFactoryId);
 		}
-		throw new UnRegisterMultipleSessionFactoryException("没有注册多个SessionFactory, 无法进行destroySessionFactory操作");
+		throw new NotEnabledMultipleSessionFactoryException("没有注册多个SessionFactory, 无法进行destroySessionFactory操作");
 	}
 }

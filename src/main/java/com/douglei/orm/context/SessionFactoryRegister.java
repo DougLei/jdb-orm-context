@@ -10,10 +10,8 @@ import com.douglei.orm.configuration.Configuration;
 import com.douglei.orm.configuration.ExternalDataSource;
 import com.douglei.orm.configuration.environment.mapping.store.MappingStore;
 import com.douglei.orm.configuration.impl.xml.XmlConfiguration;
-import com.douglei.orm.context.exception.DefaultSessionFactoryExistsException;
 import com.douglei.orm.context.exception.SessionFactoryRegistrationException;
 import com.douglei.orm.context.exception.TooManyInstanceException;
-import com.douglei.orm.context.exception.UnRegisterDefaultSessionFactoryException;
 import com.douglei.orm.context.exception.UnRegisterMultipleSessionFactoryException;
 import com.douglei.orm.context.transaction.component.TransactionAnnotationMemoryUsage;
 import com.douglei.orm.context.transaction.component.TransactionComponentEntity;
@@ -25,8 +23,7 @@ import com.douglei.orm.sessionfactory.SessionFactory;
  * @author DougLei
  */
 public final class SessionFactoryRegister {
-	private boolean registerDefaultSessionFactory;// 是否注册过默认的SessionFactory
-	private boolean registerMultipleSessionFactory;// 是否注册过多个SessionFactory
+	private boolean enableMultipleSessionFactory;// 是否启用多个SessionFactory
 	private static byte instanceCount = 0;// 实例化次数
 	
 	public SessionFactoryRegister() {
@@ -36,41 +33,60 @@ public final class SessionFactoryRegister {
 		instanceCount=1;
 	}
 	
+	// --------------------------------------------------------------------------------------------
+	// 注册SessionFactory
+	// --------------------------------------------------------------------------------------------
 	/**
-	 * 
-	 * @param configurationFile
+	 * 通过配置文件, 注册SessionFactory实例
+	 * @param file
 	 * @param dataSource 可为空
 	 * @param mappingStore 可为空
 	 * @return
 	 */
-	private SessionFactory buildSessionFactory(InputStream configurationFile, ExternalDataSource dataSource, MappingStore mappingStore) {
-		Configuration configuration = new XmlConfiguration(configurationFile);
-		configuration.setExternalDataSource(dataSource);
-		configuration.setMappingStore(mappingStore);
-		return configuration.buildSessionFactory();
+	public SessionFactory registerSessionFactoryByFile(String file, ExternalDataSource dataSource, MappingStore mappingStore) {
+		InputStream input = SessionFactoryRegister.class.getClassLoader().getResourceAsStream(file);
+		if(input == null) 
+			throw new SessionFactoryRegistrationException("不存在["+file+"]的配置文件");
+		return registerSessionFactory(input, dataSource, mappingStore, false);
 	}
 	
-	// --------------------------------------------------------------------------------------------
-	// 【默认数据源】注册默认的SessionFactory
-	// --------------------------------------------------------------------------------------------
 	/**
-	 * 使用指定的配置文件注册默认的jdb-orm Configuration实例
-	 * @param configurationFile
+	 * 通过配置文件的内容字符串, 注册SessionFactory实例
+	 * @param content
+	 * @param dataSource
+	 * @param mappingStore
+	 * @return 
+	 */
+	public SessionFactory registerSessionFactoryByContent(String content, ExternalDataSource dataSource, MappingStore mappingStore) {
+		return registerSessionFactory(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)), dataSource, mappingStore, false);
+	}
+	
+	/**
+	 * 通过配置文件内容流, 注册SessionFactory实例
+	 * @param input
+	 * @param dataSource
+	 * @param mappingStore
+	 * @return 
+	 */
+	public SessionFactory registerSessionFactoryByInput(InputStream input, ExternalDataSource dataSource, MappingStore mappingStore) {
+		return registerSessionFactory(input, dataSource, mappingStore, false);
+	}
+	
+	
+	/**
+	 * 通过配置文件内容流, 注册SessionFactory实例
+	 * @param input
 	 * @param dataSource 可为空
 	 * @param mappingStore 可为空
 	 * @param searchAll
 	 * @param transactionComponentPackages
 	 * @return
 	 */
-	public synchronized SessionFactory registerDefaultSessionFactory(String configurationFile, ExternalDataSource dataSource, MappingStore mappingStore, boolean searchAll, String... transactionComponentPackages) {
-		if(registerDefaultSessionFactory) {
-			throw new DefaultSessionFactoryExistsException(SessionFactoryContext.getDefaultSessionFactory().getId());
-		}
-		InputStream input = SessionFactoryRegister.class.getClassLoader().getResourceAsStream(configurationFile);
-		if(input == null) {
-			throw new SessionFactoryRegistrationException("不存在路径为["+configurationFile+"]的配置文件");
-		}
-		SessionFactory sessionFactory = buildSessionFactory(input, dataSource, mappingStore);
+	public SessionFactory registerSessionFactory(InputStream input, ExternalDataSource dataSource, MappingStore mappingStore, boolean searchAll, String... transactionComponentPackages) {
+		Configuration configuration = new XmlConfiguration(input);
+		configuration.setExternalDataSource(dataSource);
+		configuration.setMappingStore(mappingStore);
+		SessionFactory sessionFactory = configuration.buildSessionFactory();
 		
 		// 根据包路径扫描事务组件
 		if(transactionComponentPackages.length > 0) {
@@ -80,140 +96,50 @@ public final class SessionFactoryRegister {
 			}
 		}
 		
-		SessionFactoryContext.registerDefaultSessionFactory(sessionFactory);
-		registerDefaultSessionFactory = true;
+		if(SessionFactoryContext.registerSessionFactory(sessionFactory) == 2)
+			enableMultipleSessionFactory = true;
 		return sessionFactory;
 	}
 	
 	/**
-	 * 注册指定的 SessionFactory实例
+	 * 直接注册SessionFactory实例
 	 * @param sessionFactory
 	 * @return
 	 */
-	public synchronized SessionFactory registerDefaultSessionFactory(SessionFactory sessionFactory) {
-		if(registerDefaultSessionFactory) {
-			throw new DefaultSessionFactoryExistsException(SessionFactoryContext.getDefaultSessionFactory().getId());
-		}
-		
-		SessionFactoryContext.registerDefaultSessionFactory(sessionFactory);
-		registerDefaultSessionFactory = true;
+	public SessionFactory registerSessionFactory(SessionFactory sessionFactory) {
+		if(SessionFactoryContext.registerSessionFactory(sessionFactory) == 2)
+			enableMultipleSessionFactory = true;
 		return sessionFactory;
-	}
-	
-	// --------------------------------------------------------------------------------------------
-	// 【多数据源】注册SessionFactory
-	// --------------------------------------------------------------------------------------------
-	/**
-	 * 使用指定的配置文件path注册jdb-orm SessionFactory实例
-	 * @param configurationFile
-	 * @param dataSource
-	 * @param mappingCacheStore
-	 * @return 
-	 */
-	public SessionFactory registerSessionFactoryByConfigurationFile(String configurationFile, ExternalDataSource dataSource, MappingStore mappingCacheStore) {
-		if(registerDefaultSessionFactory) {
-			InputStream input = SessionFactoryRegister.class.getClassLoader().getResourceAsStream(configurationFile);
-			if(input == null) {
-				throw new SessionFactoryRegistrationException("不存在路径为["+configurationFile+"]的配置文件");
-			}
-			return registerSessionFactoryByConfigurationInputStream(input, dataSource, mappingCacheStore);
-		}
-		throw new UnRegisterDefaultSessionFactoryException();
-	}
-	
-	/**
-	 * 使用指定的配置文件content注册jdb-orm SessionFactory实例
-	 * @param configurationContent
-	 * @param dataSource
-	 * @param mappingCacheStore
-	 * @return 
-	 */
-	public SessionFactory registerSessionFactoryByConfigurationContent(String configurationContent, ExternalDataSource dataSource, MappingStore mappingCacheStore) {
-		if(registerDefaultSessionFactory) {
-			return registerSessionFactoryByConfigurationInputStream(new ByteArrayInputStream(configurationContent.getBytes(StandardCharsets.UTF_8)), dataSource, mappingCacheStore);
-		}
-		throw new UnRegisterDefaultSessionFactoryException();
-	}
-	
-	/**
-	 * 使用指定的配置文件input流注册jdb-orm SessionFactory实例
-	 * @param configurationFile
-	 * @param dataSource
-	 * @param mappingCacheStore
-	 * @return 
-	 */
-	public synchronized SessionFactory registerSessionFactoryByConfigurationInputStream(InputStream configurationFile, ExternalDataSource dataSource, MappingStore mappingCacheStore) {
-		if(registerDefaultSessionFactory) {
-			SessionFactory sessionFactory = buildSessionFactory(configurationFile, dataSource, mappingCacheStore);
-			SessionFactoryContext.registerSessionFactory(sessionFactory);
-			registerMultipleSessionFactory = true;
-			return sessionFactory;
-		}
-		throw new UnRegisterDefaultSessionFactoryException();
-	}
-	
-	/**
-	 * 注册指定的 SessionFactory实例
-	 * @param sessionFactory
-	 * @return 
-	 */
-	public synchronized SessionFactory registerSessionFactory(SessionFactory sessionFactory) {
-		if(registerDefaultSessionFactory) {
-			SessionFactoryContext.registerSessionFactory(sessionFactory);
-			registerMultipleSessionFactory = true;
-			return sessionFactory;
-		}
-		throw new UnRegisterDefaultSessionFactoryException();
 	}
 	
 	// --------------------------------------------------------------------------------------------
 	// 操作SessionFactory
 	// --------------------------------------------------------------------------------------------
 	/**
-	 * 获取默认的SessionFactory
-	 * @return
-	 */
-	public SessionFactory getDefaultSessionFactory() {
-		if(registerDefaultSessionFactory) {
-			return SessionFactoryContext.getDefaultSessionFactory();
-		}
-		throw new UnRegisterDefaultSessionFactoryException();
-	}
-	
-	/**
 	 * 获取SessionFactory
-	 * 当只有默认数据源时, 该方法等效于 @see {@link SessionFactoryRegister#getDefaultSessionFactory()}
-	 * 当有多个数据源, 调用该方法前需要先设置数据源id @see {@link MultiSessionFactoryHandler#setSessionFactoryId(String)}, 或使用 @see {@link SessionFactoryRegister#getSessionFactory(String)}方法
 	 * @return
 	 */
 	public SessionFactory getSessionFactory() {
-		if(registerDefaultSessionFactory) {
-			return SessionFactoryContext.getSessionFactory();
-		}
-		throw new UnRegisterDefaultSessionFactoryException();
+		return SessionFactoryContext.getSessionFactory();
 	}
 	
 	/**
 	 * 获取SessionFactory
-	 * @param sessionFactoryId 指定数据源id
+	 * @param sessionFactoryId 指定SessionFactory id
 	 * @return
 	 */
 	public SessionFactory getSessionFactory(String sessionFactoryId) {
-		if(registerDefaultSessionFactory) {
-			MultiSessionFactoryHandler.setSessionFactoryId(sessionFactoryId);
-			return SessionFactoryContext.getSessionFactory();
-		}
-		throw new UnRegisterDefaultSessionFactoryException();
+		MultiSessionFactoryHandler.setSessionFactoryId(sessionFactoryId);
+		return SessionFactoryContext.getSessionFactory();
 	}
-	
 	
 	/**
 	 * 销毁SessionFactory
 	 * @param sessionFactoryId
 	 */
 	public synchronized void destroySessionFactory(String sessionFactoryId) {
-		if(registerMultipleSessionFactory) {
-			registerMultipleSessionFactory = SessionFactoryContext.destroySessionFactory(sessionFactoryId);
+		if(enableMultipleSessionFactory) {
+			enableMultipleSessionFactory = SessionFactoryContext.destroySessionFactory(sessionFactoryId);
 		}
 		throw new UnRegisterMultipleSessionFactoryException("没有注册多个SessionFactory, 无法进行destroySessionFactory操作");
 	}

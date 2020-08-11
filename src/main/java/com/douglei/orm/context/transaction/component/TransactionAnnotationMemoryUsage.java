@@ -14,26 +14,7 @@ import com.douglei.tools.utils.reflect.ClassLoadUtil;
  * @author DougLei
  */
 public class TransactionAnnotationMemoryUsage {
-	// 默认是没有被使用的
-	private static boolean use;
-	private static boolean unUse = true;
-	
-	/**
-	 * 设置/标识Transaction注解被使用
-	 * @param isUse
-	 */
-	private static void setIsUse() {
-		use = true;
-		unUse = false;
-	}
-	
-	public static boolean isUse() {
-		return use;
-	}
-	public static boolean unUse() {
-		return unUse;
-	}
-	
+
 	/**
 	 * 根据指定的包路径, 扫描事务组件
 	 * @param searchAll
@@ -79,7 +60,6 @@ public class TransactionAnnotationMemoryUsage {
 				cs.destroy();
 				
 				if(transactionComponentEntities != null) {
-					setIsUse();
 					return transactionComponentEntities;
 				}
 			}

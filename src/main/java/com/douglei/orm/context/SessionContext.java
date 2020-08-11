@@ -5,8 +5,6 @@ import java.util.Stack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.douglei.orm.context.exception.UnsupportUseSessionContextException;
-import com.douglei.orm.context.transaction.component.TransactionAnnotationMemoryUsage;
 import com.douglei.orm.core.dialect.TransactionIsolationLevel;
 import com.douglei.orm.sessionfactory.sessions.Session;
 import com.douglei.orm.sessionfactory.sessions.session.sql.SQLSession;
@@ -22,9 +20,6 @@ public final class SessionContext {
 	private static final ThreadLocal<Stack<SessionWrapper>> SESSION_WRAPPERS = new ThreadLocal<Stack<SessionWrapper>>();
 	
 	public static Session getSession() {
-		if(TransactionAnnotationMemoryUsage.unUse()) {
-			throw new UnsupportUseSessionContextException();
-		}
 		SessionWrapper sessionWrapper = getSessionWrapper();
 		Session session = sessionWrapper.getSession();
 		logger.debug("get session is {}", sessionWrapper);

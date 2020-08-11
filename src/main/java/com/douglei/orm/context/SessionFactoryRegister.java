@@ -27,7 +27,7 @@ import com.douglei.orm.sessionfactory.SessionFactory;
 public final class SessionFactoryRegister {
 	private boolean registerDefaultSessionFactory;// 是否注册过默认的SessionFactory
 	private boolean registerMultipleSessionFactory;// 是否注册过多个SessionFactory
-	private static short instanceCount = 0;// 实例化次数
+	private static byte instanceCount = 0;// 实例化次数
 	
 	public SessionFactoryRegister() {
 		if(instanceCount > 0) {
@@ -51,7 +51,7 @@ public final class SessionFactoryRegister {
 	}
 	
 	// --------------------------------------------------------------------------------------------
-	// 【必须的数据源】注册默认的SessionFactory
+	// 【默认数据源】注册默认的SessionFactory
 	// --------------------------------------------------------------------------------------------
 	/**
 	 * 使用指定的配置文件注册默认的jdb-orm Configuration实例
@@ -66,33 +66,45 @@ public final class SessionFactoryRegister {
 		if(registerDefaultSessionFactory) {
 			throw new DefaultSessionFactoryExistsException(SessionFactoryContext.getDefaultSessionFactory().getId());
 		}
-		SessionFactory sessionFactory = buildSessionFactory(SessionFactoryRegister.class.getClassLoader().getResourceAsStream(configurationFile), dataSource, mappingStore);
-		SessionFactoryContext.registerDefaultSessionFactory(sessionFactory);
+		InputStream input = SessionFactoryRegister.class.getClassLoader().getResourceAsStream(configurationFile);
+		if(input == null) {
+			throw new SessionFactoryRegistrationException("不存在路径为["+configurationFile+"]的配置文件");
+		}
+		SessionFactory sessionFactory = buildSessionFactory(input, dataSource, mappingStore);
 		
-		scanTransactionComponent(searchAll, transactionComponentPackages);
-		registerDefaultSessionFactory = true;
-		return sessionFactory;
-	}
-	
-	/**
-	 * 根据包路径扫描事务组件
-	 * @param searchAll
-	 * @param transactionComponentPackages 要扫描事务组件包路径
-	 */
-	private void scanTransactionComponent(boolean searchAll, String... transactionComponentPackages) {
+		// 根据包路径扫描事务组件
 		if(transactionComponentPackages.length > 0) {
 			List<TransactionComponentEntity> transactionComponentEntities = TransactionAnnotationMemoryUsage.scanTransactionComponent(searchAll, transactionComponentPackages);
 			for (TransactionComponentEntity transactionComponentEntity : transactionComponentEntities) {
 				ProxyBeanContext.createAndAddProxy(transactionComponentEntity.getTransactionComponentClass(), new TransactionProxyInterceptor(transactionComponentEntity.getTransactionComponentClass(), transactionComponentEntity.getTransactionMethods()));
 			}
 		}
+		
+		SessionFactoryContext.registerDefaultSessionFactory(sessionFactory);
+		registerDefaultSessionFactory = true;
+		return sessionFactory;
 	}
-
+	
+	/**
+	 * 注册指定的 SessionFactory实例
+	 * @param sessionFactory
+	 * @return
+	 */
+	public synchronized SessionFactory registerDefaultSessionFactory(SessionFactory sessionFactory) {
+		if(registerDefaultSessionFactory) {
+			throw new DefaultSessionFactoryExistsException(SessionFactoryContext.getDefaultSessionFactory().getId());
+		}
+		
+		SessionFactoryContext.registerDefaultSessionFactory(sessionFactory);
+		registerDefaultSessionFactory = true;
+		return sessionFactory;
+	}
+	
 	// --------------------------------------------------------------------------------------------
 	// 【多数据源】注册SessionFactory
 	// --------------------------------------------------------------------------------------------
 	/**
-	 * 【多数据源】使用指定的配置文件path注册jdb-orm SessionFactory实例
+	 * 使用指定的配置文件path注册jdb-orm SessionFactory实例
 	 * @param configurationFile
 	 * @param dataSource
 	 * @param mappingCacheStore
@@ -110,7 +122,7 @@ public final class SessionFactoryRegister {
 	}
 	
 	/**
-	 * 【多数据源】使用指定的配置文件content注册jdb-orm SessionFactory实例
+	 * 使用指定的配置文件content注册jdb-orm SessionFactory实例
 	 * @param configurationContent
 	 * @param dataSource
 	 * @param mappingCacheStore
@@ -124,7 +136,7 @@ public final class SessionFactoryRegister {
 	}
 	
 	/**
-	 * 【多数据源】使用指定的配置文件input流注册jdb-orm SessionFactory实例
+	 * 使用指定的配置文件input流注册jdb-orm SessionFactory实例
 	 * @param configurationFile
 	 * @param dataSource
 	 * @param mappingCacheStore
@@ -133,6 +145,20 @@ public final class SessionFactoryRegister {
 	public synchronized SessionFactory registerSessionFactoryByConfigurationInputStream(InputStream configurationFile, ExternalDataSource dataSource, MappingStore mappingCacheStore) {
 		if(registerDefaultSessionFactory) {
 			SessionFactory sessionFactory = buildSessionFactory(configurationFile, dataSource, mappingCacheStore);
+			SessionFactoryContext.registerSessionFactory(sessionFactory);
+			registerMultipleSessionFactory = true;
+			return sessionFactory;
+		}
+		throw new UnRegisterDefaultSessionFactoryException();
+	}
+	
+	/**
+	 * 注册指定的 SessionFactory实例
+	 * @param sessionFactory
+	 * @return 
+	 */
+	public synchronized SessionFactory registerSessionFactory(SessionFactory sessionFactory) {
+		if(registerDefaultSessionFactory) {
 			SessionFactoryContext.registerSessionFactory(sessionFactory);
 			registerMultipleSessionFactory = true;
 			return sessionFactory;
@@ -179,6 +205,7 @@ public final class SessionFactoryRegister {
 		}
 		throw new UnRegisterDefaultSessionFactoryException();
 	}
+	
 	
 	/**
 	 * 销毁SessionFactory

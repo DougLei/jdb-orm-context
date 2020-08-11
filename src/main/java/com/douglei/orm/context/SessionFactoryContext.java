@@ -5,7 +5,6 @@ import java.util.Map;
 
 import com.douglei.orm.context.exception.NotExistsSessionFactoryException;
 import com.douglei.orm.context.exception.ProhibitDestroyDefaultSessionFactoryException;
-import com.douglei.orm.context.exception.RepeatedSessionFactoryException;
 import com.douglei.orm.sessionfactory.SessionFactory;
 import com.douglei.tools.utils.StringUtil;
 
@@ -34,12 +33,14 @@ class SessionFactoryContext {
 	 */
 	static void registerSessionFactory(SessionFactory sessionFactory) {
 		String sessionFactoryId = sessionFactory.getId();
-		if(JDB_ORM_SESSION_FACTORY_MAPPING == null) {
-			JDB_ORM_SESSION_FACTORY_MAPPING = new HashMap<String, SessionFactory>(8);
-		}else if(JDB_ORM_SESSION_FACTORY_MAPPING.containsKey(sessionFactoryId) || DEFAULT_JDB_ORM_SESSION_FACTORY.getId().equals(sessionFactoryId)) {
-			throw new RepeatedSessionFactoryException(sessionFactoryId);
+		if(!DEFAULT_JDB_ORM_SESSION_FACTORY.getId().equals(sessionFactoryId)) {
+			if(JDB_ORM_SESSION_FACTORY_MAPPING == null) {
+				JDB_ORM_SESSION_FACTORY_MAPPING = new HashMap<String, SessionFactory>(8);
+			}
+			if(JDB_ORM_SESSION_FACTORY_MAPPING.isEmpty() || !JDB_ORM_SESSION_FACTORY_MAPPING.containsKey(sessionFactoryId)){
+				JDB_ORM_SESSION_FACTORY_MAPPING.put(sessionFactoryId, sessionFactory);
+			}
 		}
-		JDB_ORM_SESSION_FACTORY_MAPPING.put(sessionFactoryId, sessionFactory);
 	}
 	
 	// --------------------------------------------------------------------------------------------
@@ -58,12 +59,12 @@ class SessionFactoryContext {
 	 * @return
 	 */
 	static SessionFactory getSessionFactory() {
-		if(JDB_ORM_SESSION_FACTORY_MAPPING == null) {// 没有动态添加SessionFactory时, 返回默认的SessionFactory
+		if(JDB_ORM_SESSION_FACTORY_MAPPING == null || JDB_ORM_SESSION_FACTORY_MAPPING.isEmpty()) {// 没有动态添加SessionFactory时, 返回默认的SessionFactory
 			return DEFAULT_JDB_ORM_SESSION_FACTORY;
 		}
 		String sessionFactoryId = MultiSessionFactoryHandler.getSessionFactoryId();
 		if(StringUtil.isEmpty(sessionFactoryId)) {
-			throw new NullPointerException("注册了多个SessionFactory(即多数据源)时, 在获取SessionFactory时, 必须指定要获取的数据源id");
+			throw new NullPointerException("注册了多个SessionFactory, 在获取SessionFactory时, 必须指定要获取的数据源id");
 		}
 		
 		if(JDB_ORM_SESSION_FACTORY_MAPPING.containsKey(sessionFactoryId)) {
@@ -83,13 +84,12 @@ class SessionFactoryContext {
 	 * @return 是否还存在其他数据源
 	 */
 	static boolean destroySessionFactory(String sessionFactoryId) {
-		if(JDB_ORM_SESSION_FACTORY_MAPPING.containsKey(sessionFactoryId)) {
+		if(JDB_ORM_SESSION_FACTORY_MAPPING != null && JDB_ORM_SESSION_FACTORY_MAPPING.containsKey(sessionFactoryId)) {
 			JDB_ORM_SESSION_FACTORY_MAPPING.remove(sessionFactoryId).destroy();
 			return JDB_ORM_SESSION_FACTORY_MAPPING.size() > 0;
 		}else {
-			if(DEFAULT_JDB_ORM_SESSION_FACTORY.getId().equals(sessionFactoryId)) {
+			if(DEFAULT_JDB_ORM_SESSION_FACTORY.getId().equals(sessionFactoryId))
 				throw new ProhibitDestroyDefaultSessionFactoryException(sessionFactoryId);
-			}
 			throw new NotExistsSessionFactoryException(sessionFactoryId);
 		}
 	}

@@ -104,7 +104,8 @@ public class TransactionProxyInterceptor extends ProxyInterceptor{
 		SessionWrapper sessionWrapper = SessionContext.getSessionWrapper();
 		if(sessionWrapper.ready()) {
 			sessionWrapper = SessionContext.popSessionWrapper();
-			logger.debug("{} session do close", sessionWrapper);
+			if(logger.isDebugEnabled())
+				logger.debug("{} session do close, there is {} session left", sessionWrapper, SessionContext.numberOfSessionsLeft());
 			sessionWrapper.close();
 		}else {
 			logger.debug("{} session not ready to close", sessionWrapper);

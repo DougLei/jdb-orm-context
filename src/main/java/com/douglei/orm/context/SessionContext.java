@@ -77,4 +77,13 @@ public final class SessionContext {
 		}
 		return sessionWrapper;
 	}
+	
+	/**
+	 * 剩下session的数量
+	 * @return
+	 */
+	public static int numberOfSessionsLeft() {
+		Stack<SessionWrapper> sessionWrappers = SESSION_WRAPPERS.get();
+		return sessionWrappers == null ? 0 : sessionWrappers.size();
+	}
 }

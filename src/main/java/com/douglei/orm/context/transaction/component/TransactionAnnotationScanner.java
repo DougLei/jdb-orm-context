@@ -10,10 +10,10 @@ import com.douglei.tools.instances.scanner.ClassScanner;
 import com.douglei.tools.utils.reflect.ClassLoadUtil;
 
 /**
- * Transaction注解的使用情况, 即记录是否使用Transaction注解
+ * Transaction注解扫描器
  * @author DougLei
  */
-public class TransactionAnnotationMemoryUsage {
+public class TransactionAnnotationScanner {
 
 	/**
 	 * 根据指定的包路径, 扫描事务组件
@@ -21,7 +21,7 @@ public class TransactionAnnotationMemoryUsage {
 	 * @param transactionComponentPackages
 	 * @return 返回扫描到的TransactionClass集合
 	 */
-	public static List<TransactionComponentEntity> scanTransactionComponent(boolean searchAll, String... transactionComponentPackages) {
+	public static List<TransactionComponentEntity> scan(boolean searchAll, String... transactionComponentPackages) {
 		if(transactionComponentPackages.length > 0) {
 			ClassScanner cs = new ClassScanner();
 			List<String> classes = cs.multiScan(searchAll, transactionComponentPackages);

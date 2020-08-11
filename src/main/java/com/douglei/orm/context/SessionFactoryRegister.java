@@ -13,7 +13,7 @@ import com.douglei.orm.configuration.impl.xml.XmlConfiguration;
 import com.douglei.orm.context.exception.SessionFactoryRegistrationException;
 import com.douglei.orm.context.exception.TooManyInstanceException;
 import com.douglei.orm.context.exception.NotEnabledMultipleSessionFactoryException;
-import com.douglei.orm.context.transaction.component.TransactionAnnotationMemoryUsage;
+import com.douglei.orm.context.transaction.component.TransactionAnnotationScanner;
 import com.douglei.orm.context.transaction.component.TransactionComponentEntity;
 import com.douglei.orm.sessionfactory.SessionFactory;
 
@@ -90,7 +90,7 @@ public final class SessionFactoryRegister {
 		
 		// 根据包路径扫描事务组件
 		if(transactionComponentPackages.length > 0) {
-			List<TransactionComponentEntity> transactionComponentEntities = TransactionAnnotationMemoryUsage.scanTransactionComponent(searchAll, transactionComponentPackages);
+			List<TransactionComponentEntity> transactionComponentEntities = TransactionAnnotationScanner.scan(searchAll, transactionComponentPackages);
 			for (TransactionComponentEntity transactionComponentEntity : transactionComponentEntities) {
 				ProxyBeanContext.createAndAddProxy(transactionComponentEntity.getTransactionComponentClass(), new TransactionProxyInterceptor(transactionComponentEntity.getTransactionComponentClass(), transactionComponentEntity.getTransactionMethods()));
 			}

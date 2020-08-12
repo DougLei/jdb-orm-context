@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.douglei.orm.core.dialect.TransactionIsolationLevel;
+import com.douglei.orm.sessionfactory.SessionFactory;
 import com.douglei.orm.sessionfactory.sessions.Session;
 import com.douglei.orm.sessionfactory.sessions.session.sql.SQLSession;
 import com.douglei.orm.sessionfactory.sessions.session.table.TableSession;
@@ -18,6 +19,10 @@ import com.douglei.orm.sessionfactory.sessions.sqlsession.SqlSession;
 public final class SessionContext {
 	private static final Logger logger = LoggerFactory.getLogger(SessionContext.class);
 	private static final ThreadLocal<Stack<SessionWrapper>> SESSION_WRAPPERS = new ThreadLocal<Stack<SessionWrapper>>();
+	
+	public static SessionFactory getSessionFactory() {
+		return SessionFactoryContext.getSessionFactory();
+	}
 	
 	public static Session getSession() {
 		SessionWrapper sessionWrapper = getSessionWrapper();

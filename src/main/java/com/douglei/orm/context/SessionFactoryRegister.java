@@ -9,7 +9,7 @@ import com.douglei.aop.ProxyBeanContext;
 import com.douglei.orm.configuration.Configuration;
 import com.douglei.orm.configuration.ExternalDataSource;
 import com.douglei.orm.configuration.environment.mapping.store.MappingStore;
-import com.douglei.orm.configuration.impl.xml.XmlConfiguration;
+import com.douglei.orm.configuration.impl.ConfigurationImpl;
 import com.douglei.orm.context.exception.SessionFactoryRegistrationException;
 import com.douglei.orm.context.exception.TooManyInstanceException;
 import com.douglei.orm.context.exception.NotEnabledMultipleSessionFactoryException;
@@ -83,7 +83,7 @@ public final class SessionFactoryRegister {
 	 * @return
 	 */
 	public SessionFactory registerSessionFactory(InputStream input, ExternalDataSource dataSource, MappingStore mappingStore, boolean searchAll, String... transactionComponentPackages) {
-		Configuration configuration = new XmlConfiguration(input);
+		Configuration configuration = new ConfigurationImpl(input);
 		configuration.setExternalDataSource(dataSource);
 		configuration.setMappingStore(mappingStore);
 		SessionFactory sessionFactory = configuration.buildSessionFactory();

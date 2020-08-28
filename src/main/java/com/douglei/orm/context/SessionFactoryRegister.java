@@ -103,6 +103,8 @@ public final class SessionFactoryRegister {
 	
 	/**
 	 * 直接注册SessionFactory实例
+	 * 
+	 * 如果是第一次调用该方法进行SessionFactory的注册, 则注册进的SessionFactory作为默认的SessionFactory
 	 * @param sessionFactory
 	 * @return
 	 */

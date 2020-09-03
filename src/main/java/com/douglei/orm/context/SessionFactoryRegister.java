@@ -10,9 +10,9 @@ import com.douglei.orm.configuration.Configuration;
 import com.douglei.orm.configuration.ExternalDataSource;
 import com.douglei.orm.configuration.environment.mapping.store.MappingStore;
 import com.douglei.orm.configuration.impl.ConfigurationImpl;
+import com.douglei.orm.context.exception.UnRegisterMultipleSessionFactoriesException;
 import com.douglei.orm.context.exception.SessionFactoryRegistrationException;
 import com.douglei.orm.context.exception.TooManyInstanceException;
-import com.douglei.orm.context.exception.NotEnabledMultipleSessionFactoryException;
 import com.douglei.orm.context.transaction.component.TransactionAnnotationScanner;
 import com.douglei.orm.context.transaction.component.TransactionComponentEntity;
 import com.douglei.orm.sessionfactory.SessionFactory;
@@ -23,13 +23,12 @@ import com.douglei.orm.sessionfactory.SessionFactory;
  * @author DougLei
  */
 public final class SessionFactoryRegister {
-	private boolean enableMultipleSessionFactory;// 是否启用多个SessionFactory
+	private boolean registerMultipleSessionFactories;// 是否注册多个SessionFactory
 	private static byte instanceCount = 0;// 实例化次数
 	
 	public SessionFactoryRegister() {
-		if(instanceCount > 0) {
+		if(instanceCount > 0) 
 			throw new TooManyInstanceException(SessionFactoryRegister.class.getName() + ", 只能创建一个实例, 请妥善处理创建出的实例, 保证其在项目中处于全局范围");
-		}
 		instanceCount=1;
 	}
 	
@@ -97,7 +96,7 @@ public final class SessionFactoryRegister {
 		}
 		
 		if(SessionFactoryContext.registerSessionFactory(sessionFactory) == 2)
-			enableMultipleSessionFactory = true;
+			registerMultipleSessionFactories = true;
 		return sessionFactory;
 	}
 	
@@ -110,7 +109,7 @@ public final class SessionFactoryRegister {
 	 */
 	public SessionFactory registerSessionFactory(SessionFactory sessionFactory) {
 		if(SessionFactoryContext.registerSessionFactory(sessionFactory) == 2)
-			enableMultipleSessionFactory = true;
+			registerMultipleSessionFactories = true;
 		return sessionFactory;
 	}
 	
@@ -131,7 +130,7 @@ public final class SessionFactoryRegister {
 	 * @return
 	 */
 	public SessionFactory getSessionFactory(String sessionFactoryId) {
-		MultiSessionFactoryHandler.setSessionFactoryId(sessionFactoryId);
+		SessionFactoryIdHolder.setId(sessionFactoryId);
 		return SessionFactoryContext.getSessionFactory();
 	}
 	
@@ -140,9 +139,8 @@ public final class SessionFactoryRegister {
 	 * @param sessionFactoryId
 	 */
 	public synchronized void destroySessionFactory(String sessionFactoryId) {
-		if(enableMultipleSessionFactory) {
-			enableMultipleSessionFactory = SessionFactoryContext.destroySessionFactory(sessionFactoryId);
-		}
-		throw new NotEnabledMultipleSessionFactoryException("没有注册多个SessionFactory, 无法进行destroySessionFactory操作");
+		if(registerMultipleSessionFactories) 
+			registerMultipleSessionFactories = SessionFactoryContext.destroySessionFactory(sessionFactoryId);
+		throw new UnRegisterMultipleSessionFactoriesException("当前程序未注册多个SessionFactory, 禁止进行destroySessionFactory操作");
 	}
 }

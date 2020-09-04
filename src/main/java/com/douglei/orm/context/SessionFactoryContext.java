@@ -35,9 +35,9 @@ class SessionFactoryContext {
 		if(sfw == null) {
 			MAPPING.put(sessionFactory.getId(), new SessionFactoryWrapper(sessionFactory, feature));
 		}else {
-			if(sfw.getSessionFactory() != sessionFactory) 
-				throw new DuplicateRegisterSessionFactoryException(sessionFactory.getId());
-			
+			if(sfw.getSessionFactory() == sessionFactory)
+				System.out.println(1);
+			throw new DuplicateRegisterSessionFactoryException(sessionFactory.getId());
 		}
 		setUNIQUE();
 	}

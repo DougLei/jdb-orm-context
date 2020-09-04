@@ -3,6 +3,7 @@ package com.douglei.orm.context;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.douglei.orm.context.exception.DuplicateRegisterSessionFactoryException;
 import com.douglei.orm.sessionfactory.SessionFactory;
 import com.douglei.tools.utils.StringUtil;
 
@@ -11,67 +12,99 @@ import com.douglei.tools.utils.StringUtil;
  * @author DougLei
  */
 class SessionFactoryContext {
-	private static SessionFactory DEFAULT_SESSION_FACTORY;// 默认的jdb-orm SessionFactory对象
-	private static Map<String, SessionFactory> SESSION_FACTORY_MAPPING;// jdb-orm SessionFactory映射
+	private static SessionFactoryWrapper UNIQUE; // 当MAPPING中只有一个SessionFactoryWrapper时, 该属性引用唯一的SessionFactoryWrapper; 当MAPPING中有多个或没有SessionFactoryWrapper时, 该属性都为空
+	private static Map<String, SessionFactoryWrapper> MAPPING = new HashMap<String, SessionFactoryWrapper>(4);
+	
+	// 设置UNIQUE的值
+	private static void setUNIQUE() {
+		if(MAPPING.size() == 1) {
+			UNIQUE = MAPPING.values().iterator().next();
+		}else {
+			UNIQUE = null;
+		}
+	}
 	
 	/**
 	 * 注册SessionFactory
 	 * @param sessionFactory
-	 * @return 0 传入的SessionFactory已经注册过, 1 将传入的SessionFactory注册为默认数据源, 2 将传入的SessionFactory注册到数据源Map集合中
+	 * @param feature
+	 * @throws DuplicateRegisterSessionFactoryException 
 	 */
-	static byte registerSessionFactory(SessionFactory sessionFactory) {
-		if(DEFAULT_SESSION_FACTORY == null) {
-			DEFAULT_SESSION_FACTORY = sessionFactory;
-			return 1;
+	static void register(SessionFactory sessionFactory, SessionFactoryRegistrationFeature feature) throws DuplicateRegisterSessionFactoryException {
+		SessionFactoryWrapper sfw = MAPPING.get(sessionFactory.getId());
+		if(sfw == null) {
+			MAPPING.put(sessionFactory.getId(), new SessionFactoryWrapper(sessionFactory, feature));
 		}else {
-			String sessionFactoryId = sessionFactory.getId();
-			if(!DEFAULT_SESSION_FACTORY.getId().equals(sessionFactoryId)) {
-				if(SESSION_FACTORY_MAPPING == null) {
-					SESSION_FACTORY_MAPPING = new HashMap<String, SessionFactory>(8);
-				}
-				if(SESSION_FACTORY_MAPPING.isEmpty() || !SESSION_FACTORY_MAPPING.containsKey(sessionFactoryId)){
-					SESSION_FACTORY_MAPPING.put(sessionFactoryId, sessionFactory);
-					return 2;
-				}
-			}
+			if(sfw.getSessionFactory() != sessionFactory) 
+				throw new DuplicateRegisterSessionFactoryException(sessionFactory.getId());
+			
 		}
-		return 0;
+		setUNIQUE();
 	}
 	
 	/**
 	 * 获取SessionFactory
 	 * @return
 	 */
-	static SessionFactory getSessionFactory() {
-		if(SESSION_FACTORY_MAPPING == null || SESSION_FACTORY_MAPPING.isEmpty()) {// 没有动态添加SessionFactory时, 返回默认的SessionFactory
-			if(DEFAULT_SESSION_FACTORY == null) {
-				throw new NullPointerException("不存在任何 SessionFactory 实例");
-			}
-			return DEFAULT_SESSION_FACTORY;
+	static SessionFactoryWrapper get() {
+		if(MAPPING.isEmpty())
+			throw new NullPointerException("不存在任何SessionFactory实例");
+		
+		String id = SessionFactoryIdHolder.getId();
+		if(StringUtil.isEmpty(id)) {
+			if(UNIQUE == null) // 说明有多个数据源
+				throw new NullPointerException("请指定要获取SessionFactory的实例id值");
+			return UNIQUE;
 		}
 		
-		String sessionFactoryId = SessionFactoryIdHolder.getId();
-		if(StringUtil.isEmpty(sessionFactoryId) || DEFAULT_SESSION_FACTORY.getId().equals(sessionFactoryId)) {
-			return DEFAULT_SESSION_FACTORY; // 在注册了多个SessionFactory后, 获取SessionFactory时, 如果没有指定SessionFactory的id, 则返回默认数据源
+		if(UNIQUE != null) {
+			if(id.equals(UNIQUE.getSessionFactory().getId()))
+				return UNIQUE;
+			throw new NullPointerException("不存在id为"+id+"的SessionFactory实例, get失败");
 		}
 		
-		if(SESSION_FACTORY_MAPPING.containsKey(sessionFactoryId)) 
-			return SESSION_FACTORY_MAPPING.get(sessionFactoryId);
-		throw new NullPointerException("不存在id为"+sessionFactoryId+"的SessionFactory实例");
+		SessionFactoryWrapper sfw = MAPPING.get(id);
+		if(sfw == null)
+			throw new NullPointerException("不存在id为"+id+"的SessionFactory实例, get失败");
+		return sfw;
+	}
+	
+	/**
+	 * 移除SessionFactory
+	 * @param id
+	 * @return 被移除的SessionFactoryWrapper
+	 */
+	static SessionFactoryWrapper remove(String id) {
+		if(MAPPING.isEmpty())
+			throw new NullPointerException("不存在任何SessionFactory实例");
+		
+		SessionFactoryWrapper sfw = MAPPING.remove(id);
+		if(sfw == null)
+			throw new NullPointerException("不存在id为"+id+"的SessionFactory实例, remove失败");
+		
+		if(!sfw.getFeature().isAllowRemove())
+			throw new IllegalArgumentException("id为"+id+"的SessionFactory实例不允许被remove");
+		
+		setUNIQUE();
+		return sfw;
 	}
 	
 	/**
 	 * 销毁SessionFactory
-	 * @param sessionFactoryId
-	 * @return SessionFactory Map集合中是否还有 SessionFactory 实例
+	 * @param id
 	 */
-	static boolean destroySessionFactory(String sessionFactoryId) {
-		if(SESSION_FACTORY_MAPPING != null && !SESSION_FACTORY_MAPPING.isEmpty() && SESSION_FACTORY_MAPPING.containsKey(sessionFactoryId)) {
-			SESSION_FACTORY_MAPPING.remove(sessionFactoryId).destroy();
-			return SESSION_FACTORY_MAPPING.size() > 0;
-		}
-		if(DEFAULT_SESSION_FACTORY.getId().equals(sessionFactoryId))
-			throw new IllegalArgumentException("禁止销毁默认数据源");
-		throw new NullPointerException("不存在id为"+sessionFactoryId+"的SessionFactory实例");
+	static void destroy(String id) {
+		if(MAPPING.isEmpty())
+			throw new NullPointerException("不存在任何SessionFactory实例");
+		
+		SessionFactoryWrapper sfw = MAPPING.remove(id);
+		if(sfw == null)
+			throw new NullPointerException("不存在id为"+id+"的SessionFactory实例, destroy失败");
+		
+		if(!sfw.getFeature().isAllowDestroy())
+			throw new IllegalArgumentException("id为"+id+"的SessionFactory实例不允许被destroy");
+		
+		sfw.getSessionFactory().destroy();
+		setUNIQUE();
 	}
 }

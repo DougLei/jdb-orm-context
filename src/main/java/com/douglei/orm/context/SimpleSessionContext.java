@@ -41,6 +41,6 @@ public class SimpleSessionContext {
 	 * @return
 	 */
 	public static Session getSession(boolean beginTransaction, TransactionIsolationLevel transactionIsolationLevel) {
-		return SessionFactoryContext.getSessionFactory().openSession(beginTransaction, transactionIsolationLevel);
+		return SessionFactoryContext.get().getSessionFactory().openSession(beginTransaction, transactionIsolationLevel);
 	}
 }

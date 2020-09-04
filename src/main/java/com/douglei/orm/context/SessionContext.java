@@ -21,7 +21,7 @@ public final class SessionContext {
 	private static final ThreadLocal<Stack<SessionWrapper>> SESSION_WRAPPERS = new ThreadLocal<Stack<SessionWrapper>>();
 	
 	public static SessionFactory getSessionFactory() {
-		return SessionFactoryContext.getSessionFactory();
+		return SessionFactoryContext.get().getSessionFactory();
 	}
 	
 	public static Session getSession() {
@@ -64,7 +64,7 @@ public final class SessionContext {
 			sessionWrappers = new Stack<SessionWrapper>();
 			SESSION_WRAPPERS.set(sessionWrappers);
 		}
-		Session session = SessionFactoryContext.getSessionFactory().openSession(beginTransaction, transactionIsolationLevel);
+		Session session = getSessionFactory().openSession(beginTransaction, transactionIsolationLevel);
 		SessionWrapper sessionWrapper = new SessionWrapper(session);
 		sessionWrappers.push(sessionWrapper);
 		logger.debug("open session is {}", sessionWrapper);

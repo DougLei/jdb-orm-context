@@ -10,7 +10,6 @@ import com.douglei.orm.configuration.Configuration;
 import com.douglei.orm.configuration.ExternalDataSource;
 import com.douglei.orm.configuration.environment.mapping.store.MappingStore;
 import com.douglei.orm.configuration.impl.ConfigurationImpl;
-import com.douglei.orm.context.exception.UnRegisterMultipleSessionFactoriesException;
 import com.douglei.orm.context.exception.SessionFactoryRegistrationException;
 import com.douglei.orm.context.exception.TooManyInstanceException;
 import com.douglei.orm.context.transaction.component.TransactionAnnotationScanner;
@@ -23,10 +22,9 @@ import com.douglei.orm.sessionfactory.SessionFactory;
  * @author DougLei
  */
 public final class SessionFactoryRegister {
-	private boolean registerMultipleSessionFactories;// 是否注册多个SessionFactory
 	private static byte instanceCount = 0;// 实例化次数
 	
-	public SessionFactoryRegister() {
+	public SessionFactoryRegister() throws TooManyInstanceException {
 		if(instanceCount > 0) 
 			throw new TooManyInstanceException(SessionFactoryRegister.class.getName() + ", 只能创建一个实例, 请妥善处理创建出的实例, 保证其在项目中处于全局范围");
 		instanceCount=1;
@@ -95,15 +93,11 @@ public final class SessionFactoryRegister {
 			}
 		}
 		
-		if(SessionFactoryContext.registerSessionFactory(sessionFactory) == 2)
-			registerMultipleSessionFactories = true;
-		return sessionFactory;
+		return registerSessionFactory(sessionFactory);
 	}
 	
 	/**
 	 * 直接注册SessionFactory实例
-	 * 
-	 * 如果是第一次调用该方法进行SessionFactory的注册, 则注册进的SessionFactory作为默认的SessionFactory
 	 * @param sessionFactory
 	 * @return
 	 */
@@ -133,6 +127,15 @@ public final class SessionFactoryRegister {
 		SessionFactoryIdHolder.setId(sessionFactoryId);
 		return SessionFactoryContext.getSessionFactory();
 	}
+	
+	/**
+	 * 移除SessionFactory, 具体需不需要销毁由调用方决定
+	 * @param sessionFactoryId
+	 * @return
+	 */
+//	public synchronized SessionFactory removeSessionFactory(String sessionFactoryId) {
+//		
+//	}
 	
 	/**
 	 * 销毁SessionFactory

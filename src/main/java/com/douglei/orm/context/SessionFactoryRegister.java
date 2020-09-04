@@ -10,6 +10,7 @@ import com.douglei.orm.configuration.Configuration;
 import com.douglei.orm.configuration.ExternalDataSource;
 import com.douglei.orm.configuration.environment.mapping.store.MappingStore;
 import com.douglei.orm.configuration.impl.ConfigurationImpl;
+import com.douglei.orm.context.exception.DuplicateRegisterSessionFactoryException;
 import com.douglei.orm.context.exception.SessionFactoryRegistrationException;
 import com.douglei.orm.context.exception.TooManyInstanceException;
 import com.douglei.orm.context.transaction.component.TransactionAnnotationScanner;
@@ -23,6 +24,7 @@ import com.douglei.orm.sessionfactory.SessionFactory;
  */
 public final class SessionFactoryRegister {
 	private static byte instanceCount = 0;// 实例化次数
+	private static SessionFactoryRegistrationFeature DEFAULT_FEATURE = new SessionFactoryRegistrationFeature(true, true);
 	
 	public SessionFactoryRegister() throws TooManyInstanceException {
 		if(instanceCount > 0) 
@@ -38,13 +40,15 @@ public final class SessionFactoryRegister {
 	 * @param file
 	 * @param dataSource 可为空
 	 * @param mappingStore 可为空
+	 * @param feature 将SessionFactory注册后, 其在容器中具有的特性; 可以传入null, 在传入null时, 会使用默认的特性
 	 * @return
+	 * @throws DuplicateRegisterSessionFactoryException 
 	 */
-	public SessionFactory registerSessionFactoryByFile(String file, ExternalDataSource dataSource, MappingStore mappingStore) {
+	public void registerSessionFactoryByFile(String file, ExternalDataSource dataSource, MappingStore mappingStore, SessionFactoryRegistrationFeature feature) throws DuplicateRegisterSessionFactoryException {
 		InputStream input = SessionFactoryRegister.class.getClassLoader().getResourceAsStream(file);
 		if(input == null) 
 			throw new SessionFactoryRegistrationException("不存在["+file+"]的配置文件");
-		return registerSessionFactory(input, dataSource, mappingStore, false);
+		registerSessionFactory(input, dataSource, mappingStore, feature, false);
 	}
 	
 	/**
@@ -52,10 +56,12 @@ public final class SessionFactoryRegister {
 	 * @param content
 	 * @param dataSource
 	 * @param mappingStore
+	 * @param feature 将SessionFactory注册后, 其在容器中具有的特性; 可以传入null, 在传入null时, 会使用默认的特性
 	 * @return 
+	 * @throws DuplicateRegisterSessionFactoryException 
 	 */
-	public SessionFactory registerSessionFactoryByContent(String content, ExternalDataSource dataSource, MappingStore mappingStore) {
-		return registerSessionFactory(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)), dataSource, mappingStore, false);
+	public void registerSessionFactoryByContent(String content, ExternalDataSource dataSource, MappingStore mappingStore, SessionFactoryRegistrationFeature feature) throws DuplicateRegisterSessionFactoryException {
+		registerSessionFactory(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)), dataSource, mappingStore, feature, false);
 	}
 	
 	/**
@@ -63,10 +69,12 @@ public final class SessionFactoryRegister {
 	 * @param input
 	 * @param dataSource
 	 * @param mappingStore
+	 * @param feature 将SessionFactory注册后, 其在容器中具有的特性; 可以传入null, 在传入null时, 会使用默认的特性
 	 * @return 
+	 * @throws DuplicateRegisterSessionFactoryException 
 	 */
-	public SessionFactory registerSessionFactoryByInput(InputStream input, ExternalDataSource dataSource, MappingStore mappingStore) {
-		return registerSessionFactory(input, dataSource, mappingStore, false);
+	public void registerSessionFactoryByInput(InputStream input, ExternalDataSource dataSource, MappingStore mappingStore, SessionFactoryRegistrationFeature feature) throws DuplicateRegisterSessionFactoryException {
+		registerSessionFactory(input, dataSource, mappingStore, feature, false);
 	}
 	
 	
@@ -75,11 +83,13 @@ public final class SessionFactoryRegister {
 	 * @param input
 	 * @param dataSource 可为空
 	 * @param mappingStore 可为空
+	 * @param feature 将SessionFactory注册后, 其在容器中具有的特性; 可以传入null, 在传入null时, 会使用默认的特性
 	 * @param searchAll
 	 * @param transactionComponentPackages
 	 * @return
+	 * @throws DuplicateRegisterSessionFactoryException 
 	 */
-	public SessionFactory registerSessionFactory(InputStream input, ExternalDataSource dataSource, MappingStore mappingStore, boolean searchAll, String... transactionComponentPackages) {
+	public void registerSessionFactory(InputStream input, ExternalDataSource dataSource, MappingStore mappingStore, SessionFactoryRegistrationFeature feature, boolean searchAll, String... transactionComponentPackages) throws DuplicateRegisterSessionFactoryException {
 		Configuration configuration = new ConfigurationImpl(input);
 		configuration.setExternalDataSource(dataSource);
 		configuration.setMappingStore(mappingStore);
@@ -93,18 +103,19 @@ public final class SessionFactoryRegister {
 			}
 		}
 		
-		return registerSessionFactory(sessionFactory);
+		registerSessionFactory(sessionFactory, feature);
 	}
 	
 	/**
-	 * 直接注册SessionFactory实例
+	 * 注册SessionFactory实例
 	 * @param sessionFactory
-	 * @return
+	 * @param feature 将SessionFactory注册后, 其在容器中具有的特性; 可以传入null, 在传入null时, 会使用默认的特性
+	 * @throws DuplicateRegisterSessionFactoryException 
 	 */
-	public SessionFactory registerSessionFactory(SessionFactory sessionFactory) {
-		if(SessionFactoryContext.registerSessionFactory(sessionFactory) == 2)
-			registerMultipleSessionFactories = true;
-		return sessionFactory;
+	public void registerSessionFactory(SessionFactory sessionFactory, SessionFactoryRegistrationFeature feature) throws DuplicateRegisterSessionFactoryException {
+		if(feature == null)
+			feature = DEFAULT_FEATURE;
+		SessionFactoryContext.register(sessionFactory, feature);
 	}
 	
 	// --------------------------------------------------------------------------------------------
@@ -114,36 +125,34 @@ public final class SessionFactoryRegister {
 	 * 获取SessionFactory
 	 * @return
 	 */
-	public SessionFactory getSessionFactory() {
-		return SessionFactoryContext.getSessionFactory();
+	public SessionFactoryWrapper getSessionFactory() {
+		return SessionFactoryContext.get();
 	}
 	
 	/**
 	 * 获取SessionFactory
-	 * @param sessionFactoryId 指定SessionFactory id
+	 * @param id 指定SessionFactory id
 	 * @return
 	 */
-	public SessionFactory getSessionFactory(String sessionFactoryId) {
-		SessionFactoryIdHolder.setId(sessionFactoryId);
-		return SessionFactoryContext.getSessionFactory();
+	public SessionFactoryWrapper getSessionFactory(String id) {
+		SessionFactoryIdHolder.setId(id);
+		return SessionFactoryContext.get();
 	}
 	
 	/**
-	 * 移除SessionFactory, 具体需不需要销毁由调用方决定
-	 * @param sessionFactoryId
-	 * @return
+	 * 移除SessionFactory
+	 * @param id
+	 * @return 被移除的SessionFactoryWrapper
 	 */
-//	public synchronized SessionFactory removeSessionFactory(String sessionFactoryId) {
-//		
-//	}
+	public synchronized SessionFactoryWrapper remove(String id) {
+		return SessionFactoryContext.remove(id);
+	}
 	
 	/**
 	 * 销毁SessionFactory
-	 * @param sessionFactoryId
+	 * @param id
 	 */
-	public synchronized void destroySessionFactory(String sessionFactoryId) {
-		if(registerMultipleSessionFactories) 
-			registerMultipleSessionFactories = SessionFactoryContext.destroySessionFactory(sessionFactoryId);
-		throw new UnRegisterMultipleSessionFactoriesException("当前程序未注册多个SessionFactory, 禁止进行destroySessionFactory操作");
+	public synchronized void destroySessionFactory(String id) {
+		SessionFactoryContext.destroy(id);
 	}
 }

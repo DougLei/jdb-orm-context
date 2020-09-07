@@ -3,7 +3,6 @@ package com.douglei.orm.context;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.douglei.orm.context.exception.DuplicateRegisterSessionFactoryException;
 import com.douglei.orm.sessionfactory.SessionFactory;
 import com.douglei.tools.utils.StringUtil;
 
@@ -12,8 +11,8 @@ import com.douglei.tools.utils.StringUtil;
  * @author DougLei
  */
 class SessionFactoryContext {
-	private static SessionFactoryWrapper UNIQUE; // 当MAPPING中只有一个SessionFactoryWrapper时, 该属性引用唯一的SessionFactoryWrapper; 当MAPPING中有多个或没有SessionFactoryWrapper时, 该属性都为空
-	private static Map<String, SessionFactoryWrapper> MAPPING = new HashMap<String, SessionFactoryWrapper>(4);
+	private static SessionFactory UNIQUE; // 当MAPPING中只有一个SessionFactoryWrapper时, 该属性引用唯一的SessionFactoryWrapper; 当MAPPING中有多个或没有SessionFactoryWrapper时, 该属性都为空
+	private static Map<String, SessionFactory> MAPPING = new HashMap<String, SessionFactory>(4);
 	
 	// 设置UNIQUE的值
 	private static void setUNIQUE() {
@@ -27,26 +26,31 @@ class SessionFactoryContext {
 	/**
 	 * 注册SessionFactory
 	 * @param sessionFactory
-	 * @param feature
-	 * @throws DuplicateRegisterSessionFactoryException 
+	 * @return 
+	 * @throws IdDuplicateException 
 	 */
-	static void register(SessionFactory sessionFactory, SessionFactoryRegistrationFeature feature) throws DuplicateRegisterSessionFactoryException {
-		SessionFactoryWrapper sfw = MAPPING.get(sessionFactory.getId());
-		if(sfw == null) {
-			MAPPING.put(sessionFactory.getId(), new SessionFactoryWrapper(sessionFactory, feature));
+	static RegistrationResult register(SessionFactory sessionFactory) throws IdDuplicateException {
+		SessionFactory sf = null;
+		if(!MAPPING.isEmpty())
+			sf = MAPPING.get(sessionFactory.getId());
+		
+		if(sf == null) {
+			MAPPING.put(sessionFactory.getId(), sessionFactory);
+			setUNIQUE();
+			return RegistrationResult.SUCCESS;
 		}else {
-			if(sfw.getSessionFactory() == sessionFactory)
-				System.out.println(1);
-			throw new DuplicateRegisterSessionFactoryException(sessionFactory.getId());
+			if(sf != sessionFactory)
+				throw new IdDuplicateException("已经存在id为"+sessionFactory.getId()+"的SessionFactory实例");
+			setUNIQUE();
+			return RegistrationResult.ALREADY_EXISTS;
 		}
-		setUNIQUE();
 	}
 	
 	/**
 	 * 获取SessionFactory
 	 * @return
 	 */
-	static SessionFactoryWrapper get() {
+	static SessionFactory get() {
 		if(MAPPING.isEmpty())
 			throw new NullPointerException("不存在任何SessionFactory实例");
 		
@@ -58,53 +62,34 @@ class SessionFactoryContext {
 		}
 		
 		if(UNIQUE != null) {
-			if(id.equals(UNIQUE.getSessionFactory().getId()))
+			if(id.equals(UNIQUE.getId()))
 				return UNIQUE;
 			throw new NullPointerException("不存在id为"+id+"的SessionFactory实例, get失败");
 		}
 		
-		SessionFactoryWrapper sfw = MAPPING.get(id);
-		if(sfw == null)
+		SessionFactory sf = MAPPING.get(id);
+		if(sf == null)
 			throw new NullPointerException("不存在id为"+id+"的SessionFactory实例, get失败");
-		return sfw;
+		return sf;
 	}
 	
 	/**
 	 * 移除SessionFactory
 	 * @param id
-	 * @return 被移除的SessionFactoryWrapper
+	 * @param destroy 是否在移除的同时进行销毁
+	 * @return 
 	 */
-	static SessionFactoryWrapper remove(String id) {
+	static SessionFactory remove(String id, boolean destroy) {
 		if(MAPPING.isEmpty())
 			throw new NullPointerException("不存在任何SessionFactory实例");
 		
-		SessionFactoryWrapper sfw = MAPPING.remove(id);
-		if(sfw == null)
-			throw new NullPointerException("不存在id为"+id+"的SessionFactory实例, remove失败");
+		SessionFactory sf = MAPPING.remove(id);
+		if(sf == null)
+			throw new NullPointerException("不存在id为"+id+"的SessionFactory实例, "+(destroy?"destroy":"remove")+"失败");
 		
-		if(!sfw.getFeature().isAllowRemove())
-			throw new IllegalArgumentException("id为"+id+"的SessionFactory实例不允许被remove");
-		
+		if(destroy)
+			sf.destroy();
 		setUNIQUE();
-		return sfw;
-	}
-	
-	/**
-	 * 销毁SessionFactory
-	 * @param id
-	 */
-	static void destroy(String id) {
-		if(MAPPING.isEmpty())
-			throw new NullPointerException("不存在任何SessionFactory实例");
-		
-		SessionFactoryWrapper sfw = MAPPING.remove(id);
-		if(sfw == null)
-			throw new NullPointerException("不存在id为"+id+"的SessionFactory实例, destroy失败");
-		
-		if(!sfw.getFeature().isAllowDestroy())
-			throw new IllegalArgumentException("id为"+id+"的SessionFactory实例不允许被destroy");
-		
-		sfw.getSessionFactory().destroy();
-		setUNIQUE();
+		return sf;
 	}
 }

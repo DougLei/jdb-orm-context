@@ -21,7 +21,7 @@ public final class SessionContext {
 	private static final ThreadLocal<Stack<SessionWrapper>> SESSION_WRAPPERS = new ThreadLocal<Stack<SessionWrapper>>();
 	
 	public static SessionFactory getSessionFactory() {
-		return SessionFactoryContext.get().getSessionFactory();
+		return SessionFactoryContext.get();
 	}
 	
 	public static Session getSession() {

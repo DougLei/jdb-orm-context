@@ -8,7 +8,7 @@ import java.util.List;
 import com.douglei.aop.ProxyBeanContext;
 import com.douglei.orm.configuration.Configuration;
 import com.douglei.orm.configuration.ExternalDataSource;
-import com.douglei.orm.configuration.environment.mapping.store.MappingStore;
+import com.douglei.orm.configuration.environment.mapping.container.MappingContainer;
 import com.douglei.orm.configuration.impl.ConfigurationImpl;
 import com.douglei.orm.context.transaction.component.TransactionAnnotationScanner;
 import com.douglei.orm.context.transaction.component.TransactionComponentEntity;
@@ -33,37 +33,37 @@ public final class SessionFactoryRegister {
 	 * 通过配置文件, 注册SessionFactory实例
 	 * @param file
 	 * @param dataSource 可为空
-	 * @param mappingStore 可为空
+	 * @param mappingContainer 可为空
 	 * @return
 	 * @throws IdDuplicateException 
 	 */
-	public RegistrationResult registerByFile(String file, ExternalDataSource dataSource, MappingStore mappingStore) throws IdDuplicateException {
+	public RegistrationResult registerByFile(String file, ExternalDataSource dataSource, MappingContainer mappingContainer) throws IdDuplicateException {
 		InputStream input = SessionFactoryRegister.class.getClassLoader().getResourceAsStream(file);
-		return registerByStream(input, dataSource, mappingStore, false);
+		return registerByStream(input, dataSource, mappingContainer, false);
 	}
 	
 	/**
 	 * 通过配置文件的内容字符串, 注册SessionFactory实例
 	 * @param content
 	 * @param dataSource
-	 * @param mappingStore
+	 * @param mappingContainer
 	 * @return 
 	 * @throws IdDuplicateException 
 	 */
-	public RegistrationResult registerByContent(String content, ExternalDataSource dataSource, MappingStore mappingStore) throws IdDuplicateException {
-		return registerByStream(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)), dataSource, mappingStore, false);
+	public RegistrationResult registerByContent(String content, ExternalDataSource dataSource, MappingContainer mappingContainer) throws IdDuplicateException {
+		return registerByStream(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)), dataSource, mappingContainer, false);
 	}
 	
 	/**
 	 * 通过配置文件内容流, 注册SessionFactory实例
 	 * @param input
 	 * @param dataSource
-	 * @param mappingStore
+	 * @param mappingContainer
 	 * @return 
 	 * @throws IdDuplicateException 
 	 */
-	public RegistrationResult registerByStream(InputStream input, ExternalDataSource dataSource, MappingStore mappingStore) throws IdDuplicateException {
-		return registerByStream(input, dataSource, mappingStore, false);
+	public RegistrationResult registerByStream(InputStream input, ExternalDataSource dataSource, MappingContainer mappingContainer) throws IdDuplicateException {
+		return registerByStream(input, dataSource, mappingContainer, false);
 	}
 	
 	
@@ -71,16 +71,16 @@ public final class SessionFactoryRegister {
 	 * 通过配置文件内容流, 注册SessionFactory实例
 	 * @param input
 	 * @param dataSource 可为空
-	 * @param mappingStore 可为空
+	 * @param mappingContainer 可为空
 	 * @param searchAll
 	 * @param transactionComponentPackages
 	 * @return
 	 * @throws IdDuplicateException 
 	 */
-	public RegistrationResult registerByStream(InputStream input, ExternalDataSource dataSource, MappingStore mappingStore, boolean searchAll, String... transactionComponentPackages) throws IdDuplicateException {
+	public RegistrationResult registerByStream(InputStream input, ExternalDataSource dataSource, MappingContainer mappingContainer, boolean searchAll, String... transactionComponentPackages) throws IdDuplicateException {
 		Configuration configuration = new ConfigurationImpl(input);
 		configuration.setExternalDataSource(dataSource);
-		configuration.setMappingStore(mappingStore);
+		configuration.setMappingContainer(mappingContainer);
 		SessionFactory sessionFactory = configuration.buildSessionFactory();
 		
 		// 根据包路径扫描事务组件

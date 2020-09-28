@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.douglei.aop.ProxyMethod;
-import com.douglei.tools.instances.scanner.ClassScanner;
+import com.douglei.tools.instances.scanner.impl.ClassScanner;
 import com.douglei.tools.utils.reflect.ClassLoadUtil;
 
 /**
@@ -28,8 +28,8 @@ public class TransactionAnnotationScanner {
 	 */
 	public static List<TransactionComponentEntity> scan(boolean searchAll, String... transactionComponentPackages) {
 		if(transactionComponentPackages.length > 0) {
-			ClassScanner cs = new ClassScanner();
-			List<String> classes = cs.multiScan(searchAll, transactionComponentPackages);
+			ClassScanner scanner = new ClassScanner();
+			List<String> classes = scanner.multiScan(searchAll, transactionComponentPackages);
 			if(!classes.isEmpty()) {
 				List<TransactionComponentEntity> transactionComponentEntities = null;
 				
@@ -62,7 +62,7 @@ public class TransactionAnnotationScanner {
 					}
 				}
 				
-				cs.destroy();
+				scanner.destroy();
 				
 				if(transactionComponentEntities != null) {
 					return transactionComponentEntities;

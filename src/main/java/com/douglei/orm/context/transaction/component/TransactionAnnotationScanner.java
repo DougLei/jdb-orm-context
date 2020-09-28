@@ -22,14 +22,14 @@ public class TransactionAnnotationScanner {
 	
 	/**
 	 * 根据指定的包路径, 扫描事务组件
-	 * @param searchAll
+	 * @param scanAll
 	 * @param transactionComponentPackages
 	 * @return 
 	 */
-	public static List<TransactionComponentEntity> scan(boolean searchAll, String... transactionComponentPackages) {
+	public static List<TransactionComponentEntity> scan(boolean scanAll, String... transactionComponentPackages) {
 		if(transactionComponentPackages.length > 0) {
 			ClassScanner scanner = new ClassScanner();
-			List<String> classes = scanner.multiScan(searchAll, transactionComponentPackages);
+			List<String> classes = scanner.multiScan(scanAll, transactionComponentPackages);
 			if(!classes.isEmpty()) {
 				List<TransactionComponentEntity> transactionComponentEntities = null;
 				
@@ -61,8 +61,6 @@ public class TransactionAnnotationScanner {
 						}
 					}
 				}
-				
-				scanner.destroy();
 				
 				if(transactionComponentEntities != null) {
 					return transactionComponentEntities;

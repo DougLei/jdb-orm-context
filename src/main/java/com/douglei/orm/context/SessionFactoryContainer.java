@@ -71,12 +71,12 @@ public final class SessionFactoryContainer {
 	 * @param input
 	 * @param dataSource 可为空
 	 * @param mappingContainer 可为空
-	 * @param searchAll
+	 * @param scanAll
 	 * @param transactionComponentPackages
 	 * @return
 	 * @throws IdDuplicateException 
 	 */
-	public RegistrationResult registerByStream(InputStream input, ExternalDataSource dataSource, MappingContainer mappingContainer, boolean searchAll, String... transactionComponentPackages) throws IdDuplicateException {
+	public RegistrationResult registerByStream(InputStream input, ExternalDataSource dataSource, MappingContainer mappingContainer, boolean scanAll, String... transactionComponentPackages) throws IdDuplicateException {
 		Configuration configuration = new ConfigurationImpl(input);
 		configuration.setExternalDataSource(dataSource);
 		configuration.setMappingContainer(mappingContainer);
@@ -84,7 +84,7 @@ public final class SessionFactoryContainer {
 		
 		// 根据包路径扫描事务组件
 		if(transactionComponentPackages.length > 0) {
-			List<TransactionComponentEntity> transactionComponentEntities = TransactionAnnotationScanner.scan(searchAll, transactionComponentPackages);
+			List<TransactionComponentEntity> transactionComponentEntities = TransactionAnnotationScanner.scan(scanAll, transactionComponentPackages);
 			if(!transactionComponentEntities.isEmpty()) {
 				for (TransactionComponentEntity transactionComponentEntity : transactionComponentEntities) {
 					ProxyBeanContext.createAndAddProxy(transactionComponentEntity.getTransactionComponentClass(), new TransactionProxyInterceptor(transactionComponentEntity.getTransactionComponentClass(), transactionComponentEntity.getTransactionMethods()));

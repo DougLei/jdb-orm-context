@@ -15,14 +15,13 @@ import com.douglei.orm.context.transaction.component.TransactionComponentEntity;
 import com.douglei.orm.sessionfactory.SessionFactory;
 
 /**
- * jdb-orm 的SessionFactory注册器
- * <p><b>注意: 该类只支持创建一个实例</b></p>
+ * jdb-orm 的SessionFactory容器
  * @author DougLei
  */
-public final class SessionFactoryRegister {
-	private SessionFactoryRegister(){}
-	private static SessionFactoryRegister singleton = new SessionFactoryRegister();
-	public static SessionFactoryRegister getSingleton() {
+public final class SessionFactoryContainer {
+	private SessionFactoryContainer(){}
+	private static SessionFactoryContainer singleton = new SessionFactoryContainer();
+	public static SessionFactoryContainer getSingleton() {
 		return singleton;
 	}
 	
@@ -38,7 +37,7 @@ public final class SessionFactoryRegister {
 	 * @throws IdDuplicateException 
 	 */
 	public RegistrationResult registerByFile(String file, ExternalDataSource dataSource, MappingContainer mappingContainer) throws IdDuplicateException {
-		InputStream input = SessionFactoryRegister.class.getClassLoader().getResourceAsStream(file);
+		InputStream input = SessionFactoryContainer.class.getClassLoader().getResourceAsStream(file);
 		return registerByStream(input, dataSource, mappingContainer, false);
 	}
 	

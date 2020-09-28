@@ -10,7 +10,7 @@ public class RegisterTest {
 	
 	@Test
 	public void test() {
-//		new SessionFactoryRegister().registerDefaultSessionFactory("com.douglei.orm.context.service");
+//		new SessionFactoryContainer().registerDefaultSessionFactory("com.douglei.orm.context.service");
 //		ProxyBeanContext.getProxy(Service.class).add();
 	}
 }

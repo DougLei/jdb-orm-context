@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.douglei.aop.ProxyMethod;
-import com.douglei.tools.instances.scanner.impl.ClassScanner;
+import com.douglei.tools.instances.resource.scanner.impl.ClassScanner;
 import com.douglei.tools.utils.reflect.ClassLoadUtil;
 
 /**

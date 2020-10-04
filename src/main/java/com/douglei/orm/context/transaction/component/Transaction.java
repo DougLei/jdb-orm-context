@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import com.douglei.orm.context.PropagationBehavior;
-import com.douglei.orm.core.dialect.TransactionIsolationLevel;
+import com.douglei.orm.dialect.TransactionIsolationLevel;
 
 /**
  * 

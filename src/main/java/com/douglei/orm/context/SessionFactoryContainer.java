@@ -6,12 +6,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import com.douglei.aop.ProxyBeanContext;
-import com.douglei.orm.configuration.Configuration;
-import com.douglei.orm.configuration.ExternalDataSource;
-import com.douglei.orm.configuration.environment.mapping.container.MappingContainer;
-import com.douglei.orm.configuration.impl.ConfigurationImpl;
+import com.douglei.orm.Configuration;
+import com.douglei.orm.ExternalDataSource;
 import com.douglei.orm.context.transaction.component.TransactionAnnotationScanner;
 import com.douglei.orm.context.transaction.component.TransactionComponentEntity;
+import com.douglei.orm.mapping.container.MappingContainer;
 import com.douglei.orm.sessionfactory.SessionFactory;
 
 /**
@@ -77,10 +76,10 @@ public final class SessionFactoryContainer {
 	 * @throws IdDuplicateException 
 	 */
 	public RegistrationResult registerByStream(InputStream input, ExternalDataSource dataSource, MappingContainer mappingContainer, boolean scanAll, String... transactionComponentPackages) throws IdDuplicateException {
-		Configuration configuration = new ConfigurationImpl(input);
+		Configuration configuration = new Configuration(input);
 		configuration.setExternalDataSource(dataSource);
 		configuration.setMappingContainer(mappingContainer);
-		SessionFactory sessionFactory = configuration.buildSessionFactory();
+		SessionFactory sessionFactory = configuration.getSessionFactory();
 		
 		// 根据包路径扫描事务组件
 		if(transactionComponentPackages.length > 0) {

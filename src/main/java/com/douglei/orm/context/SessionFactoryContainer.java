@@ -79,7 +79,7 @@ public final class SessionFactoryContainer {
 		Configuration configuration = new Configuration(input);
 		configuration.setExternalDataSource(dataSource);
 		configuration.setMappingContainer(mappingContainer);
-		SessionFactory sessionFactory = configuration.getSessionFactory();
+		SessionFactory sessionFactory = configuration.buildSessionFactory();
 		
 		// 根据包路径扫描事务组件
 		if(transactionComponentPackages.length > 0) {

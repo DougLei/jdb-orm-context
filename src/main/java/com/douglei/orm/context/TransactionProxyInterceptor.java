@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import com.douglei.aop.ProxyInterceptor;
 import com.douglei.aop.ProxyMethod;
 import com.douglei.orm.context.transaction.component.Transaction;
-import com.douglei.orm.sessionfactory.sessions.Session;
 import com.douglei.tools.utils.ExceptionUtil;
 
 /**
@@ -53,14 +52,10 @@ public class TransactionProxyInterceptor extends ProxyInterceptor{
 		switch(transaction.propagationBehavior()) {
 			case REQUIRED:
 				SessionWrapper sessionWrapper_REQUIRED = SessionContext.existsSessionWrapper();
-				if(sessionWrapper_REQUIRED == null) {
+				if(sessionWrapper_REQUIRED == null || !sessionWrapper_REQUIRED.getSession().isBeginTransaction()) {
 					SessionContext.openSession(true, transaction.transactionIsolationLevel());
 				}else {
-					Session session_REQUIRED = sessionWrapper_REQUIRED.increment().getSession();
-					if(!session_REQUIRED.isBeginTransaction()) {
-						session_REQUIRED.beginTransaction();
-					}
-					session_REQUIRED.setTransactionIsolationLevel(transaction.transactionIsolationLevel());
+					sessionWrapper_REQUIRED.increment().getSession().setTransactionIsolationLevel(transaction.transactionIsolationLevel());
 				}
 				break;
 			case REQUIRED_NEW:

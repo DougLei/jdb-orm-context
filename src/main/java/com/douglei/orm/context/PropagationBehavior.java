@@ -7,7 +7,7 @@ package com.douglei.orm.context;
 public enum PropagationBehavior {
 
 	/**
-	 * 需要事物:  如果当前连接存在事物, 则使用该连接, 否则开启一个新的带事物的连接
+	 * 需要事物:  如果当前连接存在事物, 则使用该连接; 如果当前连接没有开启事物, 则在当前连接上开启事物; 否则在不存在连接的情况下, 开启一个新的带事物的连接
 	 */
 	REQUIRED,
 	

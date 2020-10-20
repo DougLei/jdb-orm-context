@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.douglei.orm.environment.datasource.TransactionIsolationLevel;
 import com.douglei.orm.sessionfactory.sessions.Session;
 import com.douglei.tools.utils.ExceptionUtil;
 
@@ -17,23 +18,30 @@ class SessionWrapper {
 	private static final Logger logger = LoggerFactory.getLogger(SessionWrapper.class);
 	
 	private Session session;
-	private byte count;
+	private byte count; // 被多少个方法使用
+	private List<TransactionIsolationLevel> transactionIsolationLevels;
 	private List<Throwable> throwables;
 	
-	SessionWrapper(Session session) {
+	SessionWrapper(Session session, TransactionIsolationLevel transactionIsolationLevel) {
 		this.session = session;
 		this.count = 1;
+		this.transactionIsolationLevels = new ArrayList<TransactionIsolationLevel>();
+		this.transactionIsolationLevels.add(transactionIsolationLevel);
 	}
 	
 	public Session getSession() {
 		return session;
 	}
-	public SessionWrapper increment() {
+	public SessionWrapper increment(TransactionIsolationLevel transactionIsolationLevel) {
 		count++;
+		transactionIsolationLevels.add(transactionIsolationLevel);
+		session.setTransactionIsolationLevel(transactionIsolationLevel);
 		return this;
 	}
 	public SessionWrapper decrement() {
 		count--;
+		transactionIsolationLevels.remove(count);
+		session.setTransactionIsolationLevel(transactionIsolationLevels.get(count-1));
 		return this;
 	}
 	public void pushThrowable(Throwable throwable) {

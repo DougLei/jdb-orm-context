@@ -42,7 +42,7 @@ public final class SessionContext {
 	
 	static SessionWrapper getSessionWrapper() {
 		Stack<SessionWrapper> sessionWrappers = SESSION_WRAPPERS.get();
-		if(sessionWrappers == null || sessionWrappers.size() == 0) {
+		if(sessionWrappers == null || sessionWrappers.isEmpty()) {
 			throw new NullPointerException("不存在可用的seesion实例");
 		}
 		return sessionWrappers.peek();
@@ -50,7 +50,7 @@ public final class SessionContext {
 	
 	static SessionWrapper existsSessionWrapper() {
 		Stack<SessionWrapper> sessionWrappers = SESSION_WRAPPERS.get();
-		if(sessionWrappers == null || sessionWrappers.size() == 0) {
+		if(sessionWrappers == null || sessionWrappers.isEmpty()) {
 			return null;
 		}
 		SessionWrapper sessionWrapper = sessionWrappers.peek();
@@ -60,12 +60,12 @@ public final class SessionContext {
 	
 	static void openSession(boolean beginTransaction, TransactionIsolationLevel transactionIsolationLevel) {
 		Stack<SessionWrapper> sessionWrappers = SESSION_WRAPPERS.get();
-		if(sessionWrappers == null || sessionWrappers.size() == 0) {
+		if(sessionWrappers == null || sessionWrappers.isEmpty()) {
 			sessionWrappers = new Stack<SessionWrapper>();
 			SESSION_WRAPPERS.set(sessionWrappers);
 		}
 		Session session = getSessionFactory().openSession(beginTransaction, transactionIsolationLevel);
-		SessionWrapper sessionWrapper = new SessionWrapper(session);
+		SessionWrapper sessionWrapper = new SessionWrapper(session, transactionIsolationLevel);
 		sessionWrappers.push(sessionWrapper);
 		logger.debug("open session is {}", sessionWrapper);
 	}

@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.douglei.aop.ProxyInterceptor;
 import com.douglei.aop.ProxyMethod;
 import com.douglei.orm.context.transaction.component.Transaction;
+import com.douglei.orm.sessionfactory.sessions.Session;
 import com.douglei.tools.utils.ExceptionUtil;
 
 /**
@@ -52,10 +53,13 @@ public class TransactionProxyInterceptor extends ProxyInterceptor{
 		switch(transaction.propagationBehavior()) {
 			case REQUIRED:
 				SessionWrapper sessionWrapper_REQUIRED = SessionContext.existsSessionWrapper();
-				if(sessionWrapper_REQUIRED == null || !sessionWrapper_REQUIRED.getSession().isBeginTransaction()) {
+				if(sessionWrapper_REQUIRED == null) {
 					SessionContext.openSession(true, transaction.transactionIsolationLevel());
 				}else {
-					sessionWrapper_REQUIRED.increment().getSession().setTransactionIsolationLevel(transaction.transactionIsolationLevel());
+					Session session = sessionWrapper_REQUIRED.getSession();
+					if(!session.isBeginTransaction())
+						session.beginTransaction();
+					sessionWrapper_REQUIRED.increment(transaction.transactionIsolationLevel());
 				}
 				break;
 			case REQUIRED_NEW:
@@ -66,7 +70,7 @@ public class TransactionProxyInterceptor extends ProxyInterceptor{
 				if(sessionWrapper_SUPPORTS == null) {
 					SessionContext.openSession(false, transaction.transactionIsolationLevel());
 				}else {
-					sessionWrapper_SUPPORTS.increment().getSession().setTransactionIsolationLevel(transaction.transactionIsolationLevel());
+					sessionWrapper_SUPPORTS.increment(transaction.transactionIsolationLevel());
 				}
 				break;
 		}

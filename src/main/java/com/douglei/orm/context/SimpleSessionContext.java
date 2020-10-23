@@ -1,6 +1,6 @@
 package com.douglei.orm.context;
 
-import com.douglei.orm.environment.datasource.TransactionIsolationLevel;
+import com.douglei.orm.configuration.environment.datasource.TransactionIsolationLevel;
 import com.douglei.orm.sessionfactory.sessions.Session;
 
 /**

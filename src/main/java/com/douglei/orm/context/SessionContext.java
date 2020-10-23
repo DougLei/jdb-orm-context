@@ -5,7 +5,7 @@ import java.util.Stack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.douglei.orm.environment.datasource.TransactionIsolationLevel;
+import com.douglei.orm.configuration.environment.datasource.TransactionIsolationLevel;
 import com.douglei.orm.sessionfactory.SessionFactory;
 import com.douglei.orm.sessionfactory.sessions.Session;
 import com.douglei.orm.sessionfactory.sessions.session.sql.SQLSession;

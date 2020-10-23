@@ -6,8 +6,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import com.douglei.aop.ProxyBeanContext;
-import com.douglei.orm.Configuration;
-import com.douglei.orm.ExternalDataSource;
+import com.douglei.orm.configuration.Configuration;
+import com.douglei.orm.configuration.ExternalDataSource;
 import com.douglei.orm.context.transaction.component.TransactionAnnotationScanner;
 import com.douglei.orm.context.transaction.component.TransactionComponentEntity;
 import com.douglei.orm.mapping.container.MappingContainer;

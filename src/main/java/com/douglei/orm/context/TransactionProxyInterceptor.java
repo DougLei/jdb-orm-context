@@ -47,9 +47,9 @@ public class TransactionProxyInterceptor extends ProxyInterceptor{
 	@Override
 	protected boolean before_(Object originObject, Method method, Object[] args) {
 		Transaction transaction = getTransactionAnnotation(originObject, method);
-		if(transaction == null) {
+		if(transaction == null) 
 			return false;
-		}
+		
 		switch(transaction.propagationBehavior()) {
 			case REQUIRED:
 				SessionWrapper sessionWrapper_REQUIRED = SessionContext.existsSessionWrapper();
@@ -81,8 +81,13 @@ public class TransactionProxyInterceptor extends ProxyInterceptor{
 	protected Object after_(Object originObject, Method method, Object[] args, Object result) throws Throwable {
 		SessionWrapper sessionWrapper = SessionContext.getSessionWrapper();
 		if(sessionWrapper.readyCommit()) {
-			logger.debug("{} session do commit", sessionWrapper);
-			sessionWrapper.getSession().commit();
+			if(sessionWrapper.getTransactionExecuteMode() == SessionWrapper.ROLLBACK) {
+				logger.debug("{} session do rollback by executeRollback", sessionWrapper);
+				sessionWrapper.getSession().rollback();
+			}else {
+				logger.debug("{} session do commit", sessionWrapper);
+				sessionWrapper.getSession().commit();
+			}
 		}
 		return result;
 	}
@@ -90,11 +95,16 @@ public class TransactionProxyInterceptor extends ProxyInterceptor{
 	@Override
 	protected void exception_(Object originObject, Method method, Object[] args, Throwable t) throws Throwable {
 		SessionWrapper sessionWrapper = SessionContext.getSessionWrapper();
-		sessionWrapper.pushThrowable(t);
+		sessionWrapper.addThrowable(t);
 		if(sessionWrapper.ready()) {
-			logger.debug("{} session do rollback", sessionWrapper);
-			sessionWrapper.getSession().rollback();
-			sessionWrapper.throwThrowable();
+			if(sessionWrapper.getTransactionExecuteMode() == SessionWrapper.COMMIT) {
+				logger.debug("{} session do commit by executeCommit", sessionWrapper);
+				sessionWrapper.getSession().commit();
+			}else {
+				logger.debug("{} session do rollback", sessionWrapper);
+				sessionWrapper.getSession().rollback();
+			}
+			sessionWrapper.throwThrowables();
 		}
 	}
 

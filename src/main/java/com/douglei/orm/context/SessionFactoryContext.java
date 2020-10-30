@@ -27,9 +27,9 @@ class SessionFactoryContext {
 	 * 注册SessionFactory
 	 * @param sessionFactory
 	 * @return 
-	 * @throws IdDuplicateException 
+	 * @throws IdRepeatedException 
 	 */
-	static RegistrationResult register(SessionFactory sessionFactory) throws IdDuplicateException {
+	static RegistrationResult register(SessionFactory sessionFactory) throws IdRepeatedException {
 		SessionFactory sf = null;
 		if(!MAPPING.isEmpty())
 			sf = MAPPING.get(sessionFactory.getId());
@@ -40,7 +40,7 @@ class SessionFactoryContext {
 			return RegistrationResult.SUCCESS;
 		}else {
 			if(sf != sessionFactory)
-				throw new IdDuplicateException("已经存在id为"+sessionFactory.getId()+"的SessionFactory实例");
+				throw new IdRepeatedException(sessionFactory.getId());
 			setUNIQUE();
 			return RegistrationResult.ALREADY_EXISTS;
 		}

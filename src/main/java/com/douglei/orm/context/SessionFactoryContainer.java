@@ -33,9 +33,9 @@ public final class SessionFactoryContainer {
 	 * @param dataSource 可为空
 	 * @param mappingContainer 可为空
 	 * @return
-	 * @throws IdDuplicateException 
+	 * @throws IdRepeatedException 
 	 */
-	public RegistrationResult registerByFile(String file, ExternalDataSource dataSource, MappingContainer mappingContainer) throws IdDuplicateException {
+	public RegistrationResult registerByFile(String file, ExternalDataSource dataSource, MappingContainer mappingContainer) throws IdRepeatedException {
 		InputStream input = SessionFactoryContainer.class.getClassLoader().getResourceAsStream(file);
 		return registerByStream(input, dataSource, mappingContainer, false);
 	}
@@ -46,9 +46,9 @@ public final class SessionFactoryContainer {
 	 * @param dataSource
 	 * @param mappingContainer
 	 * @return 
-	 * @throws IdDuplicateException 
+	 * @throws IdRepeatedException 
 	 */
-	public RegistrationResult registerByContent(String content, ExternalDataSource dataSource, MappingContainer mappingContainer) throws IdDuplicateException {
+	public RegistrationResult registerByContent(String content, ExternalDataSource dataSource, MappingContainer mappingContainer) throws IdRepeatedException {
 		return registerByStream(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)), dataSource, mappingContainer, false);
 	}
 	
@@ -58,9 +58,9 @@ public final class SessionFactoryContainer {
 	 * @param dataSource
 	 * @param mappingContainer
 	 * @return 
-	 * @throws IdDuplicateException 
+	 * @throws IdRepeatedException 
 	 */
-	public RegistrationResult registerByStream(InputStream input, ExternalDataSource dataSource, MappingContainer mappingContainer) throws IdDuplicateException {
+	public RegistrationResult registerByStream(InputStream input, ExternalDataSource dataSource, MappingContainer mappingContainer) throws IdRepeatedException {
 		return registerByStream(input, dataSource, mappingContainer, false);
 	}
 	
@@ -73,9 +73,9 @@ public final class SessionFactoryContainer {
 	 * @param scanAll
 	 * @param transactionComponentPackages
 	 * @return
-	 * @throws IdDuplicateException 
+	 * @throws IdRepeatedException 
 	 */
-	public RegistrationResult registerByStream(InputStream input, ExternalDataSource dataSource, MappingContainer mappingContainer, boolean scanAll, String... transactionComponentPackages) throws IdDuplicateException {
+	public RegistrationResult registerByStream(InputStream input, ExternalDataSource dataSource, MappingContainer mappingContainer, boolean scanAll, String... transactionComponentPackages) throws IdRepeatedException {
 		Configuration configuration = new Configuration(input);
 		configuration.setExternalDataSource(dataSource);
 		configuration.setMappingContainer(mappingContainer);
@@ -98,9 +98,9 @@ public final class SessionFactoryContainer {
 	 * 注册SessionFactory实例
 	 * @param sessionFactory
 	 * @return
-	 * @throws IdDuplicateException 
+	 * @throws IdRepeatedException 
 	 */
-	public synchronized RegistrationResult register(SessionFactory sessionFactory) throws IdDuplicateException {
+	public synchronized RegistrationResult register(SessionFactory sessionFactory) throws IdRepeatedException {
 		return SessionFactoryContext.register(sessionFactory);
 	}
 	

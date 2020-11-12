@@ -86,7 +86,7 @@ public final class SessionFactoryContainer {
 			List<TransactionComponentEntity> transactionComponentEntities = TransactionAnnotationScanner.scan(scanAll, transactionComponentPackages);
 			if(!transactionComponentEntities.isEmpty()) {
 				for (TransactionComponentEntity transactionComponentEntity : transactionComponentEntities) {
-					ProxyBeanContext.createAndAddProxy(transactionComponentEntity.getTransactionComponentClass(), new TransactionProxyInterceptor(transactionComponentEntity.getTransactionComponentClass(), transactionComponentEntity.getTransactionMethods()));
+					ProxyBeanContext.createAndAddProxy(transactionComponentEntity.getClazz(), new TransactionProxyInterceptor(transactionComponentEntity.getClazz(), transactionComponentEntity.getMethods()));
 				}
 			}
 		}

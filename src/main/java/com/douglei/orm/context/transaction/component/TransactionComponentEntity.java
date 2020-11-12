@@ -10,28 +10,28 @@ import com.douglei.aop.ProxyMethod;
  * @author DougLei
  */
 public class TransactionComponentEntity {
-	private Class<?> transactionComponentClass;
-	private List<ProxyMethod> transactionMethods;
+	private Class<?> clazz;
+	private List<ProxyMethod> methods;
 	
-	public TransactionComponentEntity(Class<?> transactionComponentClass, int methodSize) {
-		this.transactionComponentClass = transactionComponentClass;
-		transactionMethods = new ArrayList<ProxyMethod>(methodSize);
+	public TransactionComponentEntity(Class<?> clazz, int methodSize) {
+		this.clazz = clazz;
+		this.methods = new ArrayList<ProxyMethod>(methodSize);
 	}
 
 	public void addMethod(ProxyMethod method) {
-		transactionMethods.add(method);
+		methods.add(method);
 	}
 	
-	public Class<?> getTransactionComponentClass() {
-		return transactionComponentClass;
+	public Class<?> getClazz() {
+		return clazz;
 	}
-	public List<ProxyMethod> getTransactionMethods() {
-		return transactionMethods;
+	public List<ProxyMethod> getMethods() {
+		return methods;
 	}
 
 	@Override
 	public String toString() {
-		return "TransactionComponentProxyEntity [transactionComponentClass="
-				+ transactionComponentClass.getName() + ", transactionMethods=" + transactionMethods + "]";
+		return "TransactionComponentProxyEntity [clazz="
+				+ clazz.getName() + ", methods=" + methods + "]";
 	}
 }

@@ -9,7 +9,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.douglei.aop.ProxyMethod;
 import com.douglei.tools.instances.resource.scanner.impl.ClassScanner;
 import com.douglei.tools.utils.reflect.ClassLoadUtil;
 
@@ -31,7 +30,7 @@ public class TransactionAnnotationScanner {
 			ClassScanner scanner = new ClassScanner();
 			List<String> classes = scanner.multiScan(scanAll, transactionComponentPackages);
 			if(!classes.isEmpty()) {
-				List<TransactionComponentEntity> transactionComponentEntities = null;
+				List<TransactionComponentEntity> entities = null;
 				
 				Class<?> loadClass = null;
 				Method[] declareMethods = null;
@@ -42,28 +41,26 @@ public class TransactionAnnotationScanner {
 						declareMethods = loadClass.getDeclaredMethods();
 						
 						if(declareMethods.length > 0) {
-							TransactionComponentEntity transactionComponentEntity = null;
-							for (Method dm : declareMethods) {
-								if(dm.getAnnotation(Transaction.class) != null) {
-									if(transactionComponentEntity == null) {
-										transactionComponentEntity = new TransactionComponentEntity(loadClass, declareMethods.length);
-									}
-									transactionComponentEntity.addMethod(new ProxyMethod(dm));
+							TransactionComponentEntity entity = null;
+							for (Method method : declareMethods) {
+								if(method.getAnnotation(Transaction.class) != null) {
+									if(entity == null) 
+										entity = new TransactionComponentEntity(loadClass, declareMethods.length);
+									entity.addMethod(method);
 								}
 							}
 							
-							if(transactionComponentEntity != null) {
-								if(transactionComponentEntities == null) {
-									transactionComponentEntities = new LinkedList<TransactionComponentEntity>();
-								}
-								transactionComponentEntities.add(transactionComponentEntity);
+							if(entity != null) {
+								if(entities == null) 
+									entities = new LinkedList<TransactionComponentEntity>();
+								entities.add(entity);
 							}
 						}
 					}
 				}
 				
-				if(transactionComponentEntities != null) {
-					return transactionComponentEntities;
+				if(entities != null) {
+					return entities;
 				}
 			}
 		}

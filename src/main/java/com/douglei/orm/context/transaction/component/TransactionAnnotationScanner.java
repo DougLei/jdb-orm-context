@@ -59,6 +59,6 @@ public class TransactionAnnotationScanner {
 				}
 			}
 		}
-		throw new IllegalArgumentException("在指定的事务组件包["+Arrays.toString(transactionComponentPackages)+"]中, 没有扫描到事务组件配置");
+		throw new IllegalArgumentException("在指定的事务组件包["+Arrays.toString(transactionComponentPackages)+"]中, 没有扫描到事务组件配置; 如果类配置了@TransactionComponent注解, 其中的方法至少有一个要配置@Transaction注解; 否则类就不要使用@TransactionComponent注解");
 	}
 }

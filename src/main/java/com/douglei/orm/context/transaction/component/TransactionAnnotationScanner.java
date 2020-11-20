@@ -2,12 +2,8 @@ package com.douglei.orm.context.transaction.component;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.douglei.tools.instances.resource.scanner.impl.ClassScanner;
 import com.douglei.tools.utils.reflect.ClassLoadUtil;
@@ -17,7 +13,6 @@ import com.douglei.tools.utils.reflect.ClassLoadUtil;
  * @author DougLei
  */
 public class TransactionAnnotationScanner {
-	private static final Logger logger = LoggerFactory.getLogger(TransactionAnnotationScanner.class);
 	
 	/**
 	 * 根据指定的包路径, 扫描事务组件
@@ -64,7 +59,6 @@ public class TransactionAnnotationScanner {
 				}
 			}
 		}
-		logger.info("在指定的事务组件包["+Arrays.toString(transactionComponentPackages)+"]中, 没有扫描到事务组件配置");
-		return Collections.emptyList();
+		throw new IllegalArgumentException("在指定的事务组件包["+Arrays.toString(transactionComponentPackages)+"]中, 没有扫描到事务组件配置");
 	}
 }

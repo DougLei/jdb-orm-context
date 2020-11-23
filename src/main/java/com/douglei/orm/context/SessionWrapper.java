@@ -98,10 +98,8 @@ class SessionWrapper {
 		this.throwables.add(throwable);
 	}
 	public void throwThrowables() throws Throwable {
-		for(int i=0;i<throwables.size();i++) {
-			if(i+1<throwables.size())
-				throwables.get(i).addSuppressed(throwables.get(i+1));
-		}
+		for(int i=0;i<throwables.size()-1;i++) 
+			throwables.get(i).addSuppressed(throwables.get(i+1));
 		Throwable throwable = throwables.get(0);
 		logger.error(ExceptionUtil.getExceptionDetailMessage(throwable));
 		throw throwable;

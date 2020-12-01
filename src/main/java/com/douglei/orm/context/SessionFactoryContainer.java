@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import com.douglei.aop.ProxyBeanContext;
+import com.douglei.aop.ProxyBeanContainer;
 import com.douglei.orm.configuration.Configuration;
 import com.douglei.orm.configuration.ExternalDataSource;
 import com.douglei.orm.context.transaction.component.TransactionAnnotationScanner;
@@ -86,7 +86,7 @@ public final class SessionFactoryContainer {
 			List<TransactionComponentEntity> transactionComponentEntities = TransactionAnnotationScanner.scan(scanAll, transactionComponentPackages);
 			if(!transactionComponentEntities.isEmpty()) {
 				for (TransactionComponentEntity transactionComponentEntity : transactionComponentEntities) {
-					ProxyBeanContext.createAndAddProxy(transactionComponentEntity.getClazz(), new TransactionProxyInterceptor(transactionComponentEntity.getClazz(), transactionComponentEntity.getMethods()));
+					ProxyBeanContainer.createAndAddProxy(transactionComponentEntity.getClazz(), new TransactionProxyInterceptor(transactionComponentEntity.getClazz(), transactionComponentEntity.getMethods()));
 				}
 			}
 		}

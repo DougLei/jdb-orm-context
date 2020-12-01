@@ -22,43 +22,40 @@ public class TransactionAnnotationScanner {
 	 */
 	public static List<TransactionComponentEntity> scan(boolean scanAll, String... transactionComponentPackages) {
 		if(transactionComponentPackages.length > 0) {
-			ClassScanner scanner = new ClassScanner();
-			List<String> classes = scanner.multiScan(scanAll, transactionComponentPackages);
-			if(!classes.isEmpty()) {
+			List<String> classpaths = new ClassScanner().multiScan(scanAll, transactionComponentPackages);
+			if(!classpaths.isEmpty()) {
 				List<TransactionComponentEntity> entities = null;
 				
-				Class<?> loadClass = null;
-				Method[] declareMethods = null;
-				
-				for (String clz : classes) {
-					loadClass = ClassLoadUtil.loadClass(clz);
-					if(loadClass.getAnnotation(TransactionComponent.class) != null) {
-						declareMethods = loadClass.getDeclaredMethods();
+				Class<?> clazz = null;
+				TransactionComponent transactionComponent = null;
+				TransactionComponentEntity entity = null;
+				for (String classpath : classpaths) {
+					clazz = ClassLoadUtil.loadClass(classpath);
+					transactionComponent = clazz.getAnnotation(TransactionComponent.class);
+					
+					if(transactionComponent != null) {
+						entity = new TransactionComponentEntity(transactionComponent.value(), clazz);
+						do {
+							for (Method method : clazz.getDeclaredMethods()) {
+								if(!method.isAnnotationPresent(Transaction.class))
+									continue;
+								entity.addMethod(method);
+							}
+							clazz = clazz.getSuperclass();
+						}while(clazz != Object.class);
 						
-						if(declareMethods.length > 0) {
-							TransactionComponentEntity entity = null;
-							for (Method method : declareMethods) {
-								if(method.getAnnotation(Transaction.class) != null) {
-									if(entity == null) 
-										entity = new TransactionComponentEntity(loadClass, declareMethods.length);
-									entity.addMethod(method);
-								}
-							}
-							
-							if(entity != null) {
-								if(entities == null) 
-									entities = new LinkedList<TransactionComponentEntity>();
-								entities.add(entity);
-							}
-						}
+						if(entity.getMethods() == null)
+							throw new NullPointerException("["+clazz.getName()+"]类被["+TransactionComponent.class.getName()+"]注解修饰, 但是类中却没有任何方法有["+Transaction.class.getName()+"]注解");
+
+						if(entities == null) 
+							entities = new LinkedList<TransactionComponentEntity>();
+						entities.add(entity);
 					}
 				}
-				
-				if(entities != null) {
+				if(entities != null) 
 					return entities;
-				}
 			}
 		}
-		throw new IllegalArgumentException("在指定的事务组件包["+Arrays.toString(transactionComponentPackages)+"]中, 没有扫描到事务组件配置; 如果类配置了@TransactionComponent注解, 其中的方法至少有一个要配置@Transaction注解; 否则类就不要使用@TransactionComponent注解");
+		throw new IllegalArgumentException("在指定的事务组件包["+Arrays.toString(transactionComponentPackages)+"]中, 没有扫描到["+TransactionComponent.class.getName()+"]配置");
 	}
 }

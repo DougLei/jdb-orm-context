@@ -97,13 +97,13 @@ public final class SessionContext {
 	}
 	
 	// 开启Session
-	static void openSession(boolean beginTransaction, TransactionIsolationLevel transactionIsolationLevel) {
+	static void openSession(boolean isBeginTransaction, TransactionIsolationLevel transactionIsolationLevel) {
 		Stack<SessionWrapper> sessionWrappers = SESSION_WRAPPERS.get();
 		if(sessionWrappers == null || sessionWrappers.isEmpty()) {
 			sessionWrappers = new Stack<SessionWrapper>();
 			SESSION_WRAPPERS.set(sessionWrappers);
 		}
-		Session session = getSessionFactory().openSession(beginTransaction, transactionIsolationLevel);
+		Session session = getSessionFactory().openSession(isBeginTransaction, transactionIsolationLevel);
 		SessionWrapper sessionWrapper = new SessionWrapper(session, transactionIsolationLevel);
 		sessionWrappers.push(sessionWrapper);
 		logger.debug("open session is {}", sessionWrapper);

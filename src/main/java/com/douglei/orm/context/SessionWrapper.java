@@ -48,7 +48,7 @@ class SessionWrapper {
 	public SessionWrapper increment(TransactionIsolationLevel transactionIsolationLevel) {
 		count++;
 		transactionIsolationLevels.add(transactionIsolationLevel);
-		session.setTransactionIsolationLevel(transactionIsolationLevel);
+		session.updateTransactionIsolationLevel(transactionIsolationLevel);
 		return this;
 	}
 	
@@ -60,7 +60,7 @@ class SessionWrapper {
 	public SessionWrapper decrement() {
 		count--;
 		transactionIsolationLevels.remove(count);
-		session.setTransactionIsolationLevel(transactionIsolationLevels.get(count-1));
+		session.updateTransactionIsolationLevel(transactionIsolationLevels.get(count-1));
 		return this;
 	}
 

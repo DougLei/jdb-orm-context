@@ -17,16 +17,10 @@ import com.douglei.orm.context.PropagationBehavior;
 public @interface Transaction {
 	
 	/**
-	 * 传播行为
+	 * 事物传播行为
 	 * @return
 	 */
 	PropagationBehavior propagationBehavior() default PropagationBehavior.REQUIRED;
-	
-	/**
-	 * 是否开启事物
-	 * @return
-	 */
-	boolean beginTransaction() default true;
 	
 	/**
 	 * 事物隔离级别

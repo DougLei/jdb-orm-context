@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.douglei.tools.instances.resource.scanner.impl.ClassScanner;
-import com.douglei.tools.utils.reflect.ClassLoadUtil;
+import com.douglei.tools.utils.reflect.ClassUtil;
 
 /**
  * Transaction注解扫描器
@@ -30,7 +30,7 @@ public class TransactionAnnotationScanner {
 				TransactionComponent transactionComponent = null;
 				TransactionComponentEntity entity = null;
 				for (String classpath : classpaths) {
-					clazz = ClassLoadUtil.loadClass(classpath);
+					clazz = ClassUtil.loadClass(classpath);
 					transactionComponent = clazz.getAnnotation(TransactionComponent.class);
 					
 					if(transactionComponent != null) {

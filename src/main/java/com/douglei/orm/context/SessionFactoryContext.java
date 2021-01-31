@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.douglei.orm.sessionfactory.SessionFactory;
-import com.douglei.tools.utils.StringUtil;
+import com.douglei.tools.StringUtil;
 
 /**
  * jdb-orm SessionFactory 上下文

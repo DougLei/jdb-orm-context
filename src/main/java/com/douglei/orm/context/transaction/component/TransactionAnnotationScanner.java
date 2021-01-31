@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.douglei.tools.instances.resource.scanner.impl.ClassScanner;
-import com.douglei.tools.utils.reflect.ClassUtil;
+import com.douglei.tools.reflect.ClassUtil;
 
 /**
  * Transaction注解扫描器

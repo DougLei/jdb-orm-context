@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.douglei.orm.configuration.environment.datasource.TransactionIsolationLevel;
 import com.douglei.orm.sessionfactory.sessions.Session;
-import com.douglei.tools.utils.ExceptionUtil;
+import com.douglei.tools.ExceptionUtil;
 
 /**
  * 

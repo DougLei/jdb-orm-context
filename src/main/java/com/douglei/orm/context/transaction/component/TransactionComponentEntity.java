@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.douglei.aop.ProxyMethod;
-import com.douglei.tools.utils.StringUtil;
+import com.douglei.tools.StringUtil;
 
 /**
  * 

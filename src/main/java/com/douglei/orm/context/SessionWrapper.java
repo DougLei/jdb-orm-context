@@ -101,7 +101,7 @@ class SessionWrapper {
 		for(int i=0;i<throwables.size()-1;i++) 
 			throwables.get(i).addSuppressed(throwables.get(i+1));
 		Throwable throwable = throwables.get(0);
-		logger.error(ExceptionUtil.getExceptionDetailMessage(throwable));
+		logger.error(ExceptionUtil.getStackTrace(throwable));
 		throw throwable;
 	}
 	

@@ -37,7 +37,7 @@ public class TransactionProxyInterceptor extends ProxyInterceptor{
 			try {
 				transaction = originObject.getClass().getDeclaredMethod(method.getName(), method.getParameterTypes()).getAnnotation(Transaction.class);
 			} catch (Exception e) {
-				logger.error("获取[{}]注解时出现异常: {}", Transaction.class.getName(), ExceptionUtil.getExceptionDetailMessage(e));
+				logger.error("获取[{}]注解时出现异常: {}", Transaction.class.getName(), ExceptionUtil.getStackTrace(e));
 				return null;
 			}
 		}

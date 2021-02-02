@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.douglei.tools.instances.resource.scanner.impl.ClassScanner;
+import com.douglei.tools.file.scanner.impl.ClassScanner;
 import com.douglei.tools.reflect.ClassUtil;
 
 /**
@@ -30,7 +30,7 @@ public class TransactionAnnotationScanner {
 				TransactionComponent transactionComponent = null;
 				TransactionComponentEntity entity = null;
 				for (String classpath : classpaths) {
-					clazz = ClassUtil.loadClass(classpath);
+					clazz = ClassUtil.loadClass2(classpath);
 					transactionComponent = clazz.getAnnotation(TransactionComponent.class);
 					
 					if(transactionComponent != null) {

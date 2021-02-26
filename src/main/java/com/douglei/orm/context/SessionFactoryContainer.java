@@ -10,7 +10,7 @@ import com.douglei.orm.configuration.Configuration;
 import com.douglei.orm.configuration.ExternalDataSource;
 import com.douglei.orm.context.transaction.component.TransactionAnnotationScanner;
 import com.douglei.orm.context.transaction.component.TransactionComponentEntity;
-import com.douglei.orm.mapping.container.MappingContainer;
+import com.douglei.orm.mapping.MappingContainer;
 import com.douglei.orm.sessionfactory.SessionFactory;
 
 /**

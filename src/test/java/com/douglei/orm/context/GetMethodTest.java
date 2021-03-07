@@ -2,8 +2,6 @@ package com.douglei.orm.context;
 
 import java.lang.reflect.Method;
 
-import com.douglei.orm.context.transaction.component.Transaction;
-
 public class GetMethodTest {
 	public static void main(String[] args) throws Exception {
 		Class<?> clz = Class.forName("com.douglei.orm.context.GetMethod");

@@ -11,15 +11,15 @@ import com.douglei.tools.StringUtil;
  * @author DougLei
  */
 class SessionFactoryContext {
-	private static SessionFactory UNIQUE; // 当MAPPING中只有一个SessionFactoryWrapper时, 该属性引用唯一的SessionFactoryWrapper; 当MAPPING中有多个或没有SessionFactoryWrapper时, 该属性都为空
-	private static Map<String, SessionFactory> MAPPING = new HashMap<String, SessionFactory>(4);
+	private static SessionFactory unique; // 当MAPPING中只有一个SessionFactoryWrapper时, 该属性引用唯一的SessionFactoryWrapper; 当MAPPING中有多个或没有SessionFactoryWrapper时, 该属性都为空
+	private static Map<String, SessionFactory> sessionFactoryMapping = new HashMap<String, SessionFactory>(4);
 	
 	// 设置UNIQUE的值
 	private static void setUNIQUE() {
-		if(MAPPING.size() == 1) {
-			UNIQUE = MAPPING.values().iterator().next();
+		if(sessionFactoryMapping.size() == 1) {
+			unique = sessionFactoryMapping.values().iterator().next();
 		}else {
-			UNIQUE = null;
+			unique = null;
 		}
 	}
 	
@@ -31,11 +31,11 @@ class SessionFactoryContext {
 	 */
 	static RegistrationResult register(SessionFactory sessionFactory) throws IdRepeatedException {
 		SessionFactory sf = null;
-		if(!MAPPING.isEmpty())
-			sf = MAPPING.get(sessionFactory.getId());
+		if(!sessionFactoryMapping.isEmpty())
+			sf = sessionFactoryMapping.get(sessionFactory.getId());
 		
 		if(sf == null) {
-			MAPPING.put(sessionFactory.getId(), sessionFactory);
+			sessionFactoryMapping.put(sessionFactory.getId(), sessionFactory);
 			setUNIQUE();
 			return RegistrationResult.SUCCESS;
 		}else {
@@ -51,23 +51,23 @@ class SessionFactoryContext {
 	 * @return
 	 */
 	static SessionFactory get() {
-		if(MAPPING.isEmpty())
+		if(sessionFactoryMapping.isEmpty())
 			throw new NullPointerException("不存在任何SessionFactory实例");
 		
 		String id = SessionFactoryIdHolder.getId();
 		if(StringUtil.isEmpty(id)) {
-			if(UNIQUE == null) // 说明有多个数据源
+			if(unique == null) // 说明有多个数据源
 				throw new NullPointerException("请指定要获取SessionFactory的实例id值");
-			return UNIQUE;
+			return unique;
 		}
 		
-		if(UNIQUE != null) {
-			if(id.equals(UNIQUE.getId()))
-				return UNIQUE;
+		if(unique != null) {
+			if(id.equals(unique.getId()))
+				return unique;
 			throw new NullPointerException("不存在id为"+id+"的SessionFactory实例, get失败");
 		}
 		
-		SessionFactory sf = MAPPING.get(id);
+		SessionFactory sf = sessionFactoryMapping.get(id);
 		if(sf == null)
 			throw new NullPointerException("不存在id为"+id+"的SessionFactory实例, get失败");
 		return sf;
@@ -80,10 +80,10 @@ class SessionFactoryContext {
 	 * @return 
 	 */
 	static SessionFactory remove(String id, boolean destroy) {
-		if(MAPPING.isEmpty())
+		if(sessionFactoryMapping.isEmpty())
 			throw new NullPointerException("不存在任何SessionFactory实例");
 		
-		SessionFactory sf = MAPPING.remove(id);
+		SessionFactory sf = sessionFactoryMapping.remove(id);
 		if(sf == null)
 			throw new NullPointerException("不存在id为"+id+"的SessionFactory实例, "+(destroy?"destroy":"remove")+"失败");
 		

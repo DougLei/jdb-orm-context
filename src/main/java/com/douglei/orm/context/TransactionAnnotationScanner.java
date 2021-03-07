@@ -1,4 +1,4 @@
-package com.douglei.orm.context.transaction.component;
+package com.douglei.orm.context;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -22,17 +22,13 @@ public class TransactionAnnotationScanner {
 	 */
 	public static List<TransactionComponentEntity> scan(boolean scanAll, String... transactionComponentPackages) {
 		if(transactionComponentPackages.length > 0) {
-			List<String> classpaths = new ClassScanner().multiScan(scanAll, transactionComponentPackages);
-			if(!classpaths.isEmpty()) {
+			List<String> classes = new ClassScanner().multiScan(scanAll, transactionComponentPackages);
+			if(!classes.isEmpty()) {
 				List<TransactionComponentEntity> entities = null;
-				
-				Class<?> clazz = null;
-				TransactionComponent transactionComponent = null;
 				TransactionComponentEntity entity = null;
-				for (String classpath : classpaths) {
-					clazz = ClassUtil.loadClass2(classpath);
-					transactionComponent = clazz.getAnnotation(TransactionComponent.class);
-					
+				for (String clz : classes) {
+					Class<?> clazz = ClassUtil.loadClass2(clz);
+					TransactionComponent transactionComponent = clazz.getAnnotation(TransactionComponent.class);
 					if(transactionComponent != null) {
 						entity = new TransactionComponentEntity(transactionComponent.value(), clazz);
 						do {

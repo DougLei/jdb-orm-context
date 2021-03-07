@@ -1,7 +1,5 @@
 package com.douglei.orm.context;
 
-import com.douglei.orm.context.transaction.component.Transaction;
-
 public class GetMethod {
 	
 	public void public_method() {

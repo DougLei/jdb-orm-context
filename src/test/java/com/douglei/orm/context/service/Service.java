@@ -3,7 +3,7 @@ package com.douglei.orm.context.service;
 import com.douglei.aop.ProxyBeanContainer;
 import com.douglei.orm.context.PropagationBehavior;
 import com.douglei.orm.context.SessionContext;
-import com.douglei.orm.context.transaction.component.Transaction;
+import com.douglei.orm.context.Transaction;
 
 public class Service {
 

@@ -3,13 +3,10 @@ package com.douglei.orm.context;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 import com.douglei.aop.ProxyBeanContainer;
 import com.douglei.orm.configuration.Configuration;
 import com.douglei.orm.configuration.ExternalDataSource;
-import com.douglei.orm.context.transaction.component.TransactionAnnotationScanner;
-import com.douglei.orm.context.transaction.component.TransactionComponentEntity;
 import com.douglei.orm.mapping.MappingContainer;
 import com.douglei.orm.sessionfactory.SessionFactory;
 
@@ -37,7 +34,7 @@ public final class SessionFactoryContainer {
 	 */
 	public RegistrationResult registerByFile(String file, ExternalDataSource dataSource, MappingContainer mappingContainer) throws IdRepeatedException {
 		InputStream input = SessionFactoryContainer.class.getClassLoader().getResourceAsStream(file);
-		return registerByStream(input, dataSource, mappingContainer, false);
+		return registerByInputStream(input, dataSource, mappingContainer, false);
 	}
 	
 	/**
@@ -49,7 +46,7 @@ public final class SessionFactoryContainer {
 	 * @throws IdRepeatedException 
 	 */
 	public RegistrationResult registerByContent(String content, ExternalDataSource dataSource, MappingContainer mappingContainer) throws IdRepeatedException {
-		return registerByStream(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)), dataSource, mappingContainer, false);
+		return registerByInputStream(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)), dataSource, mappingContainer, false);
 	}
 	
 	/**
@@ -61,7 +58,7 @@ public final class SessionFactoryContainer {
 	 * @throws IdRepeatedException 
 	 */
 	public RegistrationResult registerByStream(InputStream input, ExternalDataSource dataSource, MappingContainer mappingContainer) throws IdRepeatedException {
-		return registerByStream(input, dataSource, mappingContainer, false);
+		return registerByInputStream(input, dataSource, mappingContainer, false);
 	}
 	
 	
@@ -75,7 +72,7 @@ public final class SessionFactoryContainer {
 	 * @return
 	 * @throws IdRepeatedException 
 	 */
-	public RegistrationResult registerByStream(InputStream input, ExternalDataSource dataSource, MappingContainer mappingContainer, boolean scanAll, String... transactionComponentPackages) throws IdRepeatedException {
+	public RegistrationResult registerByInputStream(InputStream input, ExternalDataSource dataSource, MappingContainer mappingContainer, boolean scanAll, String... transactionComponentPackages) throws IdRepeatedException {
 		Configuration configuration = new Configuration();
 		configuration.setExternalDataSource(dataSource);
 		configuration.setMappingContainer(mappingContainer);
@@ -83,14 +80,10 @@ public final class SessionFactoryContainer {
 		
 		// 根据包路径扫描事务组件
 		if(transactionComponentPackages.length > 0) {
-			List<TransactionComponentEntity> transactionComponentEntities = TransactionAnnotationScanner.scan(scanAll, transactionComponentPackages);
-			if(!transactionComponentEntities.isEmpty()) {
-				for (TransactionComponentEntity transactionComponentEntity : transactionComponentEntities) {
-					ProxyBeanContainer.createAndAddProxy(transactionComponentEntity.getClazz(), new TransactionProxyInterceptor(transactionComponentEntity.getClazz(), transactionComponentEntity.getMethods()));
-				}
-			}
+			TransactionAnnotationScanner.scan(scanAll, transactionComponentPackages).forEach(entity -> {
+				ProxyBeanContainer.createAndAddProxy(entity.getClazz(), new TransactionProxyInterceptor(entity.getMethods()));
+			});
 		}
-		
 		return register(sessionFactory);
 	}
 	
@@ -116,8 +109,8 @@ public final class SessionFactoryContainer {
 	}
 	
 	/**
-	 * 获取SessionFactory
-	 * @param id 指定SessionFactory id
+	 * 获取指定id的SessionFactory
+	 * @param id
 	 * @return
 	 */
 	public SessionFactory get(String id) {
@@ -128,7 +121,7 @@ public final class SessionFactoryContainer {
 	/**
 	 * 移除SessionFactory
 	 * @param id
-	 * @param destroy 是否在移除的同时进行销毁
+	 * @param destroy 是否在移除的同时销毁SessionFactory
 	 * @return 
 	 */
 	public synchronized SessionFactory remove(String id, boolean destroy) {

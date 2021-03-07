@@ -76,10 +76,10 @@ public final class SessionFactoryContainer {
 	 * @throws IdRepeatedException 
 	 */
 	public RegistrationResult registerByStream(InputStream input, ExternalDataSource dataSource, MappingContainer mappingContainer, boolean scanAll, String... transactionComponentPackages) throws IdRepeatedException {
-		Configuration configuration = new Configuration(input);
+		Configuration configuration = new Configuration();
 		configuration.setExternalDataSource(dataSource);
 		configuration.setMappingContainer(mappingContainer);
-		SessionFactory sessionFactory = configuration.buildSessionFactory();
+		SessionFactory sessionFactory = configuration.buildSessionFactory(input);
 		
 		// 根据包路径扫描事务组件
 		if(transactionComponentPackages.length > 0) {

@@ -25,15 +25,15 @@ public final class SessionFactoryContainer {
 	// 注册SessionFactory
 	// --------------------------------------------------------------------------------------------
 	/**
-	 * 通过配置文件, 注册SessionFactory实例
-	 * @param file
+	 * 通过配置文件(基于java resource), 注册SessionFactory实例
+	 * @param filepath 
 	 * @param dataSource 可为空
 	 * @param mappingContainer 可为空
 	 * @return
 	 * @throws IdRepeatedException 
 	 */
-	public RegistrationResult registerByFile(String file, ExternalDataSource dataSource, MappingContainer mappingContainer) throws IdRepeatedException {
-		InputStream input = SessionFactoryContainer.class.getClassLoader().getResourceAsStream(file);
+	public RegistrationResult registerByFile(String filepath, ExternalDataSource dataSource, MappingContainer mappingContainer) throws IdRepeatedException {
+		InputStream input = SessionFactoryContainer.class.getClassLoader().getResourceAsStream(filepath);
 		return registerByInputStream(input, dataSource, mappingContainer, false);
 	}
 	

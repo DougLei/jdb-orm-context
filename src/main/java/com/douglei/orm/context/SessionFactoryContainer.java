@@ -80,7 +80,7 @@ public final class SessionFactoryContainer {
 		
 		// 根据包路径扫描事务组件
 		if(transactionComponentPackages.length > 0) {
-			TransactionAnnotationScanner.scan(scanAll, transactionComponentPackages).forEach(entity -> {
+			TransactionScanner.scan(scanAll, transactionComponentPackages).forEach(entity -> {
 				ProxyBeanContainer.createAndAddProxy(entity.getClazz(), new TransactionProxyInterceptor(entity.getMethods()));
 			});
 		}

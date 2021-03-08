@@ -12,7 +12,7 @@ import com.douglei.tools.reflect.ClassUtil;
  * Transaction注解扫描器
  * @author DougLei
  */
-public class TransactionAnnotationScanner {
+public class TransactionScanner {
 	
 	/**
 	 * 根据指定的包路径, 扫描事务组件

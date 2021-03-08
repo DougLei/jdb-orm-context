@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 public @interface TransactionComponent {
 	
 	/**
-	 * 设置组件的名称; 默认名称为类的SimpleName, 首字母小写
+	 * 设置组件的名称; 默认名称为类的simpleName, 首字母小写
 	 * @return
 	 */
 	String value() default "";

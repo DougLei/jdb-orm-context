@@ -27,9 +27,8 @@ class SessionFactoryContext {
 	 * 注册SessionFactory
 	 * @param sessionFactory
 	 * @return 
-	 * @throws IdRepeatedException 
 	 */
-	static RegistrationResult register(SessionFactory sessionFactory) throws IdRepeatedException {
+	static RegistrationResult register(SessionFactory sessionFactory) {
 		SessionFactory sf = null;
 		if(!sessionFactoryMapping.isEmpty())
 			sf = sessionFactoryMapping.get(sessionFactory.getId());
@@ -38,12 +37,12 @@ class SessionFactoryContext {
 			sessionFactoryMapping.put(sessionFactory.getId(), sessionFactory);
 			setUNIQUE();
 			return RegistrationResult.SUCCESS;
-		}else {
-			if(sf != sessionFactory)
-				throw new IdRepeatedException(sessionFactory.getId());
-			setUNIQUE();
-			return RegistrationResult.ALREADY_EXISTS;
 		}
+		
+		if(sf != sessionFactory)
+			throw new OrmContextException("已经存在id为"+sessionFactory.getId()+"的实例");
+		setUNIQUE();
+		return RegistrationResult.ALREADY_EXISTS;
 	}
 	
 	/**
@@ -52,24 +51,24 @@ class SessionFactoryContext {
 	 */
 	static SessionFactory get() {
 		if(sessionFactoryMapping.isEmpty())
-			throw new NullPointerException("不存在任何SessionFactory实例");
+			throw new OrmContextException("不存在任何SessionFactory实例");
 		
 		String id = SessionFactoryIdHolder.getId();
 		if(StringUtil.isEmpty(id)) {
 			if(unique == null) // 说明有多个数据源
-				throw new NullPointerException("请指定要获取SessionFactory的实例id值");
+				throw new OrmContextException("请指定要获取SessionFactory的实例id值");
 			return unique;
 		}
 		
 		if(unique != null) {
 			if(id.equals(unique.getId()))
 				return unique;
-			throw new NullPointerException("不存在id为"+id+"的SessionFactory实例, get失败");
+			throw new OrmContextException("不存在id为"+id+"的SessionFactory实例, get失败");
 		}
 		
 		SessionFactory sf = sessionFactoryMapping.get(id);
 		if(sf == null)
-			throw new NullPointerException("不存在id为"+id+"的SessionFactory实例, get失败");
+			throw new OrmContextException("不存在id为"+id+"的SessionFactory实例, get失败");
 		return sf;
 	}
 	
@@ -81,11 +80,11 @@ class SessionFactoryContext {
 	 */
 	static SessionFactory remove(String id, boolean destroy) {
 		if(sessionFactoryMapping.isEmpty())
-			throw new NullPointerException("不存在任何SessionFactory实例");
+			throw new OrmContextException("不存在任何SessionFactory实例");
 		
 		SessionFactory sf = sessionFactoryMapping.remove(id);
 		if(sf == null)
-			throw new NullPointerException("不存在id为"+id+"的SessionFactory实例, "+(destroy?"destroy":"remove")+"失败");
+			throw new OrmContextException("不存在id为"+id+"的SessionFactory实例, "+(destroy?"destroy":"remove")+"失败");
 		
 		if(destroy)
 			sf.destroy();

@@ -16,9 +16,9 @@ import com.douglei.orm.sessionfactory.SessionFactory;
  */
 public final class SessionFactoryContainer {
 	private SessionFactoryContainer(){}
-	private static SessionFactoryContainer singleton = new SessionFactoryContainer();
+	private static final SessionFactoryContainer SINGLETON = new SessionFactoryContainer();
 	public static SessionFactoryContainer getSingleton() {
-		return singleton;
+		return SINGLETON;
 	}
 	
 	// --------------------------------------------------------------------------------------------
@@ -30,9 +30,9 @@ public final class SessionFactoryContainer {
 	 * @param dataSource 可为空
 	 * @param mappingContainer 可为空
 	 * @return
-	 * @throws IdRepeatedException 
+	 * @throws OrmContextException 
 	 */
-	public RegistrationResult registerByFile(String filepath, ExternalDataSource dataSource, MappingContainer mappingContainer) throws IdRepeatedException {
+	public RegistrationResult registerByFile(String filepath, ExternalDataSource dataSource, MappingContainer mappingContainer) throws OrmContextException {
 		InputStream input = SessionFactoryContainer.class.getClassLoader().getResourceAsStream(filepath);
 		return registerByInputStream(input, dataSource, mappingContainer, false);
 	}
@@ -43,9 +43,9 @@ public final class SessionFactoryContainer {
 	 * @param dataSource
 	 * @param mappingContainer
 	 * @return 
-	 * @throws IdRepeatedException 
+	 * @throws OrmContextException 
 	 */
-	public RegistrationResult registerByContent(String content, ExternalDataSource dataSource, MappingContainer mappingContainer) throws IdRepeatedException {
+	public RegistrationResult registerByContent(String content, ExternalDataSource dataSource, MappingContainer mappingContainer) throws OrmContextException {
 		return registerByInputStream(new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8)), dataSource, mappingContainer, false);
 	}
 	
@@ -55,9 +55,9 @@ public final class SessionFactoryContainer {
 	 * @param dataSource
 	 * @param mappingContainer
 	 * @return 
-	 * @throws IdRepeatedException 
+	 * @throws OrmContextException 
 	 */
-	public RegistrationResult registerByStream(InputStream input, ExternalDataSource dataSource, MappingContainer mappingContainer) throws IdRepeatedException {
+	public RegistrationResult registerByStream(InputStream input, ExternalDataSource dataSource, MappingContainer mappingContainer) throws OrmContextException {
 		return registerByInputStream(input, dataSource, mappingContainer, false);
 	}
 	
@@ -70,9 +70,9 @@ public final class SessionFactoryContainer {
 	 * @param scanAll
 	 * @param transactionComponentPackages
 	 * @return
-	 * @throws IdRepeatedException 
+	 * @throws OrmContextException 
 	 */
-	public RegistrationResult registerByInputStream(InputStream input, ExternalDataSource dataSource, MappingContainer mappingContainer, boolean scanAll, String... transactionComponentPackages) throws IdRepeatedException {
+	public RegistrationResult registerByInputStream(InputStream input, ExternalDataSource dataSource, MappingContainer mappingContainer, boolean scanAll, String... transactionComponentPackages) throws OrmContextException {
 		Configuration configuration = new Configuration();
 		configuration.setExternalDataSource(dataSource);
 		configuration.setMappingContainer(mappingContainer);
@@ -91,9 +91,8 @@ public final class SessionFactoryContainer {
 	 * 注册SessionFactory实例
 	 * @param sessionFactory
 	 * @return
-	 * @throws IdRepeatedException 
 	 */
-	public synchronized RegistrationResult register(SessionFactory sessionFactory) throws IdRepeatedException {
+	public synchronized RegistrationResult register(SessionFactory sessionFactory) {
 		return SessionFactoryContext.register(sessionFactory);
 	}
 	

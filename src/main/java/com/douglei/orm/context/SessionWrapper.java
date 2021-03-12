@@ -16,14 +16,12 @@ import com.douglei.tools.ExceptionUtil;
  */
 class SessionWrapper {
 	private static final Logger logger = LoggerFactory.getLogger(SessionWrapper.class);
-	static final byte COMMIT = 1; // 事物执行模式为commit: 1
-	static final byte ROLLBACK = 2; // 事物执行模式为rollback: 2
 	
 	private Session session;
 	private byte count; // 被多少个方法使用
 	private List<TransactionIsolationLevel> transactionIsolationLevels;
 	private List<Throwable> throwables;
-	private byte transactionExecuteMode; // 指定的事物执行模式, 在最后commit/rollback时, 如果有指定, 则根据指定的来执行, 否则按照程序逻辑执行
+	private TransactionExecuteMoe transactionExecuteMode; // 事物执行模式, 在最后commit/rollback时, 如果有指定, 则根据指定的来执行, 否则按照程序逻辑执行
 	
 	SessionWrapper(Session session, TransactionIsolationLevel transactionIsolationLevel) {
 		this.session = session;
@@ -54,7 +52,6 @@ class SessionWrapper {
 	
 	/**
 	 * 当前Session的使用次数减1, 且设置上一个事物隔离级别
-	 * @param transactionIsolationLevel
 	 * @return
 	 */
 	public SessionWrapper decrement() {
@@ -65,18 +62,18 @@ class SessionWrapper {
 	}
 
 	/**
-	 * 设置事物执行的模式; 模式值为: {@link SessionWrapper.COMMIT}, {@link SessionWrapper.ROLLBACK}
+	 * 设置事物执行的模式
 	 * @param transactionExecuteMode
 	 */
-	public void setTransactionExecuteMode(byte transactionExecuteMode) {
+	public void setTransactionExecuteMode(TransactionExecuteMoe transactionExecuteMode) {
 		this.transactionExecuteMode = transactionExecuteMode;
 	}
 	
 	/**
-	 * 获取事物执行的模式; 模式值为: {@link SessionWrapper.COMMIT}, {@link SessionWrapper.ROLLBACK}
+	 * 获取事物执行的模式
 	 * @return
 	 */
-	public byte getTransactionExecuteMode() {
+	public TransactionExecuteMoe getTransactionExecuteMode() {
 		return transactionExecuteMode;
 	}
 	
@@ -117,4 +114,12 @@ class SessionWrapper {
 	public String toString() {
 		return session.toString();
 	}
+}
+
+/**
+ * 事物执行模式
+ * @author DougLei
+ */
+enum TransactionExecuteMoe{
+	COMMIT, ROLLBACK;
 }

@@ -9,6 +9,7 @@ import com.douglei.orm.configuration.environment.datasource.TransactionIsolation
 import com.douglei.orm.sessionfactory.SessionFactory;
 import com.douglei.orm.sessionfactory.sessions.Session;
 import com.douglei.orm.sessionfactory.sessions.session.sql.SQLSession;
+import com.douglei.orm.sessionfactory.sessions.session.sqlquery.SQLQuerySession;
 import com.douglei.orm.sessionfactory.sessions.session.table.TableSession;
 import com.douglei.orm.sessionfactory.sessions.sqlsession.SqlSession;
 
@@ -64,17 +65,25 @@ public final class SessionContext {
 	}
 	
 	/**
+	 * 获取SQLQuerySession实例
+	 * @return
+	 */
+	public static SQLQuerySession getSQLQuerySession() {
+		return getSession().getSQLQuerySession();
+	}
+	
+	/**
 	 * 对当前事物进行commit, 会覆盖原本事物要执行的commit或rollback, 可以理解为手动(强制)提交
 	 */
 	public static void executeCommit() {
-		getSessionWrapper().setTransactionExecuteMode(SessionWrapper.COMMIT);
+		getSessionWrapper().setTransactionExecuteMode(TransactionExecuteMoe.COMMIT);
 	}
 	
 	/**
 	 * 对当前事物进行rollback, 会覆盖原本事物要执行的commit或rollback, 可以理解为手动(强制)回滚
 	 */
 	public static void executeRollback() {
-		getSessionWrapper().setTransactionExecuteMode(SessionWrapper.ROLLBACK);
+		getSessionWrapper().setTransactionExecuteMode(TransactionExecuteMoe.ROLLBACK);
 	}
 	
 	// 获取SessionWrapper实例

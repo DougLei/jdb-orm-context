@@ -12,7 +12,7 @@ public enum PropagationBehavior {
 	REQUIRED,
 	
 	/**
-	 * 需要事物: 无论当前存不存在连接, 连接是否开启事务, 都创建一个带事物的新连接
+	 * 需要新事物: 无论当前存不存在连接, 连接是否开启事务, 都创建一个带事物的新连接
 	 */
 	REQUIRED_NEW,
 	

@@ -80,7 +80,7 @@ public class TransactionProxyInterceptor extends ProxyInterceptor{
 	protected Object after_(Object originObject, Method method, Object[] args, Object result) throws Throwable {
 		SessionWrapper sessionWrapper = SessionContext.getSessionWrapper();
 		if(sessionWrapper.readyCommit()) {
-			if(sessionWrapper.getTransactionExecuteMode() == SessionWrapper.ROLLBACK) {
+			if(sessionWrapper.getTransactionExecuteMode() == TransactionExecuteMoe.ROLLBACK) {
 				logger.debug("{} session do rollback by executeRollback", sessionWrapper);
 				sessionWrapper.getSession().rollback();
 			}else {
@@ -96,7 +96,7 @@ public class TransactionProxyInterceptor extends ProxyInterceptor{
 		SessionWrapper sessionWrapper = SessionContext.getSessionWrapper();
 		sessionWrapper.addThrowable(t);
 		if(sessionWrapper.ready()) {
-			if(sessionWrapper.getTransactionExecuteMode() == SessionWrapper.COMMIT) {
+			if(sessionWrapper.getTransactionExecuteMode() == TransactionExecuteMoe.COMMIT) {
 				logger.debug("{} session do commit by executeCommit", sessionWrapper);
 				sessionWrapper.getSession().commit();
 			}else {

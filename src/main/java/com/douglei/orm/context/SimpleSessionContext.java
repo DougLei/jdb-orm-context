@@ -29,7 +29,7 @@ public class SimpleSessionContext {
 	 * @return
 	 */
 	public static Session getSession(boolean beginTransaction) {
-		return getSession(beginTransaction, null);
+		return getSession(beginTransaction, TransactionIsolationLevel.DEFAULT);
 	}
 	
 	/**

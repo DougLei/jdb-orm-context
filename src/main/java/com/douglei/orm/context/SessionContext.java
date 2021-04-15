@@ -14,7 +14,7 @@ import com.douglei.orm.sessionfactory.sessions.session.table.TableSession;
 import com.douglei.orm.sessionfactory.sessions.sqlsession.SqlSession;
 
 /**
- * 通过@Transaction注解, 由系统自行控制session的的commit/rollback/close
+ * 
  * @author DougLei
  */
 public final class SessionContext {
